@@ -1,0 +1,11 @@
+.text-editor .ql-container {
+  border-radius: 0 0 4px 4px;
+  background-color: white;
+  border-color: #9ca3af;
+}
+
+.text-editor .ql-toolbar {
+  border-radius: 4px 4px 0 0;
+  background-color: white;
+  border-color: #9ca3af;
+}

@@ -1,0 +1,36 @@
+.hint-wrapper .hint-word {
+    position: relative;
+    display: inline-block;
+}
+
+.hint-wrapper .hint-word .slot-indicator {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    pointer-events: none;
+}
+
+.hint-wrapper .hint-word input {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    margin-bottom: 4px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    background-color: rgb(194, 219, 198);
+    border-color: transparent;
+    border-radius: .2rem;
+    border-width: 0px;
+    flex: 1 1 0%;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+.hint-wrapper input:focus {
+    border-color: rgba(224, 35, 41)
+}
+
+.wrong-hint-word {
+    background-color: rgba(224, 35, 41, 0.2) !important;
+}

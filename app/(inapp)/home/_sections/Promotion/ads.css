@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .slick-dots .slick-active button:before {
+    color: #e02329 !important;
+  }
+}

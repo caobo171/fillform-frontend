@@ -1,0 +1,5 @@
+.newsfeed-post-content img {
+  width: 100% !important;
+  height: auto;
+  border-radius: 8px;
+}
