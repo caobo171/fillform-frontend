@@ -1,11 +1,11 @@
 import Head from 'next/head';
 
 function Meta({
-  title = 'WELE - Nghe chép chính tả',
+  title = 'Fillform - Nghe chép chính tả',
   keywords = 'Nghe chép chính tả, tự học tiếng anh, học tiếng anh miễn phí',
   url = '',
   image = '',
-  description = 'WELE là chương trình luyện nghe Tiếng Anh miễn phí và sử dụng phương pháp nghe chép chính tả.',
+  description = 'Fillform là chương trình luyện nghe Tiếng Anh miễn phí và sử dụng phương pháp nghe chép chính tả.',
 }: {
   title: string;
   keywords?: string;
@@ -30,7 +30,7 @@ function Meta({
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url || 'https://wele-learn.com/'} />
-      <meta property="og:site_name" content="WELE" />
+      <meta property="og:site_name" content="Fillform" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta

@@ -133,7 +133,7 @@ export const UserPicker = ({ users, setUsers, onAddUser, onRemoveUser, managed }
                                         onClick={() => onClickHandle(user)}
                                         key={user.id}
                                         className={`rounded ${index == current_index ? 'bg-gray-200' : ''}`}
-                                    >{user.fullname} (@{user.username})</li>
+                                    >{user.username} (@{user.username})</li>
                                 ))
                             }
                         </ul>
@@ -151,10 +151,10 @@ export const UserItem = ({ user_id, onRemoveUser, managed }: { user_id: number, 
         return null;
     }
     return (<>
-        <div data-tip={user.fullname} className="rounded-full flex items-center justify-center relative h-10 w-10" style={{ background: UI.getColorByString(user.fullname), userSelect: 'none', marginLeft: -8, border: '2px solid #fff' }}>
+        <div data-tip={user.username} className="rounded-full flex items-center justify-center relative h-10 w-10" style={{ background: UI.getColorByString(user.username), userSelect: 'none', marginLeft: -8, border: '2px solid #fff' }}>
             {user.avatar ?
                 <Image width={32} alt={user.username} className="object-cover rounded-full" src={Constants.IMAGE_URL + Helper.normalizeUrl(user.avatar)} /> :
-                <div className="text-white uppercase flex items-center justify-center font-semibold">{user.fullname[0]}</div>}
+                <div className="text-white uppercase flex items-center justify-center font-semibold">{user.username[0]}</div>}
             <div className="absolute w-full h-full top-0 left-0 opacity-0 hover:opacity-100 transition-all duration-200">
                 {managed && <div
                     onClick={() => onRemoveUser && onRemoveUser(user)}

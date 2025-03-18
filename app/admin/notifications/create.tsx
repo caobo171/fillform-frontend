@@ -70,7 +70,7 @@ const Create = () => {
     }
 
     return (<>
-        <Meta title={`WELE | Tạo Notification`} />
+        <Meta title={`Fillform | Tạo Notification`} />
         <div className="w-full px-5 py-5 rounded-lg shadow">
             <div className="w-full flex flex-wrap">
                 <div className="w-full semi-lg:w-2/3">

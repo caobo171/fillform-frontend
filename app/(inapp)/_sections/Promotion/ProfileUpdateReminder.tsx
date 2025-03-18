@@ -32,7 +32,7 @@ export function ProfileUpdateReminder() {
     >
       <div className="flex items-center justify-center gap-4">
         <p className="text-sm font-bold text-white">
-          Cập nhật profile, nhận ngay WELE coins
+          Cập nhật profile, nhận ngay Fillform coins
         </p>
 
         <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center group-hover:translate-x-1 duration-200">

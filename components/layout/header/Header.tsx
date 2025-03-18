@@ -27,10 +27,6 @@ type HeaderProps = {
 export function Header({ menu, searchUrl, children }: HeaderProps) {
   const { data, error, isLoading } = useMe();
 
-  const sub = MeHook.useSubscription();
-
-  const isPremiumUser = useMemo(() => Helper.isPremiumUser(sub), [sub]);
-
   const [openMobileMenu, setOpenMobileMenu] = useState<boolean>(false);
 
   const [{ y }] = useWindowScroll();
@@ -66,10 +62,10 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
 
         <NotificationButton />
 
-        <UserMenu data={data} isPremium={isPremiumUser} />
+        <UserMenu data={data} />
       </>
     );
-  }, [isLoading, data, error, isPremiumUser]);
+  }, [isLoading, data, error]);
 
   return (
     <NotificationContextProvider>

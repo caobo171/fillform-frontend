@@ -58,7 +58,7 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
       { name: 'Manage account', href: '/user/account' },
       {
         name: 'Profile page',
-        href: `/profile/${Helper.generateCode(user ? user.fullname : '')}/${user?.id}`,
+        href: `/profile/${Helper.generateCode(user ? user.username : '')}/${user?.id}`,
       },
     ];
 
@@ -66,19 +66,6 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
       items.push({ name: 'Admin', href: '/admin' });
     }
 
-    if (ACL.isContentCreator(user) || Number(sub?.is_paid_premium)) {
-      items.push({
-        name: 'Manage content',
-        href: '/content-creator/podcasts',
-      });
-    }
-
-    if (ACL.isTeacher(user)) {
-      items.push({
-        name: 'Manage class',
-        href: '/teacher/podcasts',
-      });
-    }
 
     return items;
   }, [user]);
@@ -102,12 +89,12 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
           <div className="w-full flex items-center justify-between">
             {user ? (
               <Link
-                href={`/profile/${Helper.generateCode(user.fullname)}/${user?.id}`}
+                href={`/profile/${Helper.generateCode(user.username)}/${user?.id}`}
                 className="flex gap-4 cursor-pointer"
               >
                 <Avatar user={user} unlink size={40} />
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-900">{user.fullname}</span>
+                  <span className="text-sm text-gray-900">{user.username}</span>
                   <span className="text-xs text-gray-500">
                     {user?.username}
                   </span>

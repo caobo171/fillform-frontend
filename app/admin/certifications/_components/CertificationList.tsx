@@ -116,7 +116,7 @@ const CertificationList = () => {
   }, [search_params.toString(), reload, me])
 
   return (<>
-    <Meta title={`WELE | Certifications`} />
+    <Meta title={`Fillform | Certifications`} />
     <Link className="fixed bottom-14 right-14 cursor-pointer px-2 py-2 text-white flex items-center justify-center bg-primary hover:bg-primary-dark rounded-full shadow-md text-2xl " href='/admin/certifications/create'>
       <span><FaPlus /> </span>
     </Link>

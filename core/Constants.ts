@@ -438,7 +438,7 @@ export const Pricing = {
       },
       features: [
         'Tất cả tính năng của bản Free',
-        'Cho phép đăng bài nghe lên trên hệ thống WELE',
+        'Cho phép đăng bài nghe lên trên hệ thống Fillform',
         'Cho phép tạo danh sách bài nghe riêng phù hợp với nhu cầu sử dụng',
         'Tự động nhắc nhở luyện tập với những từ nghe sai',
         'Hỗ trợ mobile app',

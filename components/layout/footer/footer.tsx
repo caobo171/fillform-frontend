@@ -132,7 +132,7 @@ export function LayoutFooter() {
         </div>
 
         <div className="text-sm text-gray-500 py-6 border-t border-solid border-gray-100">
-          © Copyright {new Date().getFullYear()} - WELE
+          © Copyright {new Date().getFullYear()} - Fillform
         </div>
       </Container>
     </footer>

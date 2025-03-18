@@ -77,7 +77,7 @@ const Edit = ({ notification }: { notification: RawSystemNotification }) => {
     }
 
     return (<>
-        <Meta title={`WELE | Notification ${notification.id}`} />
+        <Meta title={`Fillform | Notification ${notification.id}`} />
         <div className="w-full px-5 py-5 rounded-lg shadow">
             <div className="w-full flex flex-wrap">
                 <div className="w-full semi-lg:w-2/3">

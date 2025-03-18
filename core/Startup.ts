@@ -26,8 +26,6 @@ class Startup {
 			access_token = Helper.getURLParam('access_token');
 		}
 
-
-
 		if (access_token) {
 			Cookie.set("access_token", access_token, 100);
 			try {
@@ -41,7 +39,6 @@ class Startup {
 
 		}
 
-		await PodcastCollectionFunctions.loadAll();
 		LogEvent.sendEvent("first.event");
 	}
 }

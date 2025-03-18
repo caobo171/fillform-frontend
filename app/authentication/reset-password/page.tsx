@@ -73,7 +73,7 @@ function ResetPassword() {
   if (success) {
     return (
       <>
-        <Meta title="WELE | Thay đổi mật khẩu" />
+        <Meta title="Fillform | Thay đổi mật khẩu" />
 
         <div className="w-screen h-screen flex items-start justify-center bg-gray-50">
           <div className="w-full sm:w-[468px] flex flex-col my-4 sm:my-20 mx-4 sm:mx-0 p-10 shadow-sm rounded-lg ring-1 ring-gray-100 bg-white">
@@ -107,7 +107,7 @@ function ResetPassword() {
 
   return (
     <>
-      <Meta title="WELE | Thay đổi mật khẩu" />
+      <Meta title="Fillform | Thay đổi mật khẩu" />
 
       <div className="w-screen h-screen flex items-start justify-center bg-gray-50">
         <div className="w-full sm:w-[468px] flex flex-col my-4 sm:my-20 mx-4 sm:mx-0 p-10 shadow-sm rounded-lg ring-1 ring-gray-100 bg-white">

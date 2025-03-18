@@ -347,7 +347,7 @@ export class Helper {
       return `${action_log.content}`;
     }
 
-    return 'Welcome to WELE';
+    return 'Welcome to Fillform';
   }
 
   static mapPointToRank = (points: number[]) => {

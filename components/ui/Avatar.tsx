@@ -40,7 +40,7 @@ function Avatar({ user, size, unlink, className, textClassName }: Props) {
   if (unlink) {
     return (
       <div
-        title={user.fullname}
+        title={user.username}
         style={{ ...style }}
         className={clsx(
           'rounded-full flex justify-center items-center ring-2 ring-gray-100 overflow-hidden',

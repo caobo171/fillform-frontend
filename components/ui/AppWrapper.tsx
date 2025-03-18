@@ -19,11 +19,6 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 			await Startup.init();
 			await setFullyLoaded(true);
 
-
-			if (process.env.NODE_ENV == 'production') {
-				posthog.init('phc_hIquiq6C8gEvkdXx7GnIW3OWnRn0pGAC4mcNoCxkiIh', { api_host: 'https://app.posthog.com' })
-			}
-
 		})()
 
 	}, []);

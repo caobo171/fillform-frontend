@@ -28,7 +28,7 @@ function WaitingRegister() {
           </h1>
 
           <p className="text-sm text-center text-gray-500 mb-6">
-            WELE đã gửi 1 email tới&nbsp;
+            Fillform đã gửi 1 email tới&nbsp;
             <span className="text-primary">
               {decodeURIComponent(email ?? '')}
             </span>

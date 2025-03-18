@@ -79,7 +79,7 @@ function ConfirmRegister() {
             router.push('/authentication/login?from=onboarding/welcome')
           }
         >
-          Bắt đầu sử dụng WELE
+          Bắt đầu sử dụng Fillform
         </Button>
       </>
     );
@@ -87,7 +87,7 @@ function ConfirmRegister() {
 
   return (
     <>
-      <Meta title="WELE | Xác thực tài khoản" />
+      <Meta title="Fillform | Xác thực tài khoản" />
       <div className="w-screen h-screen flex items-start justify-center bg-gray-50">
         <div className="w-full sm:w-[468px] flex flex-col my-4 sm:my-20 mx-4 sm:mx-0 p-10 shadow-sm rounded-lg ring-1 ring-gray-100 bg-white">
           {isLoading ? (

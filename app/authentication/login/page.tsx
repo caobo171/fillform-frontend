@@ -72,7 +72,7 @@ export default function Login() {
 
   return (
     <>
-      <Meta title="WELE | Đăng nhập" />
+      <Meta title="Fillform | Đăng nhập" />
 
       <div className="w-screen h-screen bg-cover bg-center bg-[url('/static/bg3.jpg')]">
         <div className="relative bg-white flex flex-col h-full justify-center items-center xl:w-1/2 2xl:w-[736px] px-6 sm:px-0">
@@ -90,7 +90,7 @@ export default function Login() {
             </h1>
 
             <p className="mb-10 text-gray-500">
-              Chào mừng bạn quay trở lại với WELE
+              Chào mừng bạn quay trở lại với Fillform
             </p>
 
             <form

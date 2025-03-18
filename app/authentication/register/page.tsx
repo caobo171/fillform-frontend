@@ -71,7 +71,7 @@ export default function Register() {
         username,
         password,
         confirm_password: confirmPassword,
-        refer_code: referCode,
+        refer_id: referCode,
       });
 
       if (res && res.data && res.data.code === Code.SUCCESS) {
@@ -99,7 +99,7 @@ export default function Register() {
 
   return (
     <>
-      <Meta title="WELE | Đăng kí tài khoản" />
+      <Meta title="Fillform | Đăng kí tài khoản" />
 
       <div className="w-screen h-screen bg-cover bg-center bg-[url('/static/bg3.jpg')]">
         <div className="relative bg-white flex flex-col h-full justify-center items-center xl:w-1/2 2xl:w-[736px] px-6 sm:px-0">

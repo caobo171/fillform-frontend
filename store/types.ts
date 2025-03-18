@@ -1,4 +1,3 @@
-import { TranscriberData } from '@/hooks/transcriber/useTranscriber';
 import { AnyObject } from '@/store/interface';
 
 import rootReducer from './rootReducer';
@@ -84,64 +83,11 @@ export type RawWeleClass = {
 export type RawUser = {
   id: number;
   username: string;
-  fullname: string;
-  facebook: string;
-  trial_ended: string;
-  dayOfBirth: number;
-  email: string;
-  avatar: string;
-  address: string;
-  cover_avatar: string;
-  sex: string;
-  description: string;
-  status: number;
-  phone: string;
-  since: number;
-  last_update: number;
-  role: number;
-  user_type: number[];
-  data?: {
-    last_login: number;
-    challenge_ids: number[];
-    coin_fields: { [key: string]: boolean };
-    listening_time: number;
-    podcasts?: {
-      podcast_id: number;
-      is_allow_listen_result?: boolean;
-    }[];
-  };
-  total_score?: number;
-  score?: number;
-  city: string;
-  district: string;
-  ward: string;
-  dob: number;
-  allowance_coin: number;
-  earning_coin: number;
-  job_position: string | null;
-  major: string | null;
-  school: string | null;
-  company: string | null;
-  cache_streak: {
-    streak_number: number;
-    updated_time: number;
-  };
-  is_super_admin?: boolean;
+  credit: number;
+  role: string;
+  is_super_admin: number;
 };
 
-export type RawUserClass = RawUser & {
-  following?: {
-    podcasts: RawPodcast[];
-    following_id: number;
-    stats: {
-      listen_time: number;
-      avg_accuracy: number;
-      unique_correct_words_num: number;
-      score: number;
-      submits_num: number;
-    };
-  };
-};
 
 export type RawImage = {
   id: number;
@@ -189,49 +135,6 @@ export type RawDownloadLink = {
   link: string;
 };
 
-export type RawPodcast = {
-  id: number;
-  name: string;
-  sub_name: string;
-  views: number;
-  metatype: string;
-  user_id: number;
-  download_link: RawDownloadLink[];
-  data: string;
-  duration: number;
-  image_url: string;
-  hint: number[];
-  narrator: string;
-  source_key: number;
-  description: string;
-  since: number;
-  last_update: number;
-  file_size: number;
-  file_path: string;
-  result: string;
-  collections: string[];
-  member_count: number;
-  status: number;
-  class_id: number;
-  private: number;
-  has_transcript: number;
-
-  version: number;
-  result_array: string[];
-
-  podcast_submit?: RawPodcastSubmit;
-  transcript?: TranscriberData['chunks'];
-
-  // Fetch property
-  is_submitted?: number;
-  is_listening?: number;
-
-  members: {
-    score: number;
-    user_id: number;
-    percent?: number;
-  }[];
-};
 
 export type RawPodcastSubmit = {
   id: number;

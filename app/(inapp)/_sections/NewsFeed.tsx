@@ -61,7 +61,7 @@ function NewsItem({ data }: { data: RawUserActionLog }) {
             href={`/profile/${userData?.username}/${userData?.id}`}
             className="text-xs text-gray-900 hover:text-gray-600"
           >
-            {user.fullname}
+            {user.username}
           </Link>
 
           <span className="w-1 h-1 rounded-full bg-gray-400" />

@@ -59,7 +59,7 @@ function ForgotPassword() {
   if (success) {
     return (
       <>
-        <Meta title="WELE | Quên mật khẩu" />
+        <Meta title="Fillform | Quên mật khẩu" />
 
         <div className="w-screen h-screen flex items-start justify-center bg-gray-50">
           <div className="w-full sm:w-[468px] flex flex-col my-4 sm:my-20 mx-4 sm:mx-0 p-10 shadow-sm rounded-lg ring-1 ring-gray-100 bg-white">
@@ -72,7 +72,7 @@ function ForgotPassword() {
             </h1>
 
             <p className="text-sm text-center text-gray-500 mb-6">
-              WELE đã gửi email hướng dẫn thay đổi mật khẩu tới&nbsp;
+              Fillform đã gửi email hướng dẫn thay đổi mật khẩu tới&nbsp;
               <span className="text-primary">{success}</span>
             </p>
 
@@ -89,7 +89,7 @@ function ForgotPassword() {
 
   return (
     <>
-      <Meta title="WELE | Quên mật khẩu" />
+      <Meta title="Fillform | Quên mật khẩu" />
 
       <div className="w-screen h-screen flex items-start justify-center bg-gray-50">
         <div className="w-full sm:w-[468px] flex flex-col my-4 sm:my-20 mx-4 sm:mx-0 p-10 shadow-sm rounded-lg ring-1 ring-gray-100 bg-white">

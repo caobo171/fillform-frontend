@@ -42,9 +42,9 @@ export function AdsBook({ data }: AdsBookProps) {
 
   return (
     <div>
-      <h3 className="text-base text-gray-700">Ưu đãi từ WELE</h3>
+      <h3 className="text-base text-gray-700">Ưu đãi từ Fillform</h3>
       <p className="text-xs text-gray-500 mb-6">
-        (Nhập mã giảm giá của WELE để nhận ưu đãi bạn nhé)
+        (Nhập mã giảm giá của Fillform để nhận ưu đãi bạn nhé)
       </p>
       <div className="flex flex-wrap gap-6">
         {data.map((item) => (

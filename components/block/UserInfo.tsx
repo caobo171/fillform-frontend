@@ -64,14 +64,14 @@ const UserInfo = (props: { user: RawUser }) => {
                     </>) : (<>
                         <div style={{ backgroundColor: UI.getColorByString(props.user.username) }}
                             className="w-20 h-20 rounded-full bg-cover bg-center flex items-center justify-center">
-                            <span className="text-white font-medium text-3xl">{props.user.fullname.slice(0, 2)}</span>
+                            <span className="text-white font-medium text-3xl">{props.user.username.slice(0, 2)}</span>
                         </div>
                     </>)}
                 </div>
             </div>
 
             <h3 className="text-center mt-2 font-medium text-xl">
-                {props.user.fullname}
+                {props.user.username}
             </h3>
             <p className="text-center text-sm text-gray-500">{props.user.username}</p>
             <div className="flex items-center justify-between mt-3">
@@ -102,7 +102,7 @@ const UserInfo = (props: { user: RawUser }) => {
                 </div>
             </div>
             <div className="mt-5">
-                <h5 className="font-medium text-base">Contact {props.user.fullname}</h5>
+                <h5 className="font-medium text-base">Contact {props.user.username}</h5>
                 <div className="mt-1 flex pt-2">
 
                     <a href={`mailto:${props.user.email}`} target={`_blank`} className="mr-3 w-10 h-10 rounded-full flex justify-center items-center bg-red-400 text-lg text-white">

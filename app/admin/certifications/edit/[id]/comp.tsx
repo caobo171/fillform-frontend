@@ -107,7 +107,7 @@ const Edit = ({ certification }: { certification: RawCertification }) => {
     }
 
     return (<>
-        <Meta title={`WELE | Certification ${certification.id}`} />
+        <Meta title={`Fillform | Certification ${certification.id}`} />
         <div className="w-full px-5 py-5 rounded-lg shadow">
             <div className="w-full flex flex-wrap">
                 <div className="w-full semi-lg:w-2/3">

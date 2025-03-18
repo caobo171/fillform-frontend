@@ -124,7 +124,7 @@ const Create = () => {
     }
 
     return (<>
-        <Meta title={`WELE | Tạo Certification`} keywords={"Nghe chép"} description={""} />
+        <Meta title={`Fillform | Tạo Certification`} keywords={"Nghe chép"} description={""} />
         <div className="w-full px-5 py-5 rounded-lg shadow">
             <div className="w-full flex flex-wrap">
                 <div className="w-full semi-lg:w-2/3">
@@ -196,13 +196,13 @@ const Create = () => {
                                                                         </div>
                                                                     </>) : (<>
                                                                         <div className="flex items-center justify-center h-10 w-10 rounded-full mr-1" style={{
-                                                                            backgroundColor: UI.getColorByString(user.fullname)
+                                                                            backgroundColor: UI.getColorByString(user.username)
                                                                         }}>
-                                                                            <span className="text-lg text-white"> {user.fullname.slice(0, 2)} </span>
+                                                                            <span className="text-lg text-white"> {user.username.slice(0, 2)} </span>
                                                                         </div>
                                                                     </>)}
                                                                     <div className="ml-2">
-                                                                        {user.fullname} ({user.email})
+                                                                        {user.username} ({user.email})
                                                                     </div>
                                                                 </li>
                                                             )) : (<>

@@ -17,10 +17,9 @@ import { RawUser } from '@/store/types';
 
 type UserMenuProps = {
   data: RawUser;
-  isPremium?: boolean;
 };
 
-export function UserMenu({ data, isPremium }: UserMenuProps) {
+export function UserMenu({ data }: UserMenuProps) {
   const dropdownItemCls = 'flex gap-4 items-center px-2 h-7';
   const opts = useMemo(() => {
     const options: DropdownProps['options'] = [
@@ -29,43 +28,17 @@ export function UserMenu({ data, isPremium }: UserMenuProps) {
           <div className="flex gap-4">
             <Avatar user={data} unlink size={40} />
             <div className="flex flex-col gap-1">
-              <span>{data?.fullname}</span>
+              <span>{data?.username}</span>
               <span className="text-xs text-gray-500">{data?.username}</span>
             </div>
           </div>
         ),
         value: 'profile',
-        className: !isPremium ? '' : 'mb-2',
-        href: `/profile/${Helper.generateCode(data ? data.fullname : '')}/${data?.id}`,
+        className: '',
+        href: `/profile/${Helper.generateCode(data ? data.username : '')}/${data?.id}`,
       },
     ];
 
-    if (!isPremium) {
-      options.push({
-        label: (
-          <div className="flex flex-col gap-3 items-center justify-center w-full">
-            <div
-              className={clsx(
-                'flex items-center justify-center h-[36px] rounded-full bg-primary text-white w-full cursor-pointer',
-                'bg-gradient-to-r from-primary to-primary-dark',
-                'hover:opacity-[0.9]'
-              )}
-            >
-              Nâng cấp&nbsp;<span className="font-bold">Premium</span>
-            </div>
-
-            <div
-              className="border-b border-gray-150"
-              style={{ width: 'calc(100% + 24px)' }}
-            />
-          </div>
-        ),
-        value: 'subscription',
-        className: 'cursor-auto',
-        disableHoverEffect: true,
-        href: '/user/plans',
-      });
-    }
 
     if (ACL.isAdmin(data)) {
       options.push({
@@ -92,18 +65,6 @@ export function UserMenu({ data, isPremium }: UserMenuProps) {
       href: '/content-creator/podcasts',
     });
 
-    if (ACL.isTeacher(data)) {
-      options.push({
-        label: (
-          <div className={dropdownItemCls}>
-            <ChatBubbleOvalLeftEllipsisIcon className="w-5 h-5" />
-            Quản lý lớp học
-          </div>
-        ),
-        value: 'manage_classes',
-        href: '/teacher/classes',
-      });
-    }
 
     options.push({
       label: (
@@ -126,7 +87,7 @@ export function UserMenu({ data, isPremium }: UserMenuProps) {
     });
 
     return options;
-  }, [data, isPremium]);
+  }, [data]);
 
   const handleItemClick = (val: string | number | boolean) => {
     if (val === 'logout') {
@@ -143,10 +104,6 @@ export function UserMenu({ data, isPremium }: UserMenuProps) {
     >
       <div className="relative">
         <Avatar user={data} unlink />
-
-        {isPremium && (
-          <PremiumIcon className="absolute z-1 bottom-0 right-0" border />
-        )}
       </div>
     </Dropdown>
   );

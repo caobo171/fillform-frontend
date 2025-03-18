@@ -124,7 +124,7 @@ export const Inner = () => {
   const [selected, setSelected] = useState<RawSystemNotification>();
 
   return (<>
-    <Meta title={`WELE | Notifications`} />
+    <Meta title={`Fillform | Notifications`} />
     <Link className="fixed bottom-14 right-14 cursor-pointer px-2 py-2 text-white flex items-center justify-center bg-primary hover:bg-primary-dark rounded-full shadow-md text-2xl " href='/admin/notifications/create'>
       <span><FaPlus /> </span>
     </Link>

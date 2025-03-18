@@ -6,7 +6,7 @@ export const SubscriptionBanner = () => {
 	const sub = MeHook.useSubscription();
 
 
-	let sub_text = 'Upgrade your plan to access more power of WELE';
+	let sub_text = 'Upgrade your plan to access more power of Fillform';
 	let free_trial = ''
 
 	if (sub) {

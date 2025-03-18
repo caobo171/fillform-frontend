@@ -6,7 +6,7 @@ export function UserBlock(props: { user: RawUser }) {
   return (
     <div className="items-center flex cursor-pointer">
       <Avatar unlink className={'inline-block'} user={props.user} />
-      <span className="truncate font-medium ml-1 text-base">{props.user.fullname}</span>
+      <span className="truncate font-medium ml-1 text-base">{props.user.username}</span>
     </div>
   );
 }
