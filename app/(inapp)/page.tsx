@@ -12,17 +12,17 @@ import './_sections/Promotion/ads.css';
 import { WordReview } from './_sections/Review/WordReview';
 import { ClientOnly } from '@/components/common/ClientOnly';
 
-const RecentPodcasts = lazy(() => import('./_sections/RecentPodcasts'));
-const NewReleasePodcasts = lazy(() => import('./_sections/NewReleasePodcasts'));
-const RecommendPodcasts = lazy(() => import('./_sections/RecommendPodcasts'));
-const Source = lazy(() => import('./_sections/Source'));
-const WeeklyLeaderBoard = lazy(() => import('./_sections/WeeklyLeaderBoard'));
-const PopularPodcasts = lazy(() => import('./_sections/PopularPodcasts'));
-const Ads = lazy(() => import('./_sections/Promotion/AdsCarousel'));
-const NewsFeed = lazy(() => import('./_sections/NewsFeed'));
-const ChallengeCarousel = lazy(
-  () => import('./_sections/Promotion/ChallengeCarousel')
-);
+// const RecentPodcasts = lazy(() => import('./_sections/RecentPodcasts'));
+// const NewReleasePodcasts = lazy(() => import('./_sections/NewReleasePodcasts'));
+// const RecommendPodcasts = lazy(() => import('./_sections/RecommendPodcasts'));
+// const Source = lazy(() => import('./_sections/Source'));
+// const WeeklyLeaderBoard = lazy(() => import('./_sections/WeeklyLeaderBoard'));
+// const PopularPodcasts = lazy(() => import('./_sections/PopularPodcasts'));
+// const Ads = lazy(() => import('./_sections/Promotion/AdsCarousel'));
+// const NewsFeed = lazy(() => import('./_sections/NewsFeed'));
+// const ChallengeCarousel = lazy(
+//   () => import('./_sections/Promotion/ChallengeCarousel')
+// );
 
 type Props = {
   params: { id: string };
@@ -70,45 +70,42 @@ export default function Home() {
         <div className="w-[800px] flex flex-col gap-[56px]">
           <Suspense fallback={null}>
             <ClientOnly>
-              <ChallengeCarousel />
+              <></>
             </ClientOnly>
 
           </Suspense>
 
           <Suspense fallback={<div>Loading...</div>}>
-            <RecentPodcasts />
-          </Suspense>
-
-          <Ads />
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <NewReleasePodcasts />
+            <></>
           </Suspense>
 
           <Suspense fallback={<div>Loading...</div>}>
-            <Source />
+            <></>
           </Suspense>
 
           <Suspense fallback={<div>Loading...</div>}>
-            <RecommendPodcasts />
+            <></>
+          </Suspense>
+
+          <Suspense fallback={<div>Loading...</div>}>
+            <></>
           </Suspense>
         </div>
 
         <div className="flex-1 flex flex-col gap-[48px] border-l-[1px] border-gray-200 pl-10 ml-10">
           <WordReview />
 
-          <BlogMinimal posts={BlogList} />
 
           <Suspense fallback={<div>Loading...</div>}>
-            <WeeklyLeaderBoard />
+            <></>
           </Suspense>
 
           <Suspense fallback={<div>Loading...</div>}>
-            <NewsFeed />
+            <></>
           </Suspense>
 
           <Suspense fallback={<div>Loading...</div>}>
-            <PopularPodcasts />
+            <></>
           </Suspense>
         </div>
       </Container>

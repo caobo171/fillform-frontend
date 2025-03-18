@@ -51,16 +51,12 @@ export default function NormalLayout({ children }: PropsWithChildren) {
         searchUrl="podcasts"
         menu={{
           main: [
-            { name: 'Home', href: '/home' },
-            { name: 'Podcasts', href: '/podcasts' },
-            { name: 'Challenges', href: '/challenges' },
-            { name: 'Classes', href: '/classes' },
+            { name: 'Tài khoản', href: '/home' },
+            { name: 'Tạo form ngay', href: '/form/create' },
+            { name: 'Mã hoá data', href: '/data/encode' },
+            { name: 'Nạp tiền', href: '/credit' },
           ],
-          subs: [
-            { name: 'Playlists', href: '/playlist', isPremium: true },
-            { name: 'Feeds', href: '/news-feed' },
-            { name: 'Leaderboard', href: '/billboard' },
-          ],
+          subs: []
         }}
       />
 

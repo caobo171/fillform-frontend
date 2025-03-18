@@ -16,7 +16,7 @@ export function InOutButtons() {
         type="solid"
         onClick={() => router.push('/authentication/register')}
       >
-        Bắt đầu miễn phí
+        Đăng ký
       </Button>
     </div>
   );

@@ -79,7 +79,7 @@ export default function Login() {
           <div className="text-left text-sm leading-5 mb-[60px] w-full sm:w-auto">
             <Link href="/" className="inline-block">
               <img
-                src="/static/logo.svg"
+                src="/static/logo-color-long.png"
                 alt="logo"
                 className="w-auto h-12 mb-6"
               />
@@ -89,7 +89,7 @@ export default function Login() {
               Đăng nhập
             </h1>
 
-            <p className="mb-14 text-gray-500">
+            <p className="mb-10 text-gray-500">
               Chào mừng bạn quay trở lại với WELE
             </p>
 

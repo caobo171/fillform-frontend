@@ -12,11 +12,8 @@ import { Menu, MenuProps } from '@/components/layout/header/Menu';
 import { MobileMenu } from '@/components/layout/header/MobileMenu';
 import { NotificationButton } from '@/components/layout/header/NotificationButton';
 import { NotificationContextProvider } from '@/components/layout/header/NotificationContext';
-import { SearchBox } from '@/components/layout/header/SearchBox';
-import { Streak } from '@/components/layout/header/Streak';
 import { UserMenu } from '@/components/layout/header/UserMenu';
 import { UserRecordButton } from '@/components/layout/header/UserRecordButton';
-import { WeleCoin } from '@/components/layout/header/WeleCoin';
 import { useMe } from '@/hooks/user';
 import { Helper } from '@/services/Helper';
 import { MeHook } from '@/store/me/hooks';
@@ -64,9 +61,6 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
 
     return (
       <>
-        <WeleCoin data={data} isPremium={isPremiumUser} />
-
-        <Streak data={data} />
 
         <UserRecordButton />
 
@@ -101,7 +95,6 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
 
           <div className="flex items-center gap-4">
             {children}
-            {searchUrl && <SearchBox url={searchUrl} />}
             {rightBlock}
           </div>
         </nav>

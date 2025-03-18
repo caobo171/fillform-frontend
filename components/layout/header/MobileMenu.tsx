@@ -116,7 +116,7 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
             ) : (
               <Link href="/" className="outline-none">
                 <span className="sr-only">Wele Learn</span>
-                <img className="h-8 w-auto" src="/static/logo.svg" alt="logo" />
+                <img className="h-8 w-auto" src="/static/logo-color-long.png" alt="logo" />
               </Link>
             )}
 

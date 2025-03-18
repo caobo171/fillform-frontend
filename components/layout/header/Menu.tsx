@@ -63,7 +63,7 @@ export function Menu({ main, subs }: MenuProps) {
   }, [logClick, main, pathName]);
 
   const subMenu = useMemo(() => {
-    if (!Array.isArray(subs)) {
+    if (!Array.isArray(subs) || subs.length === 0) {
       return null;
     }
 
