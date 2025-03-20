@@ -3,26 +3,8 @@ import React, { Suspense, lazy } from 'react';
 // react-slick styles
 import 'slick-carousel/slick/slick-theme.css';
 import 'slick-carousel/slick/slick.css';
-
-import { BlogMinimal } from '@/app/(inapp)/_components/BlogMinimal';
-import { Container } from '@/components/layout/container/container';
 import { MetaData } from '@/core/Metadata';
-
-import './_sections/Promotion/ads.css';
-import { WordReview } from './_sections/Review/WordReview';
-import { ClientOnly } from '@/components/common/ClientOnly';
-
-// const RecentPodcasts = lazy(() => import('./_sections/RecentPodcasts'));
-// const NewReleasePodcasts = lazy(() => import('./_sections/NewReleasePodcasts'));
-// const RecommendPodcasts = lazy(() => import('./_sections/RecommendPodcasts'));
-// const Source = lazy(() => import('./_sections/Source'));
-// const WeeklyLeaderBoard = lazy(() => import('./_sections/WeeklyLeaderBoard'));
-// const PopularPodcasts = lazy(() => import('./_sections/PopularPodcasts'));
-// const Ads = lazy(() => import('./_sections/Promotion/AdsCarousel'));
-// const NewsFeed = lazy(() => import('./_sections/NewsFeed'));
-// const ChallengeCarousel = lazy(
-//   () => import('./_sections/Promotion/ChallengeCarousel')
-// );
+import HomeComponent from './Home';
 
 type Props = {
   params: { id: string };
@@ -49,66 +31,8 @@ export async function generateMetadata(
     },
   };
 }
-
-const BlogList = [
-  {
-    image:
-      'https://blog.wele-learn.com/wp-content/uploads/2024/10/17716d66-72b3-4f9e-a6dc-cad6c2bfabf8.jpeg',
-    title: 'Lộ trình cho các bạn mới luyện nghe',
-    published_at: '03/10/2024',
-    author_name: 'Le Trung Hieu',
-    description:
-      'Lộ trình cho các bạn mới bắt đầu luyện nghe, phương pháp nghe chép chính tả',
-    link: 'https://blog.wele-learn.com/lo-trinh-cho-cac-ban-moi-luyen-nghe/',
-  },
-];
-
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 pt-8 pb-[80px] mb-[-50px]">
-      <Container className="flex">
-        <div className="w-[800px] flex flex-col gap-[56px]">
-          <Suspense fallback={null}>
-            <ClientOnly>
-              <></>
-            </ClientOnly>
-
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <></>
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <></>
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <></>
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <></>
-          </Suspense>
-        </div>
-
-        <div className="flex-1 flex flex-col gap-[48px] border-l-[1px] border-gray-200 pl-10 ml-10">
-          <WordReview />
-
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <></>
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <></>
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <></>
-          </Suspense>
-        </div>
-      </Container>
-    </div>
+    <HomeComponent />
   );
 }

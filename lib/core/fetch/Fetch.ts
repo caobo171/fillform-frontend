@@ -48,6 +48,63 @@ class Fetch {
     return res;
   }
 
+
+  async download(url: string, params: any = {}, filename?: string): Promise<void> {
+    try {
+      // Use axios to get the file with responseType blob
+      const response = await axios({
+        url: `${this.__base_url}${url}`,
+        method: 'POST',
+        data: params,
+        responseType: 'blob',
+      });
+
+      // Create a URL for the blob
+      const blob = new Blob([response.data]);
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      // Create a temporary link element to trigger the download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+
+      // Use the provided filename or get it from the Content-Disposition header
+      const contentDisposition = response.headers['content-disposition'];
+      const serverFilename = contentDisposition
+        ? contentDisposition.split('filename=')[1]?.replace(/["']/g, '')
+        : '';
+
+      link.download = filename || serverFilename || 'data.csv';
+
+      // Append to the document, click, and clean up
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Download failed:', error);
+      throw error;
+    }
+  }
+
+
+  async downloadWithAccessToken(
+    url: string,
+    params: Object = {},
+    filename?: string,
+    context: { access_token: string } | null = null
+  ): Promise<void> {
+    return this.download(
+      url,
+      {
+        ...params,
+        access_token: context
+          ? context.access_token
+          : Cookie.fromDocument('access_token'),
+      },
+      filename
+    );
+  }
+
   async post<ResponseType>(
     url: string,
     params: any = {},

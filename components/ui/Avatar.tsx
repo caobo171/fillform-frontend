@@ -68,7 +68,7 @@ function Avatar({ user, size, unlink, className, textClassName }: Props) {
                 textClassName
               )}
             >
-              {user?.fullname?.slice(0, 2)}
+              {user?.username?.slice(0, 2)}
             </span>
           </div>
         )}

@@ -13,7 +13,6 @@ import { MobileMenu } from '@/components/layout/header/MobileMenu';
 import { NotificationButton } from '@/components/layout/header/NotificationButton';
 import { NotificationContextProvider } from '@/components/layout/header/NotificationContext';
 import { UserMenu } from '@/components/layout/header/UserMenu';
-import { UserRecordButton } from '@/components/layout/header/UserRecordButton';
 import { useMe } from '@/hooks/user';
 import { Helper } from '@/services/Helper';
 import { MeHook } from '@/store/me/hooks';
@@ -57,10 +56,6 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
 
     return (
       <>
-
-        <UserRecordButton />
-
-        <NotificationButton />
 
         <UserMenu data={data} />
       </>

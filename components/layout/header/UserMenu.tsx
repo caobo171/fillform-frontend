@@ -52,18 +52,6 @@ export function UserMenu({ data }: UserMenuProps) {
       });
     }
 
-    options.push({
-      label: (
-        <div className={dropdownItemCls}>
-          <FolderIcon className="w-5 h-5" />
-          Quản lý bài nghe
-
-          <PremiumIcon  />
-        </div>
-      ),
-      value: 'manage_content',
-      href: '/content-creator/podcasts',
-    });
 
 
     options.push({
