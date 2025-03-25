@@ -84,11 +84,31 @@ export type RawLoginSession = {
 
 
 
-export type RawRecord = {
-  score: number;
-  podcast: number;
-  time: number;
+export type RawOrder = {
+  idview: string;
+  id: string;
+  name: string;
+  num: number;
+  type: string;
+  delay: number;
+  createdAt: string;
+  status: string;
+  url: string;
+  pageHistory: string;
+  owner: string;
+  version: string;
+  data: any[];
 };
+
+
+export type RawCredit = {
+  id: string;
+  direction: string;
+  owner: string;
+  status: string;
+  description: string;
+}
+
 
 export type RawDownloadLink = {
   name: string;

@@ -53,7 +53,7 @@ function Meta({
       <meta name="keywords" content={keywords} />
       <meta name="description" content={description} />
       <meta charSet="utf-8" />
-      <link rel="icon" href="/favicon.ico" />
+      <link rel="icon" href="/logo.webp" />
       <title>{title}</title>
     </Head>
   );

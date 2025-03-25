@@ -13,7 +13,12 @@ import { MeHook } from '@/store/me/hooks';
 export function SubscriptionBannerTop() {
   const pathname = usePathname();
 
-  const sub = MeHook.useSubscription();
+  const sub = {
+    is_effective: true,
+    plan: 'premium',
+    end_date: new Date().getTime() + 365 * 24 * 3600 * 1000,
+    is_freetrial: true,
+  };
 
   const me = MeHook.useMe();
 
@@ -24,14 +29,14 @@ export function SubscriptionBannerTop() {
 
   const [showBanner, setShowBanner] = useState(false);
 
-  useEffect(() => {
-    // don't show banner in user/plans page
-    if (pathname === '/user/plans' || Cookie.fromDocument('hide_banner')) {
-      setShowBanner(false);
-    } else {
-      setShowBanner(true);
-    }
-  }, [pathname]);
+  // useEffect(() => {
+  //   // don't show banner in user/plans page
+  //   if (pathname === '/user/plans' || Cookie.fromDocument('hide_banner')) {
+  //     setShowBanner(false);
+  //   } else {
+  //     setShowBanner(true);
+  //   }
+  // }, [pathname]);
 
   // only show banner in these situations
   // 1. in free trial period

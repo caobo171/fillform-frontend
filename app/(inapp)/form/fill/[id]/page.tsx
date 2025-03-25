@@ -52,7 +52,7 @@ interface ChatError {
 export default function FormRate() {
 
     const params = useParams();
-    const { data: dataForm, isLoading } = useFormById(params.id as string);
+    const { data: dataForm, isLoading, mutate: mutateForm } = useFormById(params.id as string);
 
     const { register, handleSubmit, watch } = useForm();
 
@@ -73,6 +73,19 @@ export default function FormRate() {
         }
 
         setIsSaved(true);
+    };
+
+
+    const autoFillHandle = async (): Promise<void> => {
+        try {
+            await Fetch.postWithAccessToken('/api/form/rate.autofill', {
+                id: dataForm?.form.id,
+            });
+
+            mutateForm();
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const toggleChat = (): void => {
@@ -234,13 +247,16 @@ export default function FormRate() {
                         <Link href="" className="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 mb-2 hover:bg-blue-700">
                             Điền theo tỉ lệ mong muốn
                         </Link>
-                        <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mb-2 hover:bg-blue-50">
+                        <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mr-2 mb-2 hover:bg-blue-50">
                             Điền theo data có trước
+                        </Link>
+                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mb-2 hover:bg-blue-50">
+                            Chạy form
                         </Link>
                     </div>
                     <p className="mb-2">Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi nhé</p>
                     <p className="mb-2">
-                        Nếu bạn chưa biết điền. Hãy thử <Link href={`/form/autofill/${dataForm?.form.id}`} className="text-blue-600 text-lg font-bold">ấn vào đây</Link> để fillform <b>đề xuất tỉ lệ</b> cho bạn tham khảo nha!(Tỉ lệ mang tính chất tham khảo để bạn duyệt trước).
+                        Nếu bạn chưa biết điền. Hãy thử <span onClick={autoFillHandle} className="text-blue-600 text-lg font-bold cursor-pointer">ấn vào đây</span> để fillform <b>đề xuất tỉ lệ</b> cho bạn tham khảo nha!(Tỉ lệ mang tính chất tham khảo để bạn duyệt trước).
                     </p>
                     <p className="mb-2"><b>Hãy chỉnh sửa tỉ lệ để phù hợp nhất với đề tài của bạn</b> FillForm sẽ chỉ cam kết điền form đúng theo yêu cầu tỉ lệ</p>
                     <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=3_r-atbIiAI" className="text-blue-600">https://www.youtube.com/watch?v=3_r-atbIiAI</a></p>
@@ -248,12 +264,12 @@ export default function FormRate() {
 
                 <form className="mb-6">
                     <div className="mb-4">
-                        <div className="flex mb-3">
+                        <div className="flex mb-3 w-full">
                             <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Form</span>
                             <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                 id="urlMain" name="urlMain" defaultValue={dataForm?.form.urlMain} />
                         </div>
-                        <div className="flex mb-3">
+                        <div className="flex mb-3 w-full">
                             <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Tên Form</span>
                             <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                 id="urlCopy" name="urlCopy" defaultValue={dataForm?.form.name} />
@@ -359,7 +375,7 @@ export default function FormRate() {
                     onClick={toggleChat}
                 >
                     <div className="flex items-center">
-                        <Image src="/img/logo-white-short.png" alt="Logo" width={24} height={24} className="mr-2" />
+                        <Image src="/static/img/logo-white-short.png" alt="Logo" width={24} height={24} className="mr-2" />
                         <span className="font-medium">Bé Fill Điền Form</span>
                     </div>
                     <div className="flex items-center">

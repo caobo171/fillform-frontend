@@ -9,7 +9,6 @@ import ACL from '@/services/ACL';
 import { Helper } from '@/services/Helper';
 import { MeFunctions } from '@/store/me/functions';
 import { RawUser } from '@/store/types';
-import { MeHook } from '@/store/me/hooks';
 
 function NavLink({
   data,
@@ -38,7 +37,6 @@ type MobilePanelProps = {
 };
 
 export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
-  const sub = MeHook.useSubscription();
   const menuItems = useMemo(() => {
     let items: MenuItemProps[] = [];
 

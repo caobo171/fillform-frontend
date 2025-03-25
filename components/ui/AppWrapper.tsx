@@ -8,8 +8,7 @@ import posthog from 'posthog-js'
 
 
 const AppWrapper = ({ children }: { children: ReactElement }) => {
-	const [isFullyLoaded, setFullyLoaded] = useState(false);
-	const sub = MeHook.useSubscription();
+	const [isFullyLoaded, setFullyLoaded] = useState(false);;
 	const route = useRouter();
 	const pathname = usePathname();
 	const me = MeHook.useMe();
@@ -27,35 +26,13 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 	useEffect(() => {
 
 		if (me) {
-			if (Cookie.fromDocument('mobile') && (sub && Number(sub.is_effective))) {
-
-				if (pathname.indexOf('mobile/') == -1) {
-					console.log('reload');
-
-					if (typeof window !== 'undefined') {
-						//@ts-ignore
-						window.ReactNativeWebView?.postMessage(JSON.stringify({ type: 'reload' }));
-						return;
-					}
-
-				}
-
-			}
 
 			//@ts-ignore
-			if (Cookie.fromDocument('mobile') && (!sub || sub.plan == 'free' || !Number(sub.is_effective))) {
-
-				if (pathname.indexOf('me/') == -1 && pathname.indexOf('profile') == -1 && pathname.indexOf('admin') == -1) {
-					route.push('/mobile/plans');
-					return;
-				}
-
-			}
 
 		}
 
 
-	}, [sub, pathname, me]);
+	}, [pathname, me]);
 
 
 	return (<>

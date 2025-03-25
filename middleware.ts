@@ -7,7 +7,6 @@ import { RawSubscription, RawUser, RawWeleClass } from './store/types';
 
 const publicLinks = [
   '/notfound',
-  '/home',
   '/billboard',
   '/news-feed',
   '/profile',
@@ -27,7 +26,6 @@ const authLinks = ['/podcasts/listen'];
 
 const adminLinks = ['/admin'];
 
-const contentCreatorLinks = ['/content-creator'];
 
 const teacherLinks = ['/teacher'];
 
@@ -41,7 +39,7 @@ export default async function middleware(req: NextRequest) {
 
   if (host === Constants.APP_HOST && path === '/') {
     return NextResponse.redirect(
-      new URL(`/home?${urlSearchParams.toString()}`, req.url)
+      new URL(`/?${urlSearchParams.toString()}`, req.url)
     );
   }
 

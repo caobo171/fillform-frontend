@@ -61,7 +61,7 @@ export default function Login() {
 
         // router.push(from ?? '/home');
 
-        window.location.pathname = from ?? '/home';
+        window.location.pathname = from ?? '/';
       } else {
         setErrorMessage(res?.data?.message);
       }

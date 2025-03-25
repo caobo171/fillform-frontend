@@ -88,10 +88,12 @@ export function UserMenu({ data }: UserMenuProps) {
       options={opts}
       onClickItem={handleItemClick}
       popupClassName="max-w-70"
-      className="w-10 h-10"
+      className="h-10"
     >
-      <div className="relative">
+      <div className="relative flex-row items-center gap-2 flex">
+
         <Avatar user={data} unlink />
+        <div className="font-medium">{data?.username}</div>
       </div>
     </Dropdown>
   );

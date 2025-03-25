@@ -3,16 +3,15 @@ import { RawForm } from '@/store/types';
 import useSWR from 'swr'
 
 
-export const useForms = (search_params?: URLSearchParams, page_size?: number) => {
-
-	let real_search_params = search_params || new URLSearchParams();
-	const res = useSWR('/api/form/list?' + real_search_params.toString(), async (url) => {
+export const useForms = (page: number, limit: number) => {
+			
+	const res = useSWR('/api/form/list?page=' + page + '&limit=' + limit, async (url) => {
 		const rest = await Fetch.postWithAccessToken<{
 			forms: RawForm[],
 			form_num: number,
 		}>(url, {
-			...Object.fromEntries(real_search_params.entries()),
-			page_size: page_size || 12
+			page: page,
+			page_size: limit
 		});
 
 		return {

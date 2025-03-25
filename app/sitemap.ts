@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: 'https://app.wele-learn.com/home',
+      url: 'https://app.wele-learn.com/',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,

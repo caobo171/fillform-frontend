@@ -20,13 +20,13 @@ const navigation = {
   ],
   social: [
     {
-      name: 'Zalo',
-      href: 'https://zalo.me/g/rxkjpk038',
-      icon: '/static/svg/zalo.svg',
+      name: 'Gmail',
+      href: 'mailto:fillform.info@gmail.com',
+      icon: '/static/svg/gmail.svg',
     },
     {
       name: 'Facebook',
-      href: 'https://www.facebook.com/groups/464396007027802',
+      href: 'https://www.facebook.com/fillformvn',
       icon: '/static/svg/facebook.svg',
     },
     {
@@ -57,37 +57,16 @@ export function LayoutFooter() {
             <a href="/">
               <img
                 className="h-12 mb-4"
-                src="/static/logo.png"
+                src="/static/img/logo-color-long.png"
                 alt="Company name"
               />
             </a>
 
             <p className="text-sm text-gray-500 mb-10">
-              Nghe chép chính tả - Lan toả niềm vui
+              Điền đơn tự động - Tiết kiệm thời gian
             </p>
 
             <div className="flex gap-x-4">
-              <a
-                href="https://play.google.com/store/apps/details?id=com.welelearnapp"
-                target="_blank"
-              >
-                <img
-                  src="/static/google-play.png"
-                  alt="google play"
-                  className="h-10 w-auto"
-                />
-              </a>
-
-              <a
-                href="https://apps.apple.com/vn/app/wele-learn/id6449467539"
-                target="_blank"
-              >
-                <img
-                  src="/static/app-store.png"
-                  alt="apple store"
-                  className="h-10 w-auto"
-                />
-              </a>
             </div>
           </div>
 
@@ -106,7 +85,7 @@ export function LayoutFooter() {
               ))}
 
               <a
-                href="https://www.facebook.com/groups/464396007027802"
+                href="https://www.facebook.com/fillformvn"
                 target="_blank"
                 className="hover:text-gray-500"
               >
@@ -124,7 +103,7 @@ export function LayoutFooter() {
                   target="_blank"
                   className="flex gap-x-2 items-center hover:text-gray-500"
                 >
-                  <img src={item.icon} alt={item.name} /> {item.name}
+                  <img src={item.icon} alt={item.name} height={24} width={24} /> {item.name}
                 </a>
               ))}
             </div>

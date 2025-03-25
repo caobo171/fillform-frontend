@@ -2,14 +2,9 @@ import dayjs from 'dayjs';
 import { sortBy, uniqBy } from 'lodash';
 import moment from 'moment';
 
-import { USER_ACTION_METATYPE } from '@/core/Constants';
 import { RankRecord } from '@/store/interface';
 import {
-  RawPodcastChallenge,
-  RawSubscription,
   RawUser,
-  RawUserActionLog,
-  RawUserStats,
   UploadImage,
 } from '@/store/types';
 
@@ -319,46 +314,6 @@ export class Helper {
     return labels;
   }
 
-  static generateHeaderActionLog(action_log: RawUserActionLog) {
-    if (action_log.metatype == USER_ACTION_METATYPE.METATYPE_CERTIFICATE) {
-      return `${Helper.extractContent(action_log.content)}`;
-    }
-
-    if (action_log.metatype == USER_ACTION_METATYPE.METATYPE_MILESTONE) {
-      return `${action_log.user_name} completed  ${action_log.content} podcasts`;
-    }
-
-    if (action_log.metatype == USER_ACTION_METATYPE.METATYPE_LISTENING) {
-      if (
-        action_log.end_time &&
-        Math.floor((action_log.end_time - action_log.start_time) / 60) > 10
-      ) {
-        return `${action_log.user_name} have listened to podcast ${action_log.podcast_name} ${action_log.podcast_sub_name} for ${Math.floor((action_log.end_time - action_log.start_time) / 60)} minutes`;
-      }
-
-      return `${action_log.user_name} started listening to podcast ${action_log.podcast_name} ${action_log.podcast_sub_name}`;
-    }
-
-    if (action_log.metatype == USER_ACTION_METATYPE.METATYPE_SUBMIT) {
-      return `${action_log.user_name} submitted ${action_log.podcast_name} ${action_log.podcast_sub_name}`;
-    }
-
-    if (action_log.metatype == USER_ACTION_METATYPE.METATYPE_SYSTEM) {
-      return `${action_log.content}`;
-    }
-
-    return 'Welcome to Fillform';
-  }
-
-  static mapPointToRank = (points: number[]) => {
-    const mapping = {} as { [key: number]: number };
-    for (let i = 0; i < points.length; ++i) {
-      if (!mapping[points[i]]) {
-        mapping[points[i]] = i + 1;
-      }
-    }
-    return mapping;
-  };
 
   static mapUserById = (users: RawUser[]) => {
     const mapping = {} as { [key: number]: RawUser };
@@ -368,15 +323,6 @@ export class Helper {
     return mapping;
   };
 
-  static mapPodcastChallengeByPodcastId = (
-    podcast_challenges: RawPodcastChallenge[]
-  ) => {
-    const mapping = {} as { [key: number]: RawPodcastChallenge };
-    for (const podcast_challenge of podcast_challenges) {
-      mapping[podcast_challenge.podcast_id] = podcast_challenge;
-    }
-    return mapping;
-  };
 
   static getRankStatus = (rank: number, rank_record: RankRecord) => {
     if (!rank_record.rank && rank == 1) {
@@ -470,7 +416,7 @@ export class Helper {
     return new Date(date * 1000).toISOString().substring(0, length ?? 16);
   }
 
-  static isPremiumUser(sub: RawSubscription) {
+  static isPremiumUser(sub: any) {
 
     return (
       sub?.plan === 'premium' && sub?.end_date > (new Date().getTime() / 1000)

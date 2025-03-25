@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-full">
       <Header menu={{ subs: null, main: null }} searchUrl="/admin">
-        <Link href="/home">
+        <Link href="/">
           <Button type="outline" size="small">
             Back to app
           </Button>
