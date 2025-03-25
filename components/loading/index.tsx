@@ -23,8 +23,8 @@ export const ProgressLoading = () => {
 
 export const Loading = ({ height }: { height?: number }) => {
     return (
-        <div style={{minHeight: '300px'}} className=" flex items-center justify-center">
-            <span className="text-primary text-opacity-80 text-8xl animate-spin"><AiOutlineLoading3Quarters/></span>
+        <div style={{minHeight: `${height || 100}px`}} className=" flex items-center justify-center">
+            <span className="text-primary text-opacity-80 text-4xl animate-spin"><AiOutlineLoading3Quarters/></span>
         </div>
     )
 };

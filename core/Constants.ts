@@ -120,3 +120,18 @@ export const OPTIONS_DELAY = {
     price: 500
   }
 }
+
+
+export const BANK_INFO = {
+  current: 'OCB',
+  providers: {
+    OCB: {
+      name: "OCB - Ngân hàng Phương Đông",
+      number: "SEPFFR148620"
+    },
+    VTB: {
+      name: "VTB - Viettin Bank",
+      number: "107868958175"
+    }
+  }
+}

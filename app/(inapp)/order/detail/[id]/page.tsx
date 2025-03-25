@@ -1,8 +1,10 @@
 'use client'
 
+import LoadingAbsolute, { Loading } from '@/components/loading'
 import { OPTIONS_DELAY, ORDER_STATUS } from '@/core/Constants'
 import { useFormById } from '@/hooks/form'
 import { useOrderById } from '@/hooks/order'
+import { useMe } from '@/hooks/user'
 import { useParams } from 'next/navigation'
 import { FC } from 'react'
 
@@ -43,10 +45,11 @@ interface OrderPageProps {
 
 const OrderPage: FC<OrderPageProps> = () => {
 
-    const params = useParams()
+    const params = useParams();
+    const me = useMe();
     const order = useOrderById(params.id as string)
     // Note: You'll need to fetch this data from your API
-    const isAdmin = true // Replace with actual auth check
+    const isAdmin = me.data?.is_super_admin;
 
     return (
         <section className="py-12">
@@ -84,7 +87,7 @@ const OrderPage: FC<OrderPageProps> = () => {
                     </div>
                 </div>
 
-                {isAdmin && (
+                {isAdmin ? (
                     <div className="text-left mb-8">
                         <h2 className="text-2xl font-bold mb-4">Config Order</h2>
                         <p className="mb-4">Hãy chắc chắn đã ấn <b>Tạm dừng</b> trước khi thực hiện <b>bất cứ thao tác nào</b> với order</p>
@@ -94,27 +97,27 @@ const OrderPage: FC<OrderPageProps> = () => {
                             {order.data?.order.status === ORDER_STATUS.SUCCESS ? (
                                 <button disabled className="px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed opacity-50">Continue</button>
                             ) : order.data?.order.status === ORDER_STATUS.RUNNING ? (
-                                <button 
+                                <button
                                     onClick={() => window.location.href = `/order/pause/${order.data?.order.id}`}
                                     className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                                 >
                                     Pause
                                 </button>
                             ) : (
-                                <button 
+                                <button
                                     onClick={() => window.location.href = `/order/continue/${order.data?.order.id}`}
                                     className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
                                 >
                                     Continue
                                 </button>
                             )}
-                            <button 
+                            <button
                                 onClick={() => window.location.href = `/order/stop/${order.data?.order.id}`}
                                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                             >
                                 Stop
                             </button>
-                            <button 
+                            <button
                                 onClick={() => window.location.href = `/order/clone/${order.data?.order.id}`}
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
                             >
@@ -125,17 +128,22 @@ const OrderPage: FC<OrderPageProps> = () => {
                         {/* Order Details List */}
                         <h2 className="text-2xl font-bold my-4">Danh sách request</h2>
                         <div className="grid gap-2">
+                            {order.isLoading && (
+                                <Loading />
+                            )}
                             {order.data?.order_detail_list.map((detail, index) => (
                                 <div key={index} className="flex text-sm">
                                     <div className="w-1/4 bg-gray-100 p-2">{detail.index}</div>
-                                    <div className="w-1/3 bg-gray-100 p-2">{detail.result}</div>
-                                    <a href={detail.data} className="w-5/12 border border-gray-300 text-center hover:bg-gray-50">
+                                    <div className="w-1/3 bg-gray-100 p-2">{detail.result?.toUpperCase()}</div>
+                                    <a href={detail.data} className="w-5/12 border border-gray-300 text-center hover:bg-gray-50 flex items-center justify-center">
                                         Xem
                                     </a>
                                 </div>
                             ))}
                         </div>
                     </div>
+                ) : (
+                    <></>
                 )}
 
                 {/* Form Config */}

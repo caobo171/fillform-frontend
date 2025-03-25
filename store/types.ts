@@ -64,7 +64,6 @@ export type RawUser = {
   username: string;
   email: string;
   credit: number;
-  role: string;
   is_super_admin: number;
 };
 
