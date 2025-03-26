@@ -5,7 +5,7 @@ const FAKE_DATA = {
 
 const IMAGE_URL = 'https://d2inr1ykkgbz5g.cloudfront.net/';
 
-const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
+export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:3001' : 'https://v2.fillform.info';
 
 export const FIREBASE_CONFIG =
   process.env.NODE_ENV !== 'production'

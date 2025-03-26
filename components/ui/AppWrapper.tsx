@@ -5,7 +5,7 @@ import { MeHook } from "@/store/me/hooks";
 import { usePathname, useRouter } from "next/navigation";
 import Cookie from "@/lib/core/fetch/Cookie";
 import posthog from 'posthog-js'
-
+import { SocketService } from "@/services/SocketClient";
 
 const AppWrapper = ({ children }: { children: ReactElement }) => {
 	const [isFullyLoaded, setFullyLoaded] = useState(false);;
@@ -18,21 +18,22 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 			await Startup.init();
 			await setFullyLoaded(true);
 
+
 		})()
 
 	}, []);
 
 
+
 	useEffect(() => {
-
+		console.log('me', me);
 		if (me) {
-
-			//@ts-ignore
+			SocketService.connect(me);
 
 		}
 
 
-	}, [pathname, me]);
+	}, [me]);
 
 
 	return (<>

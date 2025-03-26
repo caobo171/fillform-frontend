@@ -52,7 +52,7 @@ export default function FormRate() {
             });
 
             await mutateForm();
-            
+
             // After mutating, update all form values
             if (res.data.form.loaddata) {
                 res.data.form.loaddata.forEach((question) => {
@@ -60,7 +60,7 @@ export default function FormRate() {
                         setValue(`isMulti-${question.id}`, question.isMulti);
                         setValue(`totalans-${question.id}`, question.totalAnswer);
                         setValue(`type-${question.id}`, question.type);
-                        
+
                         question.answer?.forEach((answer: any) => {
                             if (answer.data) {
                                 setValue(`answer_${answer.id}`, answer.count);
@@ -185,34 +185,38 @@ export default function FormRate() {
     };
 
     useEffect(() => {
-        validateConfig();
-        validateInputs();
 
-        // Add event listeners for form validation
-        const numberInputs = document.querySelectorAll("input[type='number']");
-        const selects = document.querySelectorAll(".answer-select");
+        if (dataForm?.form && dataForm?.form.loaddata) {
 
-        const handleInputChange = () => validateInputs();
+            validateConfig();
+            validateInputs();
 
-        numberInputs.forEach(input => {
-            input.addEventListener('input', handleInputChange);
-        });
+            // Add event listeners for form validation
+            const numberInputs = document.querySelectorAll("input[type='number']");
+            const selects = document.querySelectorAll(".answer-select");
 
-        selects.forEach(select => {
-            select.addEventListener('change', handleInputChange);
-        });
+            const handleInputChange = () => validateInputs();
 
-        // Cleanup event listeners
-        return () => {
             numberInputs.forEach(input => {
-                input.removeEventListener('input', handleInputChange);
+                input.addEventListener('input', handleInputChange);
             });
 
             selects.forEach(select => {
-                select.removeEventListener('change', handleInputChange);
+                select.addEventListener('change', handleInputChange);
             });
-        };
-    }, []);
+
+            // Cleanup event listeners
+            return () => {
+                numberInputs.forEach(input => {
+                    input.removeEventListener('input', handleInputChange);
+                });
+
+                selects.forEach(select => {
+                    select.removeEventListener('change', handleInputChange);
+                });
+            };
+        }
+    }, [dataForm]);
 
 
     if (isLoadingForm || !dataForm || isLoading) {
@@ -220,162 +224,164 @@ export default function FormRate() {
             <LoadingAbsolute />
         );
     }
-    
+
 
 
     return (
-        <section className="py-12 bg-white">
-            <div className="container mx-auto text-center" data-aos="fade-up">
+        <>
+            <section className="py-12 bg-white">
+                <div className="container mx-auto text-center" data-aos="fade-up">
 
-                {
-                    isSaved && (
-                        <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4" role="alert">
-                            <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-4 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                Tạo yêu cầu điền đơn ngay!
+                    {
+                        isSaved && (
+                            <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4" role="alert">
+                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-4 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Tạo yêu cầu điền đơn ngay!
+                                </Link>
+                            </div>
+                        )
+                    }
+
+                    <div className="mb-10">
+                        <h2 className="text-3xl font-bold mb-4">Điền theo tỉ lệ mong muốn</h2>
+                        <div className="mb-4">
+                            <Link href="" className="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 mb-2 hover:bg-blue-700">
+                                Điền theo tỉ lệ mong muốn
+                            </Link>
+                            <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mr-2 mb-2 hover:bg-blue-50">
+                                Điền theo data có trước
+                            </Link>
+                            <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mb-2 hover:bg-blue-50">
+                                Chạy form
                             </Link>
                         </div>
-                    )
-                }
-
-                <div className="mb-10">
-                    <h2 className="text-3xl font-bold mb-4">Điền theo tỉ lệ mong muốn</h2>
-                    <div className="mb-4">
-                        <Link href="" className="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 mb-2 hover:bg-blue-700">
-                            Điền theo tỉ lệ mong muốn
-                        </Link>
-                        <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mr-2 mb-2 hover:bg-blue-50">
-                            Điền theo data có trước
-                        </Link>
-                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mb-2 hover:bg-blue-50">
-                            Chạy form
-                        </Link>
+                        <p className="mb-2">Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi nhé</p>
+                        <p className="mb-2">
+                            Nếu bạn chưa biết điền. Hãy thử <span onClick={autoFillHandle} className="text-blue-600 text-lg font-bold cursor-pointer">ấn vào đây</span> để fillform <b>đề xuất tỉ lệ</b> cho bạn tham khảo nha!(Tỉ lệ mang tính chất tham khảo để bạn duyệt trước).
+                        </p>
+                        <p className="mb-2"><b>Hãy chỉnh sửa tỉ lệ để phù hợp nhất với đề tài của bạn</b> FillForm sẽ chỉ cam kết điền form đúng theo yêu cầu tỉ lệ</p>
+                        <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=3_r-atbIiAI" className="text-blue-600">https://www.youtube.com/watch?v=3_r-atbIiAI</a></p>
                     </div>
-                    <p className="mb-2">Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi nhé</p>
-                    <p className="mb-2">
-                        Nếu bạn chưa biết điền. Hãy thử <span onClick={autoFillHandle} className="text-blue-600 text-lg font-bold cursor-pointer">ấn vào đây</span> để fillform <b>đề xuất tỉ lệ</b> cho bạn tham khảo nha!(Tỉ lệ mang tính chất tham khảo để bạn duyệt trước).
-                    </p>
-                    <p className="mb-2"><b>Hãy chỉnh sửa tỉ lệ để phù hợp nhất với đề tài của bạn</b> FillForm sẽ chỉ cam kết điền form đúng theo yêu cầu tỉ lệ</p>
-                    <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=3_r-atbIiAI" className="text-blue-600">https://www.youtube.com/watch?v=3_r-atbIiAI</a></p>
-                </div>
 
-                <form className="mb-6">
-                    <div className="mb-4">
-                        <div className="flex mb-3 w-full">
-                            <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Form</span>
-                            <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                                id="urlMain" name="urlMain" defaultValue={dataForm?.form.urlMain} />
+                    <form className="mb-6">
+                        <div className="mb-4">
+                            <div className="flex mb-3 w-full">
+                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Form</span>
+                                <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                    id="urlMain" name="urlMain" defaultValue={dataForm?.form.urlMain} />
+                            </div>
+                            <div className="flex mb-3 w-full">
+                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Tên Form</span>
+                                <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                    id="urlCopy" name="urlCopy" defaultValue={dataForm?.form.name} />
+                            </div>
+                            <input type="hidden" id="lang" name="lang" value={dataForm?.config?.lang || ''} />
+                            <input type="hidden" id="isValidCollectEmail" name="isValidCollectEmail" value={dataForm?.config?.isValidCollectEmail || ''} />
+                            <input type="hidden" id="isValidEditAnswer" name="isValidEditAnswer" value={dataForm?.config?.isValidEditAnswer || ''} />
+                            <input type="hidden" id="isValidLimitRes" name="isValidLimitRes" value={dataForm?.config?.isValidLimitRes || ''} />
+                            <input type="hidden" id="isValidPublished" name="isValidPublished" value={dataForm?.config?.isValidPublished || ''} />
                         </div>
-                        <div className="flex mb-3 w-full">
-                            <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Tên Form</span>
-                            <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                                id="urlCopy" name="urlCopy" defaultValue={dataForm?.form.name} />
-                        </div>
-                        <input type="hidden" id="lang" name="lang" value={dataForm?.config?.lang || ''} />
-                        <input type="hidden" id="isValidCollectEmail" name="isValidCollectEmail" value={dataForm?.config?.isValidCollectEmail || ''} />
-                        <input type="hidden" id="isValidEditAnswer" name="isValidEditAnswer" value={dataForm?.config?.isValidEditAnswer || ''} />
-                        <input type="hidden" id="isValidLimitRes" name="isValidLimitRes" value={dataForm?.config?.isValidLimitRes || ''} />
-                        <input type="hidden" id="isValidPublished" name="isValidPublished" value={dataForm?.config?.isValidPublished || ''} />
-                    </div>
-                </form>
+                    </form>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-6 rounded-lg">
-                    <div className="space-y-4">
-                        {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
-                            <div key={questionId} className="p-4 bg-white rounded shadow-sm">
-                                <div className="md:flex md:items-start">
-                                    <div className="md:w-1/3 mb-4 md:mb-0">
-                                        {question.description ? (
-                                            <>
-                                                <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
-                                                <label className="block truncate w-full">{question.description}</label>
-                                            </>
-                                        ) : (
-                                            <label className="block font-bold truncate w-full">{question.question}</label>
-                                        )}
-                                    </div>
-
-                                    <div className="md:w-2/3">
-                                        <div className="flex gap-x-2 flex-wrap gap-y-2">
-                                            {question.type ? (
+                    <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-6 rounded-lg">
+                        <div className="space-y-4">
+                            {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
+                                <div key={questionId} className="p-4 bg-white rounded shadow-sm">
+                                    <div className="md:flex md:items-start">
+                                        <div className="md:w-1/3 mb-4 md:mb-0">
+                                            {question.description ? (
                                                 <>
-                                                    <input type="hidden" {...register(`isMulti-${question.id}`)} defaultValue={question.isMulti} />
-                                                    <input type="hidden" {...register(`totalans-${question.id}`)} defaultValue={question.totalAnswer} />
-                                                    <input type="hidden" {...register(`type-${question.id}`)} defaultValue={question.type} />
-
-                                                    {question.answer && question.answer.map((answer: any, answerId: any) => (
-                                                        answer.data && (
-                                                            <div key={answerId} className="flex">
-                                                                <div className="flex-1">
-                                                                    <div className="flex">
-                                                                        <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 max-w-[280px]">{answer.data}</span>
-                                                                        <input
-                                                                            type="number"
-                                                                            min="0"
-                                                                            step="1"
-                                                                            className="rounded-r-md border-gray-300 w-24 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 answer-input"
-                                                                            {...register('answer_' + answer.id)}
-                                                                            defaultValue={answer.count}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    ))}
+                                                    <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
+                                                    <label className="block truncate w-full">{question.description}</label>
                                                 </>
                                             ) : (
-                                                question.answer && question.answer.map((answer: any, answerId: any) => (
-                                                    <div key={answerId} className="w-full">
-                                                        <div className="flex">
-                                                            <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 text-sm">
-                                                                Chọn loại câu hỏi tự luận (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
-                                                            </span>
-                                                            <select
-                                                                className="rounded-r-md border-gray-300 w-1/3 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm answer-select"
-                                                                {...register(answer.id)}
-                                                                defaultValue={answer.count}
-                                                            >
-                                                                {answer.options && answer.options.map((option: any, optionId: any) => (
-                                                                    <option key={optionId} value={option}>{option}</option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
-                                                        <textarea
-                                                            className="mt-2 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm hidden custom-input"
-                                                            id={`custom-${answer.id}`}
-                                                            {...register(`custom-${answer.id}`)}
-                                                            defaultValue={answer.data}
-                                                            placeholder="Nhập mỗi dòng 1 câu trả lời (ấn enter để xuống dòng). Không để dòng trống. Tool sẽ điền lặp lại ngẫu nhiên nếu số lượng không đủ."
-                                                        />
-                                                    </div>
-                                                ))
+                                                <label className="block font-bold truncate w-full">{question.question}</label>
                                             )}
+                                        </div>
+
+                                        <div className="md:w-2/3">
+                                            <div className="flex gap-x-2 flex-wrap gap-y-2">
+                                                {question.type ? (
+                                                    <>
+                                                        <input type="hidden" {...register(`isMulti-${question.id}`)} defaultValue={question.isMulti} />
+                                                        <input type="hidden" {...register(`totalans-${question.id}`)} defaultValue={question.totalAnswer} />
+                                                        <input type="hidden" {...register(`type-${question.id}`)} defaultValue={question.type} />
+
+                                                        {question.answer && question.answer.map((answer: any, answerId: any) => (
+                                                            answer.data && (
+                                                                <div key={answerId} className="flex">
+                                                                    <div className="flex-1">
+                                                                        <div className="flex">
+                                                                            <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 max-w-[280px]">{answer.data}</span>
+                                                                            <input
+                                                                                type="number"
+                                                                                min="0"
+                                                                                step="1"
+                                                                                className="rounded-r-md border-gray-300 w-24 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 answer-input"
+                                                                                {...register('answer_' + answer.id)}
+                                                                                defaultValue={answer.count}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        ))}
+                                                    </>
+                                                ) : (
+                                                    question.answer && question.answer.map((answer: any, answerId: any) => (
+                                                        <div key={answerId} className="w-full">
+                                                            <div className="flex">
+                                                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 text-sm">
+                                                                    Chọn loại câu hỏi tự luận (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
+                                                                </span>
+                                                                <select
+                                                                    className="rounded-r-md border-gray-300 w-1/3 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm answer-select"
+                                                                    {...register(answer.id)}
+                                                                    defaultValue={answer.count}
+                                                                >
+                                                                    {answer.options && answer.options.map((option: any, optionId: any) => (
+                                                                        <option key={optionId} value={option}>{option}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                            <textarea
+                                                                className="mt-2 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm hidden custom-input"
+                                                                id={`custom-${answer.id}`}
+                                                                {...register(`custom-${answer.id}`)}
+                                                                defaultValue={answer.data}
+                                                                placeholder="Nhập mỗi dòng 1 câu trả lời (ấn enter để xuống dòng). Không để dòng trống. Tool sẽ điền lặp lại ngẫu nhiên nếu số lượng không đủ."
+                                                            />
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                        <button
-                            type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
-                            Lưu lại và tiếp tục
-                        </button>
+                            ))}
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                                Lưu lại và tiếp tục
+                            </button>
 
-                        {
-                            isSaved && (
-                                <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4 text-center" role="alert">
-                                    <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                        Tạo yêu cầu điền đơn ngay!
-                                    </Link>
-                                </div>
-                            )
-                        }
-                    </div>
-                </form>
-            </div>
+                            {
+                                isSaved && (
+                                    <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4 text-center" role="alert">
+                                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                            Tạo yêu cầu điền đơn ngay!
+                                        </Link>
+                                    </div>
+                                )
+                            }
+                        </div>
+                    </form>
+                </div>
+            </section>
 
-            {/* Chat Container */}
-            <div className={`fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${chatOpen ? 'h-96' : 'h-12'}`}>
+            {/* Chat Container - moved outside section */}
+            <div className={`fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 z-[9999] ${chatOpen ? 'h-96' : 'h-12'}`}>
                 <div
                     className="bg-blue-600 text-white p-3 flex items-center justify-between cursor-pointer"
                     onClick={toggleChat}
@@ -430,6 +436,6 @@ export default function FormRate() {
                     </div>
                 )}
             </div>
-        </section>
+        </>
     );
 }

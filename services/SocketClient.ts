@@ -1,15 +1,22 @@
 import { io } from 'socket.io-client';
-
-const SOCKET_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-
-class SocketService {
+import { SOCKET_URL } from '@/core/Constants';
+import { RawUser } from '@/store/types';
+class SocketServiceClient {
     private socket: any;
 
-    connect() {
-        this.socket = io(SOCKET_URL);
+    connect(me: RawUser) {
+
+        console.log('Connecting to WebSocket server, ', me.id);
+        this.socket = io(SOCKET_URL, {
+            auth: {
+                userId: me.id
+            }
+        });
 
         this.socket.on('connect', () => {
             console.log('Connected to WebSocket server');
+
+            this.socket.emit('joinRoom', me.id);
         });
 
         this.socket.on('disconnect', () => {
@@ -39,4 +46,5 @@ class SocketService {
     }
 }
 
-export default new SocketService(); 
+const SocketService = new SocketServiceClient();
+export { SocketService };
