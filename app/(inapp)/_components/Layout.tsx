@@ -23,6 +23,7 @@ export default function NormalLayout({ children }: PropsWithChildren) {
             { name: 'Tạo form ngay', href: '/form/create' },
             { name: 'Mã hoá data', href: '/data/encode' },
             { name: 'Nạp tiền', href: '/credit' },
+            { name: 'Về fillform', href: 'https://fillform.info' },
           ],
           subs: []
         }}

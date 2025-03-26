@@ -12,7 +12,8 @@ import { useMe } from '@/hooks/user';
 
 export default function FormRateOrder() {
     const params = useParams();
-    const { data: formData, isLoading } = useFormById(params.id as string);
+    const { data: formData, isLoading: isLoadingForm } = useFormById(params.id as string);
+    const [isLoading, setIsLoading] = useState(false);
     const me = useMe();
 
     const [numRequest, setNumRequest] = useState('');
@@ -114,6 +115,7 @@ export default function FormRateOrder() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
 
             const response = await Fetch.postWithAccessToken<{
@@ -138,6 +140,8 @@ export default function FormRateOrder() {
 
             Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
             console.error('Error submitting form:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -153,7 +157,7 @@ export default function FormRateOrder() {
                                 <div className="mb-4 grid grid-cols-12 items-center">
                                     <label htmlFor="credit" className="col-span-8 lg:col-span-6">Số dư tài khoản</label>
                                     <div className="col-span-4 lg:col-span-6">
-                                        <input type="text" readOnly className="bg-transparent w-full" id="credit" value={me.data?.credit} />
+                                        <input type="text" readOnly className="bg-transparent w-full" id="credit" value={me.data?.credit.toLocaleString() + ' VND'} />
                                     </div>
                                 </div>
                                 <div className="mb-4 grid grid-cols-12 items-center">
@@ -186,10 +190,11 @@ export default function FormRateOrder() {
                                             value={delayType}
                                             onChange={(e) => setDelayType(e.target.value)}
                                         >
-                                            <option value="0">Không cần điền rải</option>
-                                            <option value="1">Điền giãn cách ngắn</option>
-                                            <option value="2">Điền giãn cách tiêu chuẩn</option>
-                                            <option value="3">Điền giãn cách dài</option>
+                                            {Object.keys(OPTIONS_DELAY).map(e => parseInt(e)).map((key: number) => (
+                                                <option key={key} value={key}>
+                                                    {OPTIONS_DELAY[key].name}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>

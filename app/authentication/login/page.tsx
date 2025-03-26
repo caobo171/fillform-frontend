@@ -74,7 +74,7 @@ export default function Login() {
     <>
       <Meta title="Fillform | Đăng nhập" />
 
-      <div className="w-screen h-screen bg-cover bg-center bg-[url('/static/bg3.jpg')]">
+      <div className="w-screen h-screen bg-cover bg-center bg-[url('/static/background_index.jpg')]">
         <div className="relative bg-white flex flex-col h-full justify-center items-center xl:w-1/2 2xl:w-[736px] px-6 sm:px-0">
           <div className="text-left text-sm leading-5 mb-[60px] w-full sm:w-auto">
             <Link href="/" className="inline-block">

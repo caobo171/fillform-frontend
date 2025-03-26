@@ -7,40 +7,8 @@ import Image from 'next/image';
 import { useFormById } from '@/hooks/form';
 import { useParams } from 'next/navigation';
 import Fetch from '@/lib/core/fetch/Fetch';
-
-// Define TypeScript interfaces
-interface Answer {
-    id: string;
-    data?: string;
-    count: number | string;
-    options?: string[];
-}
-
-interface Question {
-    id: string;
-    question: string;
-    description?: string;
-    type?: number;
-    isMulti?: number;
-    totalAnswer?: number;
-    answer: Answer[];
-}
-
-interface FormData {
-    slug: string;
-    urlMain: string;
-    name: string;
-    owner: string;
-    loaddata: Question[];
-}
-
-interface Config {
-    lang: string | null;
-    isValidCollectEmail: string | null;
-    isValidEditAnswer: string | null;
-    isValidLimitRes: string | null;
-    isValidPublished: string | null;
-}
+import LoadingAbsolute from '@/components/loading';
+import { RawForm } from '@/store/types';
 
 interface ChatError {
     id: string;
@@ -52,9 +20,9 @@ interface ChatError {
 export default function FormRate() {
 
     const params = useParams();
-    const { data: dataForm, isLoading, mutate: mutateForm } = useFormById(params.id as string);
-
-    const { register, handleSubmit, watch } = useForm();
+    const { data: dataForm, isLoading: isLoadingForm, mutate: mutateForm } = useFormById(params.id as string);
+    const { register, handleSubmit, watch, setValue } = useForm();
+    const [isLoading, setIsLoading] = useState(false);
 
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const [chatOpen, setChatOpen] = useState<boolean>(true);
@@ -77,14 +45,41 @@ export default function FormRate() {
 
 
     const autoFillHandle = async (): Promise<void> => {
+        setIsLoading(true);
         try {
-            await Fetch.postWithAccessToken('/api/form/rate.autofill', {
+            const res = await Fetch.postWithAccessToken<{ code: number, message: string, form: RawForm }>('/api/form/rate.autofill', {
                 id: dataForm?.form.id,
             });
 
-            mutateForm();
+            await mutateForm();
+            
+            // After mutating, update all form values
+            if (res.data.form.loaddata) {
+                res.data.form.loaddata.forEach((question) => {
+                    if (question.type) {
+                        setValue(`isMulti-${question.id}`, question.isMulti);
+                        setValue(`totalans-${question.id}`, question.totalAnswer);
+                        setValue(`type-${question.id}`, question.type);
+                        
+                        question.answer?.forEach((answer: any) => {
+                            if (answer.data) {
+                                setValue(`answer_${answer.id}`, answer.count);
+                            }
+                        });
+                    } else {
+                        question.answer?.forEach((answer: any) => {
+                            setValue(answer.id, answer.count);
+                            if (answer.data) {
+                                setValue(`custom-${answer.id}`, answer.data);
+                            }
+                        });
+                    }
+                });
+            }
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -99,9 +94,9 @@ export default function FormRate() {
     const addChatError = (message: string, errorId: string, type: 'error' | 'warning' | 'note'): void => {
         // Check if error already exists
         if (chatErrors.some(error => error.id === errorId)) return;
-
         setChatErrors([...chatErrors, { id: errorId, message, type }]);
     };
+
 
     const validateInputs = (): void => {
         // Validation logic here
@@ -220,13 +215,12 @@ export default function FormRate() {
     }, []);
 
 
-    if (isLoading || !dataForm) {
+    if (isLoadingForm || !dataForm || isLoading) {
         return (
-            <div className="flex flex-col gap-4">
-                <div className="w-[150px] h-[28px] rounded-lg bg-gray-200 animate-pulse" />
-            </div>
+            <LoadingAbsolute />
         );
     }
+    
 
 
     return (
@@ -235,9 +229,11 @@ export default function FormRate() {
 
                 {
                     isSaved && (
-                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                            Tạo yêu cầu điền đơn ngay!
-                        </Link>
+                        <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4" role="alert">
+                            <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-4 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Tạo yêu cầu điền đơn ngay!
+                            </Link>
+                        </div>
                     )
                 }
 
@@ -317,7 +313,7 @@ export default function FormRate() {
                                                                             min="0"
                                                                             step="1"
                                                                             className="rounded-r-md border-gray-300 w-24 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 answer-input"
-                                                                            {...register(answer.id)}
+                                                                            {...register('answer_' + answer.id)}
                                                                             defaultValue={answer.count}
                                                                         />
                                                                     </div>
@@ -364,6 +360,16 @@ export default function FormRate() {
                         >
                             Lưu lại và tiếp tục
                         </button>
+
+                        {
+                            isSaved && (
+                                <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4 text-center" role="alert">
+                                    <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                        Tạo yêu cầu điền đơn ngay!
+                                    </Link>
+                                </div>
+                            )
+                        }
                     </div>
                 </form>
             </div>

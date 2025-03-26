@@ -51,6 +51,10 @@ const OrderPage: FC<OrderPageProps> = () => {
     // Note: You'll need to fetch this data from your API
     const isAdmin = me.data?.is_super_admin;
 
+    if (order.isLoading) {
+        return <Loading />
+    }
+
     return (
         <section className="py-12">
             <div className="container mx-auto text-center">

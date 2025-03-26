@@ -11,6 +11,7 @@ import { MeHook } from "@/store/me/hooks";
 import { useMe } from "@/hooks/user";
 import Fetch from "@/lib/core/fetch/Fetch";
 import { Toast } from "@/services/Toast";
+import LoadingAbsolute from "@/components/loading";
 
 interface FormData {
     slug: string;
@@ -49,6 +50,7 @@ export default function FormPrefill() {
     const { id } = useParams();
 
     const { data: formData, isLoading: isLoadingForm } = useFormById(id as string);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [fields, setFields] = useState<Field[] | null>(null);
     const [prefillForm, setPrefillForm] = useState<any>(null);
@@ -65,13 +67,10 @@ export default function FormPrefill() {
         try {
 
 
-            const res = await Fetch.postWithAccessToken('/api/form/get.prefill', {
+            const res = await Fetch.postWithAccessToken<{ code: number, message: string, fields: any, prefillData: any, form: any }>('/api/form/get.prefill', {
                 data_url: urlData,
                 id: formData?.form?.id
             });
-
-            console.log("res", res);
-
 
             setFields(res.data?.fields);
             setPrefillData(res.data?.prefillData);
@@ -89,15 +88,15 @@ export default function FormPrefill() {
         console.log("Running prefill with data:", data);
 
         try {
-            const response = await Fetch.postWithAccessToken('/api/order/create.prefill.run', {
+            const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.prefill.run', {
                 form_id: formData?.form?.id,
                 ...data,
                 delay_type: data.delay,
                 num_request: data.num_request,
                 data_url: urlData,
-    
+
             });
-    
+
             if (response.data?.code == Code.SUCCESS) {
                 Toast.success('Đã tạo yêu cầu điền form thành công!');
                 router.push(`/`);
@@ -105,9 +104,9 @@ export default function FormPrefill() {
                 Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
                 console.error('Form submission failed');
             }
-    
+
             console.log("res", response);
-        } catch(err){
+        } catch (err) {
             Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
             console.error('Form submission failed');
         }
@@ -197,12 +196,13 @@ export default function FormPrefill() {
 
     const { pricePerAnswer, total, insufficientFunds, delayNote, message } = calculatePriceAndDelay();
 
-    if (!formData) return <div>Loading...</div>;
+    if (!formData) return <LoadingAbsolute />;
 
     return (
         <section className="py-12 bg-gray-50">
             <div className="container mx-auto px-4 text-center">
                 <div className="mb-8">
+                    {(isLoading || isLoadingForm) ? <LoadingAbsolute /> : <></>}
                     <h2 className="text-2xl font-bold mb-4">Điền theo data có trước</h2>
                     <div className="flex flex-wrap justify-center gap-2 mb-4">
                         <Link
@@ -274,29 +274,29 @@ export default function FormPrefill() {
                                     <div key={index} className="p-2 mb-2 border-b border-gray-200">
                                         <div className="flex flex-col md:flex-row gap-4">
                                             <div className="md:w-1/2">
-                                            <label className="font-bold block mb-1">{data.question}</label>
-                                            <span className="text-sm text-gray-600 block">{data.description}</span>
-                                        </div>
-                                        <div className="md:w-1/2">
-                                            <div className="flex flex-col">
-                                                <label className="bg-gray-100 p-2 border border-gray-300 rounded-t text-sm">
-                                                    Chọn cột để liên kết dữ liệu
-                                                </label>
-                                                <select
-                                                    {...register('question_'+data.id, {value: data.field})}
-                                                    className="border border-gray-300 p-2 rounded-b text-sm"
-                                                    defaultValue={data.field}
-                                                >
-                                                    {fields && fields.map((field: any) => (
-                                                        <option key={field.value} value={field.value}>
-                                                            {field.value}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                <label className="font-bold block mb-1">{data.question}</label>
+                                                <span className="text-sm text-gray-600 block">{data.description}</span>
+                                            </div>
+                                            <div className="md:w-1/2">
+                                                <div className="flex flex-col">
+                                                    <label className="bg-gray-100 p-2 border border-gray-300 rounded-t text-sm">
+                                                        Chọn cột để liên kết dữ liệu
+                                                    </label>
+                                                    <select
+                                                        {...register('question_' + data.id, { value: data.field })}
+                                                        className="border border-gray-300 p-2 rounded-b text-sm"
+                                                        defaultValue={data.field}
+                                                    >
+                                                        {fields && fields.map((field: any) => (
+                                                            <option key={field.value} value={field.value}>
+                                                                {field.value}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 )
                             })}
 
