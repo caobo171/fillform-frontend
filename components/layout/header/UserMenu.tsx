@@ -5,7 +5,6 @@ import {
   FolderIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
-import clsx from 'clsx';
 import React, { useMemo } from 'react';
 
 import { Dropdown, DropdownProps, PremiumIcon } from '@/components/common';
@@ -53,17 +52,6 @@ export function UserMenu({ data }: UserMenuProps) {
     }
 
 
-
-    options.push({
-      label: (
-        <div className={dropdownItemCls}>
-          <Cog6ToothIcon className="w-5 h-5" />
-          Quản lý tài khoản
-        </div>
-      ),
-      value: 'manage_account',
-      href: '/user/account',
-    });
 
     options.push({
       label: (

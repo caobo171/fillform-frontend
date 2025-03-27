@@ -3,7 +3,7 @@ import { RawForm, RawOrder } from '@/store/types';
 import useSWR from 'swr'
 
 
-export const useOrders = (page: number, limit: number) => {
+export const useMyOrders = (page: number, limit: number) => {
 
 	const res = useSWR('/api/order/list?page=' + page + '&limit=' + limit, async (url) => {
 		const rest = await Fetch.postWithAccessToken<{

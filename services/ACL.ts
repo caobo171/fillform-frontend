@@ -1,14 +1,10 @@
 import Constants, { ROLES } from '@/core/Constants';
-import { RawUser, RawWeleClass } from '@/store/types';
+import { RawUser } from '@/store/types';
 
 class ACL {
   isAdmin(user?: RawUser | null) {
     if (user) {
-      if (
-        user.role == 'admin'
-      ) {
-        return true;
-      }
+      return user.is_super_admin;
     }
 
     return false;

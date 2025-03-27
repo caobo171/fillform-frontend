@@ -11,20 +11,17 @@ import {
   Input,
   Modal,
   Pagination,
-  Select,
   Table,
   TableProps,
   TextArea,
 } from '@/components/common';
 import { FormItem } from '@/components/form/FormItem';
-import Avatar from '@/components/ui/Avatar';
-import { Code, ROLES } from '@/core/Constants';
+import { Code } from '@/core/Constants';
 import { useQueryString } from '@/hooks/useQueryString';
 import Fetch from '@/lib/core/fetch/Fetch';
-import { Helper } from '@/services/Helper';
 import { AnyObject } from '@/store/interface';
 import { RawUser } from '@/store/types';
-
+import Link from 'next/link';
 export default function Users() {
   const pageSize = 20;
 
@@ -57,7 +54,7 @@ export default function Users() {
     mutate: reloadUsers,
   } = useSWR(
     [
-      '/api/user/admin.list ',
+      '/api/user/list ',
       {
         q: query,
         page: currentPage,
@@ -72,8 +69,8 @@ export default function Users() {
     Fetch.postFetcher.bind(Fetch)
   );
 
-  const { trigger: updateCoin, isMutating: updating } = useSWRMutation(
-    '/api/user/change.coin',
+  const { trigger: addCredit, isMutating: addingCredit } = useSWRMutation(
+    '/api/user/add.credit',
     Fetch.postFetcher.bind(Fetch)
   );
 
@@ -121,33 +118,33 @@ export default function Users() {
     [createQueryString, pathname, router]
   );
 
-  const handleUpdateCoin = useCallback(async () => {
-    const coin = Number(coinInputRef.current?.value);
+  const handleAddCredit = useCallback(async () => {
+    const credit = Number(coinInputRef.current?.value);
 
-    if (!coin) {
-      toast.error('Number of coin must be a number');
+    if (!credit) {
+      toast.error('Number of credit must be a number');
 
       return;
     }
 
-    const res: AnyObject = await updateCoin({
+    const res: AnyObject = await addCredit({
       payload: {
         user_id: selected?.id,
-        coin: Number(coinInputRef.current?.value),
-        reason: contentRef.current?.value,
+        credit: Number(coinInputRef.current?.value),
+        message: contentRef.current?.value,
       },
     });
 
     if (res?.data?.code === Code.Error) {
       toast.error(res?.data?.message);
     } else {
-      toast.success('Coin has been updated');
+      toast.success('Credit has been added');
 
       reloadUsers();
 
       setSelected(undefined);
     }
-  }, [reloadUsers, selected?.id, updateCoin]);
+  }, [reloadUsers, selected?.id, addCredit]);
 
   const handleCopyEmail = useCallback((val: string) => {
     navigator.clipboard.writeText(val);
@@ -161,81 +158,49 @@ export default function Users() {
         title: 'Id',
         key: 'id',
         dataIndex: 'id',
-        className: 'w-16',
+        className: '',
       },
+
       {
-        title: 'Avatar',
-        key: 'avatar',
-        className: 'w-16',
+        title: 'Username',
+        key: 'username',
+        dataIndex: 'username',
         render: (data: RawUser) => (
-          <div className="flex gap-2 items-center">
-            <Avatar user={data} size={32} />
-
-            <div className="flex flex-col gap-1">
-              <span className="text-sm text-gray-900">{data.username}</span>
-
-              <span
-                aria-hidden="true"
-                title="Click to copy email"
-                className="text-xs text-gray-500 cursor-pointer"
-                onClick={() => handleCopyEmail(data.email)}
-              >
-                {data.email}
-              </span>
-            </div>
-          </div>
+          <Link href={`/admin/users/${data.id}`} className="w-full flex items-center justify-end gap-4">
+            {data.username}
+          </Link>
         ),
       },
+
       {
-        title: 'Full name',
-        key: 'fullname',
-        dataIndex: 'fullname',
+        title: 'Email',
+        key: 'email',
+        dataIndex: 'email',
       },
+
       {
-        title: 'Join date',
-        key: 'since',
-        dataIndex: 'since',
-        render: (data: RawUser) => Helper.getDay(data.since),
-      },
-      {
-        title: 'Role',
-        key: 'role',
-        dataIndex: 'role',
-        className: 'w-[212px]',
-        render: (data: RawUser) => (
-          <Select
-            onChange={(val) => onRoleChange(data.id, Number(val))}
-            value={data.role ?? ROLES.Member}
-            className="w-full"
-            options={[
-              { label: 'Member', value: ROLES.Member },
-              { label: 'Admin', value: ROLES.Admin },
-              { label: 'Content creator', value: ROLES.ContentCreator },
-              { label: 'Teacher', value: ROLES.Teacher },
-            ]}
-          />
-        ),
-      },
-      {
-        title: 'Coin',
-        key: 'coin',
+        title: 'Số dư',
+        key: 'credit',
         className: 'text-right',
         render: (data: RawUser) => (
           <div className="w-full flex items-center justify-end gap-4">
-            <span className="text-sm text-lime-500" title="Wallet 1">
-              {data.allowance_coin ?? 0}
-            </span>
+            {data.credit.toLocaleString()} VND
+          </div>
+        ),
+      },
 
-            <span className="text-sm text-indigo-500" title="Wallet 2">
-              {data.earning_coin ?? 0}
-            </span>
-
+      {
+        title: 'Credit',
+        key: 'credit',
+        className: 'text-right',
+        render: (data: RawUser) => (
+          <div className="w-full flex items-center justify-end gap-4">
             <span
               aria-hidden="true"
               onClick={() => setSelected(data)}
               className="text-sm text-gray-500 underline hover:text-gray-900 cursor-pointer"
             >
-              Edit coin
+              Add credit
             </span>
           </div>
         ),
@@ -249,10 +214,10 @@ export default function Users() {
       <Modal
         open={!!selected}
         onCancel={() => setSelected(undefined)}
-        title={`Update coin for ${selected?.fullname}`}
-        okText="Update"
-        onOk={handleUpdateCoin}
-        okButtonProps={{ loading: updating }}
+        title={`Add credit for ${selected?.username}`}
+        okText="Add"
+        onOk={handleAddCredit}
+        okButtonProps={{ loading: addingCredit }}
       >
         <div className="pt-6 pb-4 text-sm text-gray-900">
           <FormItem
@@ -262,7 +227,7 @@ export default function Users() {
             <Input type="number" ref={coinInputRef} />
           </FormItem>
 
-          <FormItem label="Reason">
+          <FormItem label="Message">
             <TextArea ref={contentRef} />
           </FormItem>
         </div>

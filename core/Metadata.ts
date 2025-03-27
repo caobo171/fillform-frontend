@@ -4,9 +4,9 @@ class MetaData {
   static appDomain = 'https://app.wele-learn.com';
 
   static defaultKeywords =
-    'Nghe chép chính tả, tự học tiếng anh, học tiếng anh miễn phí';
+    'Điền đơn tự động, tự học tiếng anh, học tiếng anh miễn phí';
 
-  static defaultTitle = 'Fillform - Nghe chép chính tả';
+  static defaultTitle = 'Fillform - Điền đơn tự động';
 
   static defaultDescription =
     'Fillform là chương trình luyện nghe Tiếng Anh miễn phí và sử dụng phương pháp nghe chép chính tả.';

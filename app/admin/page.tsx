@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
+import Users from './users/_components/Users';
 
-import { Podcasts } from '@/app/admin/podcasts/Podcasts';
 
 export const metadata: Metadata = {
   title: 'Podcasts',
 };
 
 export default function Page() {
-  return <Podcasts />;
+  return <Users />
 }

@@ -1,10 +1,10 @@
 'use client';
 
 import { Fragment, useState } from 'react';
-import { useForms } from '@/hooks/form';
+import { useMyForms } from '@/hooks/form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useOrders } from '@/hooks/order';
+import { useMyOrders } from '@/hooks/order';
 import { ORDER_STATUS, OPTIONS_DELAY, Code } from '@/core/Constants';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { Toast } from '@/services/Toast';
@@ -13,7 +13,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function OrderLists() {
     const [currentOrderPage, setCurrentOrderPage] = useState(1);
-    const dataOrder = useOrders(currentOrderPage, ITEMS_PER_PAGE);
+    const dataOrder = useMyOrders(currentOrderPage, ITEMS_PER_PAGE);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 

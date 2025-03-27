@@ -23,6 +23,21 @@ export const useMe = () => {
 }
 
 
+export const useUserProfile = (id: number) => {
+	const res = useSWR('/api/user/profile?id=' + id, async (url) => {
+		const rest = await Fetch.postWithAccessToken<{
+			user: RawUser
+		}>(url, {
+			id: id
+		});
+		return rest.data.user;
+	}, {
+	});
+
+	return res;
+}
+
+
 export const useUsers = (ids: number[]) => {
 	const res = useSWR('/api/user/ids?ids=' + _.union(ids).join(','), async (url) => {
 

@@ -1,8 +1,8 @@
 import Head from 'next/head';
 
 function Meta({
-  title = 'Fillform - Nghe chép chính tả',
-  keywords = 'Nghe chép chính tả, tự học tiếng anh, học tiếng anh miễn phí',
+  title = 'Fillform - Điền đơn tự động',
+  keywords = 'Điền đơn tự động, tự học tiếng anh, học tiếng anh miễn phí',
   url = '',
   image = '',
   description = 'Fillform là chương trình luyện nghe Tiếng Anh miễn phí và sử dụng phương pháp nghe chép chính tả.',

@@ -1,12 +1,15 @@
 'use client'
 
 import LoadingAbsolute, { Loading } from '@/components/loading'
-import { OPTIONS_DELAY, ORDER_STATUS } from '@/core/Constants'
+import { Code, OPTIONS_DELAY, ORDER_STATUS } from '@/core/Constants'
 import { useFormById } from '@/hooks/form'
 import { useOrderById } from '@/hooks/order'
 import { useMe } from '@/hooks/user'
+import Fetch from '@/lib/core/fetch/Fetch'
+import { Toast } from '@/services/Toast'
+import { RawOrder } from '@/store/types'
 import { useParams } from 'next/navigation'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 
 interface Answer {
     id: string
@@ -48,15 +51,93 @@ const OrderPage: FC<OrderPageProps> = () => {
     const params = useParams();
     const me = useMe();
     const order = useOrderById(params.id as string)
+    const [isFetching, setIsFetching] = useState(false)
     // Note: You'll need to fetch this data from your API
     const isAdmin = me.data?.is_super_admin;
+
+    const orderContinue = async () => {
+        setIsFetching(true)
+        try {
+
+            const res = await Fetch.postWithAccessToken<{ code: number }>('/api/order/continue', {
+                id: params.id as string
+            })
+
+            if (res.data.code === Code.SUCCESS) {
+                order.mutate();
+                Toast.success('Order đã được tiếp tục');
+            }
+        } catch (error) {
+            Toast.error('Lỗi khi tiếp tục order');
+        } finally {
+            setIsFetching(false)
+        }
+    }
+
+    const orderStop = async () => {
+        setIsFetching(true)
+        try {
+            const res = await Fetch.postWithAccessToken<{ code: number }>('/api/order/stop', {
+                id: params.id as string
+            })
+
+            if (res.data.code === Code.SUCCESS) {
+                order.mutate();
+                Toast.success('Order đã được dừng');
+            }
+        } catch (error) {
+            Toast.error('Lỗi khi dừng order');
+        } finally {
+            setIsFetching(false)
+        }
+    }
+
+    const orderClone = async () => {
+        setIsFetching(true)
+        try {
+            const res = await Fetch.postWithAccessToken<{ code: number, cloned_order: RawOrder, order: RawOrder }>('/api/order/clone', {
+                id: params.id as string
+            })
+
+            if (res.data.code === Code.SUCCESS) {
+                order.mutate();
+                Toast.success('Order đã được clone');
+                window.open(`/order/detail/${res.data.cloned_order.id}`, '_blank');
+            }
+        } catch (error) {
+            Toast.error('Lỗi khi clone order');
+        } finally {
+            setIsFetching(false)
+        }
+    }
+
+    const orderPause = async () => {
+        setIsFetching(true)
+        try {
+            const res = await Fetch.postWithAccessToken<{ code: number }>('/api/order/pause', {
+                id: params.id as string
+            })
+
+            if (res.data.code === Code.SUCCESS) {
+                order.mutate();
+                Toast.success('Order đã được tạm dừng');
+            }
+        } catch (error) {
+            Toast.error('Lỗi khi tạm dừng order');
+        } finally {
+            setIsFetching(false)
+        }
+    }
 
     if (order.isLoading) {
         return <Loading />
     }
 
+
+
     return (
         <section className="py-12">
+            {isFetching && <LoadingAbsolute />}
             <div className="container mx-auto text-center">
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold mb-6">Xem chi tiết Order</h2>
@@ -80,7 +161,7 @@ const OrderPage: FC<OrderPageProps> = () => {
                                     <a href={order.data?.order.url} className="text-black hover:underline">{order.data?.order.name}</a>
                                 </b><br />
                                 Tổng Order Request: <b>{order.data?.order.num}</b><br />
-                                Số Request đã chạy: <b>{order.data?.order.num}</b><br />
+                                Số Request đã chạy: <b>{order.data?.order_detail_list.length}</b><br />
                                 Các request bị lỗi: {(order.data?.order_fail_list?.length || 0) > 0 ? (
                                     order.data?.order_fail_list.map((fail: any, i: any) => <b key={i}>{fail}; </b>)
                                 ) : (
@@ -102,27 +183,27 @@ const OrderPage: FC<OrderPageProps> = () => {
                                 <button disabled className="px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed opacity-50">Continue</button>
                             ) : order.data?.order.status === ORDER_STATUS.RUNNING ? (
                                 <button
-                                    onClick={() => window.location.href = `/order/pause/${order.data?.order.id}`}
+                                    onClick={() => orderPause()}
                                     className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                                 >
                                     Pause
                                 </button>
                             ) : (
                                 <button
-                                    onClick={() => window.location.href = `/order/continue/${order.data?.order.id}`}
+                                    onClick={() => orderContinue()}
                                     className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
                                 >
                                     Continue
                                 </button>
                             )}
                             <button
-                                onClick={() => window.location.href = `/order/stop/${order.data?.order.id}`}
+                                onClick={() => orderStop()}
                                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
                             >
                                 Stop
                             </button>
                             <button
-                                onClick={() => window.location.href = `/order/clone/${order.data?.order.id}`}
+                                onClick={() => orderClone()}
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
                             >
                                 Clone
@@ -131,15 +212,15 @@ const OrderPage: FC<OrderPageProps> = () => {
 
                         {/* Order Details List */}
                         <h2 className="text-2xl font-bold my-4">Danh sách request</h2>
-                        <div className="grid gap-2">
+                        <div className="flex flex-wrap gap-4">
                             {order.isLoading && (
                                 <Loading />
                             )}
                             {order.data?.order_detail_list.map((detail, index) => (
-                                <div key={index} className="flex text-sm">
+                                <div key={index} className="flex text-sm w-[200px]">
                                     <div className="w-1/4 bg-gray-100 p-2">{detail.index}</div>
                                     <div className="w-1/3 bg-gray-100 p-2">{detail.result?.toUpperCase()}</div>
-                                    <a href={detail.data} className="w-5/12 border border-gray-300 text-center hover:bg-gray-50 flex items-center justify-center">
+                                    <a href={detail.data} target='_blank' className="w-5/12 border border-gray-300 text-center hover:bg-gray-50 flex items-center justify-center">
                                         Xem
                                     </a>
                                 </div>
