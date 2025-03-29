@@ -1,8 +1,8 @@
 'use client';
 
 import { Fragment, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useMyOrders } from '@/hooks/order';
+import { useParams, useRouter } from 'next/navigation';
+import { useMyOrders, useUserOrders } from '@/hooks/order';
 import { ORDER_STATUS, OPTIONS_DELAY, Code } from '@/core/Constants';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { Toast } from '@/services/Toast';
@@ -10,8 +10,11 @@ import LoadingAbsolute from '@/components/loading';
 const ITEMS_PER_PAGE = 10;
 
 export default function OrderLists() {
+    const params = useParams();
+    const userId = params.id as string;
+
     const [currentOrderPage, setCurrentOrderPage] = useState(1);
-    const dataOrder = useMyOrders(currentOrderPage, ITEMS_PER_PAGE);
+    const dataOrder = useUserOrders(currentOrderPage, ITEMS_PER_PAGE, userId);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 

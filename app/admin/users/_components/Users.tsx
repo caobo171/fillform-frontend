@@ -34,7 +34,6 @@ export default function Users() {
   const { createQueryString } = useQueryString();
 
   const coinInputRef = useRef<HTMLInputElement>(null);
-
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
   const [currentPage, setCurrentPage] = useState<number>(() =>
@@ -165,6 +164,7 @@ export default function Users() {
         title: 'Username',
         key: 'username',
         dataIndex: 'username',
+        className: 'text-right',
         render: (data: RawUser) => (
           <Link href={`/admin/users/${data.id}`} className="w-full flex items-center justify-end gap-4">
             {data.username}
@@ -176,6 +176,12 @@ export default function Users() {
         title: 'Email',
         key: 'email',
         dataIndex: 'email',
+        className: 'text-right',
+        render: (data: RawUser) => (
+          <div className="w-full flex items-center justify-end gap-4">
+            {data.email}
+          </div>
+        ),
       },
 
       {

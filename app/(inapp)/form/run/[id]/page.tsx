@@ -9,6 +9,7 @@ import { RawForm } from '@/store/types';
 import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
 import { Toast } from '@/services/Toast';
 import { useMe } from '@/hooks/user';
+import LoadingAbsolute from '@/components/loading';
 
 export default function FormRateOrder() {
     const params = useParams();
@@ -137,7 +138,7 @@ export default function FormRateOrder() {
                 console.error('Form submission failed');
             }
         } catch (error) {
-
+            setIsLoading(false);
             Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
             console.error('Error submitting form:', error);
         } finally {
@@ -150,6 +151,7 @@ export default function FormRateOrder() {
             <div className="container mx-auto text-center min-h-screen">
                 <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 mt-12">
                     <div className="p-4">
+                        {(isLoading || isLoadingForm) ? <LoadingAbsolute /> : <></>}
                         <h3 className="text-2xl font-bold mb-2">TẠO YÊU CẦU ĐIỀN FORM</h3>
                         <h6 className="text-sm text-gray-500 mb-4">{formData?.form.name}</h6>
                         <form onSubmit={handleSubmit}>

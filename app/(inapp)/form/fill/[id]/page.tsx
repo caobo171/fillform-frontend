@@ -184,10 +184,20 @@ export default function FormRate() {
         }
     };
 
+    // Function to handle select change
+    const handleSelectChange = (selectId: string) => {
+        const select = document.getElementById(selectId) as HTMLSelectElement;
+        if (select) {
+            const inputId = selectId.replace("select-", "custom-");
+            const textarea = document.getElementById(inputId) as HTMLTextAreaElement;
+            if (textarea) {
+                textarea.style.display = select.value === "custom (nội dung tùy chỉnh)" ? "block" : "none";
+            }
+        }
+    };
+
     useEffect(() => {
-
         if (dataForm?.form && dataForm?.form.loaddata) {
-
             validateConfig();
             validateInputs();
 
@@ -201,8 +211,16 @@ export default function FormRate() {
                 input.addEventListener('input', handleInputChange);
             });
 
-            selects.forEach(select => {
-                select.addEventListener('change', handleInputChange);
+            // Initialize textarea visibility
+            selects.forEach((select: Element) => {
+                const selectElement = select as HTMLSelectElement;
+                handleSelectChange(selectElement.id);
+            });
+
+            // Add event listeners for select changes
+            selects.forEach((select: Element) => {
+                const selectElement = select as HTMLSelectElement;
+                selectElement.addEventListener('change', () => handleSelectChange(selectElement.id));
             });
 
             // Cleanup event listeners
@@ -211,8 +229,9 @@ export default function FormRate() {
                     input.removeEventListener('input', handleInputChange);
                 });
 
-                selects.forEach(select => {
-                    select.removeEventListener('change', handleInputChange);
+                selects.forEach((select: Element) => {
+                    const selectElement = select as HTMLSelectElement;
+                    selectElement.removeEventListener('change', () => handleSelectChange(selectElement.id));
                 });
             };
         }
@@ -235,7 +254,7 @@ export default function FormRate() {
                     {
                         isSaved && (
                             <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4" role="alert">
-                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-4 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                     Tạo yêu cầu điền đơn ngay!
                                 </Link>
                             </div>
@@ -336,7 +355,8 @@ export default function FormRate() {
                                                                 </span>
                                                                 <select
                                                                     className="rounded-r-md border-gray-300 w-1/3 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm answer-select"
-                                                                    {...register(answer.id)}
+                                                                    id={`select-${answer.id}`}
+                                                                    {...register('answer_'+answer.id)}
                                                                     defaultValue={answer.count}
                                                                 >
                                                                     {answer.options && answer.options.map((option: any, optionId: any) => (
@@ -344,6 +364,7 @@ export default function FormRate() {
                                                                     ))}
                                                                 </select>
                                                             </div>
+                                                            
                                                             <textarea
                                                                 className="mt-2 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm hidden custom-input"
                                                                 id={`custom-${answer.id}`}

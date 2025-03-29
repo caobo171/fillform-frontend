@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Fetch from '@/lib/core/fetch/Fetch'
 import { Toast } from '@/services/Toast'
+import LoadingAbsolute from '@/components/loading'
 
 interface FormData {
     formid?: string
@@ -19,6 +20,7 @@ export default function FormCreate() {
     const [msg, setMsg] = useState<string>('');
     const router = useRouter();
     const [form, setForm] = useState<any>({});
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleCreateForm = async () => {
 
@@ -26,6 +28,8 @@ export default function FormCreate() {
             setMsg('Vui lòng nhập đường dẫn edit form!');
             return;
         }
+
+        setLoading(true);
 
         try {
             const res: any = await Fetch.postWithAccessToken('/api/form/create', {
@@ -40,6 +44,8 @@ export default function FormCreate() {
             }
         } catch (e) {
             setMsg('Đã xảy ra lỗi!');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -54,6 +60,8 @@ export default function FormCreate() {
                         Hãy đọc kĩ hướng dẫn để tránh sai sót
                     </p>
                 </div>
+
+                {loading ? <LoadingAbsolute /> : <></>}
 
                 {/* Form Section */}
                 <div className="mx-auto text-left">
@@ -74,7 +82,7 @@ export default function FormCreate() {
                     </div>
                     <button
                         onClick={handleCreateForm}
-                        className="bg-blue-600 text-white px-6 py-2 w-full rounded-md hover:bg-blue-700 transition-colors"
+                        className="bg-blue-600 text-center text-white px-6 py-2 w-full rounded-md hover:bg-blue-700 transition-colors"
                     >
                         Tạo ngay
                     </button>
@@ -83,15 +91,15 @@ export default function FormCreate() {
                     {/* Alert Message */}
                     {msg && (
                         <div className="mt-4">
-                            <div className="bg-blue-100 border border-blue-200 text-blue-700 px-4 py-3 rounded">
+                            <div className="bg-blue-100 border border-blue-200 text-blue-700 px-4 py-3 rounded text-center">
                                 {msg}
                             </div>
                             {form.id && (
                                 <Link
                                     href={`/form/fill/${form.id}`}
-                                    className="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                    className="w-full text-center inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
                                 >
-                                    View Now
+                                    Xem form ngay
                                 </Link>
                             )}
                         </div>

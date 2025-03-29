@@ -4,7 +4,7 @@ import useSWR from 'swr'
 
 
 
-export const useUserForms = (page: number, limit: number, userId: number) => {
+export const useUserForms = (page: number, limit: number, userId: string) => {
 
 	const res = useSWR('/api/form/user.list?page=' + page + '&limit=' + limit + '&user_id=' + userId, async (url) => {
 		const rest = await Fetch.postWithAccessToken<{

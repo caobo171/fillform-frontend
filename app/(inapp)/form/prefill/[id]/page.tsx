@@ -86,7 +86,7 @@ export default function FormPrefill() {
     const onSubmitPrefill = async (data: any) => {
         // This would be your API call to run the prefill
         console.log("Running prefill with data:", data);
-
+        setIsLoading(true);
         try {
             const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.prefill.run', {
                 form_id: formData?.form?.id,
@@ -106,9 +106,11 @@ export default function FormPrefill() {
             }
 
             console.log("res", response);
+            setIsLoading(false);
         } catch (err) {
             Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
             console.error('Form submission failed');
+            setIsLoading(false);
         }
 
     };

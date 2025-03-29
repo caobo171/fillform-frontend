@@ -129,6 +129,8 @@ const OrderPage: FC<OrderPageProps> = () => {
         }
     }
 
+    
+
     if (order.isLoading) {
         return <Loading />
     }
@@ -247,10 +249,10 @@ const OrderPage: FC<OrderPageProps> = () => {
 
                                     <div className="lg:col-span-8">
                                         {question.type ? (
-                                            <div className="grid gap-2">
+                                            <div className="gap-4 flex flex-wrap">
                                                 {question.answer.map((answer: any, aIndex: any) => (
                                                     answer.data && (
-                                                        <div key={aIndex} className="flex">
+                                                        <div key={aIndex} className="flex border-gray-300 border rounded overflow-hidden">
                                                             <div className="w-3/5 bg-gray-100 p-2">{answer.data}</div>
                                                             <input
                                                                 type="number"
