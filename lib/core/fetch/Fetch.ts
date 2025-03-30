@@ -3,6 +3,7 @@ import axios, { AxiosPromise } from 'axios';
 import { AnyObject } from '@/store/interface';
 
 import Cookie from './Cookie';
+import { API_URL } from '@/core/Constants';
 
 type GetFetcherOptions = [string, AnyObject | undefined | null] | string;
 
@@ -14,10 +15,7 @@ type PostFetcherOptions = {
 };
 
 class Fetch {
-  private __base_url: string =
-    process.env.NODE_ENV != 'production'
-      ? 'http://localhost:4001'
-      : 'https://wele-learn.com';
+  private __base_url: string = API_URL;
 
   async postWithAccessToken<ResponseType>(
     url: string,
