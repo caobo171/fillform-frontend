@@ -6,8 +6,9 @@ class SocketServiceClient {
 
     connect(me: RawUser) {
 
-        console.log('Connecting to WebSocket server, ', me.id);
-        this.socket = io(SOCKET_URL, {
+        console.log('Connecting to WebSocket server, ', me.id, SOCKET_URL);
+        this.socket = io(SOCKET_URL + '/', {
+            path: '/api/socket.io',
             auth: {
                 userId: me.id
             }
