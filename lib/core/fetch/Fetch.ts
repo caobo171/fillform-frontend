@@ -16,7 +16,7 @@ type PostFetcherOptions = {
 class Fetch {
   private __base_url: string =
     process.env.NODE_ENV != 'production'
-      ? 'http://localhost:3001'
+      ? 'http://localhost:4001'
       : 'https://wele-learn.com';
 
   async postWithAccessToken<ResponseType>(
