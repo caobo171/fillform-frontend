@@ -183,7 +183,7 @@ const OrderPage = () => {
                                     <a href={order.data?.order.url} className="text-black hover:underline">{order.data?.order.name}</a>
                                 </b><br />
                                 Tổng Order Request: <b>{order.data?.order.num}</b><br />
-                                Số Request đã chạy: <b>{order.data?.order_detail_list.length}</b><br />
+                                Số Request đã chạy: <b>{order.data?.order_detail_list.filter(e => e.result === "pass").length}</b><br />
                                 Các request bị lỗi: {(order.data?.order_fail_list?.length || 0) > 0 ? (
                                     order.data?.order_fail_list.map((fail: any, i: any) => <b key={i}>{fail}; </b>)
                                 ) : (
