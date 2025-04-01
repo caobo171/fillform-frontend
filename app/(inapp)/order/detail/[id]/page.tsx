@@ -6,47 +6,17 @@ import { useFormById } from '@/hooks/form'
 import { useOrderById } from '@/hooks/order'
 import { useMe } from '@/hooks/user'
 import Fetch from '@/lib/core/fetch/Fetch'
+import { Helper } from '@/services/Helper'
+import { SocketService } from '@/services/SocketClient'
 import { Toast } from '@/services/Toast'
 import { RawOrder } from '@/store/types'
 import { useParams } from 'next/navigation'
-import { FC, useState } from 'react'
+import { FC, useState, useMemo, useEffect } from 'react'
 
-interface Answer {
-    id: string
-    data?: string
-    count: string | number
-}
 
-interface Question {
-    question: string
-    description?: string
-    type?: boolean
-    answer: Answer[]
-}
 
-interface OrderDetail {
-    index: number
-    result: string
-    data: string
-}
 
-interface Order {
-    _id: string
-    owner: string
-    type: string
-    delay: number
-    status: string
-    url: string
-    name: string
-    num: number
-    data: Question[]
-}
-
-interface OrderPageProps {
-    params: { id: string }
-}
-
-const OrderPage: FC<OrderPageProps> = () => {
+const OrderPage = () => {
 
     const params = useParams();
     const me = useMe();
@@ -54,6 +24,18 @@ const OrderPage: FC<OrderPageProps> = () => {
     const [isFetching, setIsFetching] = useState(false)
     // Note: You'll need to fetch this data from your API
     const isAdmin = me.data?.is_super_admin;
+
+    let estimatedEndTime = useMemo(() => {
+        if (!order.data?.order_detail_list){
+            return 0;
+        }
+
+        if (order.data?.order_detail_list.length > 0) {
+            return Math.max(...order.data?.order_detail_list.map(e => (e.start_time || 0)))
+        }
+        return 0
+    }, [order.data?.order_detail_list, order.data?.order.delay]);
+    
 
     const orderContinue = async () => {
         setIsFetching(true)
@@ -129,6 +111,37 @@ const OrderPage: FC<OrderPageProps> = () => {
         }
     }
 
+
+
+    useEffect(() => {
+
+        if (me) {
+            (async () => {
+                await Helper.waitUntil(() => {
+                    return SocketService.socket;
+                })
+
+                SocketService.socket.on('order_running', (data: any) => {
+
+                    console.log('order_running', data)
+                    order.mutate();
+                })
+
+                SocketService.socket.on('order_completed', (data: any) => {
+                    console.log('order_completed', data)
+                    order.mutate();
+                })
+
+                return () => {
+                    SocketService.socket.off('order_running');
+                    SocketService.socket.off('order_completed');
+                }
+            })()
+
+        }
+
+    }, [me]);
+
     
 
     if (order.isLoading) {
@@ -150,7 +163,14 @@ const OrderPage: FC<OrderPageProps> = () => {
                                 Người tạo: <b>{order.data?.order.owner}</b><br />
                                 Hình thức: <b>{order.data?.order.type}</b><br />
                                 Điền rải: <b>{OPTIONS_DELAY[(order.data?.order.delay || 0) as keyof typeof OPTIONS_DELAY].name}</b><br />
-                                Tình trạng: <b>{order.data?.order.status}</b>
+                                Tình trạng: <b>{order.data?.order.status}</b><br />
+
+                                {
+                                    order.data?.order.status === ORDER_STATUS.RUNNING && (
+                                        <span>Thời gian dự kiến hoàn thành: <b>{estimatedEndTime ? new Date(estimatedEndTime).toLocaleString() : 'Chưa có dữ liệu'}</b></span>
+                                    )
+                                }
+
                                 {order.data?.order.status === ORDER_STATUS.RUNNING && (
                                     <span> - Order có thể được dừng bởi người dùng, hoặc dừng do không trong thời gian rải đơn (từ 7-22h hằng ngày)</span>
                                 )}
@@ -214,15 +234,16 @@ const OrderPage: FC<OrderPageProps> = () => {
 
                         {/* Order Details List */}
                         <h2 className="text-2xl font-bold my-4">Danh sách request</h2>
-                        <div className="flex flex-wrap gap-4">
+                        <div className="flex flex-wrap gap-4 border-box">
                             {order.isLoading && (
                                 <Loading />
                             )}
                             {order.data?.order_detail_list.map((detail, index) => (
-                                <div key={index} className="flex text-sm w-[200px]">
+                                <div key={index} className="flex text-sm w-1/4">
                                     <div className="w-1/4 bg-gray-100 p-2">{detail.index}</div>
-                                    <div className="w-1/3 bg-gray-100 p-2">{detail.result?.toUpperCase()}</div>
-                                    <a href={detail.data} target='_blank' className="w-5/12 border border-gray-300 text-center hover:bg-gray-50 flex items-center justify-center">
+                                    <div className="w-1/4 bg-gray-100 p-2">{detail.result?.toUpperCase()}</div>
+                                    <div className="w-1/4 bg-gray-100 p-2">Start at {new Date(Number(detail.start_time)).toLocaleString()}</div>
+                                    <a href={detail.data} target='_blank' className="w-1/4 border border-gray-300 text-center hover:bg-gray-50 flex items-center justify-center">
                                         Xem
                                     </a>
                                 </div>

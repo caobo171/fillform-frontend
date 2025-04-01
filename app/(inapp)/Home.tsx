@@ -7,8 +7,8 @@ import { useMyOrders } from '@/hooks/order'
 import { useMe } from '@/hooks/user'
 import { ORDER_STATUS, OPTIONS_DELAY } from '@/core/Constants'
 import { useRouter } from 'next/navigation';
-import FormLists from './_sections/FormList'
-import OrderLists from './_sections/OrderList'
+import FormLists from './_sections/FormLists'
+import OrderLists from './_sections/OrderLists'
 const ITEMS_PER_PAGE = 10;
 
 export default function HomePage() {

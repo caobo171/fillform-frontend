@@ -115,43 +115,6 @@ export default function FormPrefill() {
 
     };
 
-    // Function to estimate end time
-    const estimateEndTime = (num: number, delayType: number) => {
-        let now = new Date();
-        now.setUTCHours(now.getUTCHours() + 7); // Convert to GMT+7
-        let minutesToAdd = 0;
-
-        if (delayType === 1) minutesToAdd = num * 3;
-        else if (delayType === 2) minutesToAdd = num * 7;
-        else if (delayType === 3) minutesToAdd = num * 12;
-
-        // Get current hours & minutes in GMT+7
-        let currentHours = now.getHours();
-
-        // If outside working hours (before 9am or after 9pm), set to 9:00 next day
-        if (currentHours < 9) {
-            now.setHours(9, 0, 0, 0);
-        } else if (currentHours >= 21) {
-            now.setDate(now.getDate() + 1);
-            now.setHours(9, 0, 0, 0);
-        }
-
-        // Loop to add minutes, only keep within 9:00 - 21:00 range
-        while (minutesToAdd > 0) {
-            let remainingMinutesToday = (21 * 60) - (now.getHours() * 60 + now.getMinutes());
-
-            if (minutesToAdd <= remainingMinutesToday) {
-                now.setMinutes(now.getMinutes() + minutesToAdd);
-                break;
-            } else {
-                minutesToAdd -= remainingMinutesToday;
-                now.setDate(now.getDate() + 1);
-                now.setHours(9, 0, 0, 0);
-            }
-        }
-
-        return `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
-    };
 
     // Watch for delay value changes
     const delayValue = watch("delay", 0);

@@ -33,6 +33,17 @@ export class Helper {
     return /^[a-zA-Z0-9\'\"]+$/.test(str);
   }
 
+  static waitUntil = function(callback: () => boolean){
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(() => {
+        if (callback()) {
+          clearInterval(interval);
+          resolve(true);
+        }
+      }, 100);
+    });
+  }
+
   static purify = function (txt: string) {
     let temp = `${txt}`;
 

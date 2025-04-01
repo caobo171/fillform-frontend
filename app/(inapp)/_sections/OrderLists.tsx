@@ -1,21 +1,54 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyOrders } from '@/hooks/order';
 import { ORDER_STATUS, OPTIONS_DELAY, Code } from '@/core/Constants';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { Toast } from '@/services/Toast';
 import LoadingAbsolute from '@/components/loading';
+import { SocketService } from '@/services/SocketClient';
+import { MeHook } from '@/store/me/hooks';
+import { Helper } from '@/services/Helper';
 const ITEMS_PER_PAGE = 10;
+
 
 export default function OrderLists() {
     const [currentOrderPage, setCurrentOrderPage] = useState(1);
     const dataOrder = useMyOrders(currentOrderPage, ITEMS_PER_PAGE);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const me = MeHook.useMe();
 
     const totalOrderPages = Math.ceil((dataOrder?.data?.order_num || 0) / ITEMS_PER_PAGE)
+
+
+    useEffect(() => {
+
+        if (me) {
+            (async () => {
+                await Helper.waitUntil(() => {
+                    return SocketService.socket;
+                })
+
+                SocketService.socket.on('order_running', () => {
+                    dataOrder.mutate();
+                })
+
+                SocketService.socket.on('order_completed', () => {
+                    dataOrder.mutate();
+                })
+
+                return () => {
+                    SocketService.socket.off('order_running');
+                    SocketService.socket.off('order_completed');
+                }
+            })()
+
+        }
+
+    }, [me]);
+
 
     if (dataOrder.isLoading) {
         return (
@@ -84,10 +117,9 @@ export default function OrderLists() {
                                     <th className="px-4 py-2 text-left">#</th>
                                     <th className="px-4 py-2 text-left">Tên Form</th>
                                     <th className="px-4 py-2 text-left min-w-[120px]">Số lượng</th>
-                                    <th className="px-4 py-2 text-left min-w-[160px]">Loại</th>
-                                    <th className="px-4 py-2 text-left min-w-[160px]">Điền rải</th>
-                                    <th className="px-4 py-2 text-left min-w-[160px]">Ngày tạo</th>
-                                    <th className="px-4 py-2 text-left">Trạng thái</th>
+                                    <th className="px-4 py-2 text-left min-w-[140px]">Loại</th>
+                                    <th className="px-4 py-2 text-left min-w-[120px]">Ngày tạo</th>
+                                    <th className="px-4 py-2 text-left min-w-[120px]">Trạng thái</th>
                                     <th className="px-4 py-2 text-left min-w-[160px]">Hành động</th>
                                 </tr>
                             </thead>
@@ -95,10 +127,13 @@ export default function OrderLists() {
                                 {dataOrder?.data?.orders?.map((order, index) => (
                                     <tr key={order.id} className="border-t">
                                         <td className="px-4 py-2">{(currentOrderPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
-                                        <td className="px-4 py-2">{order.name}</td>
-                                        <td className="px-4 py-2">{order.num}</td>
-                                        <td className="px-4 py-2">{order.type}</td>
-                                        <td className="px-4 py-2">{OPTIONS_DELAY[order.delay as keyof typeof OPTIONS_DELAY].name}</td>
+                                        <td title={order.name} className="px-4 py-2 line-clamp-2 flex align-center">{order.name}</td>
+                                        <td className="px-4 py-2">{order.passed_num} / {order.num}</td>
+                                        <td className="px-4 py-2">
+                                            {order.type}
+                                            <br />
+                                            {OPTIONS_DELAY[order.delay as keyof typeof OPTIONS_DELAY].name}
+                                        </td>
                                         <td className="px-4 py-2">{new Date(order.createdAt).toLocaleDateString()}</td>
                                         <td className="px-4 py-2">{order.status}</td>
                                         <td className="px-4 py-2 space-x-2">

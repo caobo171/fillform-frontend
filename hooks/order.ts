@@ -52,13 +52,19 @@ export const useMyOrders = (page: number, limit: number) => {
 	return res;
 };
 
+type OrderDetailRequest = {
+	index: number,
+	result: string,
+	data: string,
+	start_time: number
+}
 
 export const useOrderById = (id: string) => {
 	const res = useSWR(`/api/order/detail?id=${id}`, async (url) => {
 		const rest = await Fetch.postWithAccessToken<{
 			order: RawOrder,
-			order_detail_list: any[],
-			order_fail_list: any[],
+			order_detail_list: OrderDetailRequest[],
+			order_fail_list: string[],
 			config: any
 		}>(url, {
 			id: id
@@ -66,8 +72,8 @@ export const useOrderById = (id: string) => {
 
 		return {
 			order: rest.data.order as RawOrder,
-			order_detail_list: rest.data.order_detail_list as any[],
-			order_fail_list: rest.data.order_fail_list as any[],
+			order_detail_list: rest.data.order_detail_list as OrderDetailRequest[],
+			order_fail_list: rest.data.order_fail_list as string[],
 			config: rest.data.config as any
 		};
 	});

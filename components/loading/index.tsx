@@ -8,7 +8,7 @@ import { LoadingHook } from '@/store/loading/hooks';
 
 const LoadingAbsolute = ({ height }: { height?: number }) => {
     return (
-        <div className=" h-96 z-50 fixed w-full left-0 flex items-center justify-center">
+        <div className="h-96 z-50 fixed w-full left-0 flex items-center justify-center">
             <span className="text-primary text-opacity-80 text-8xl animate-spin"><AiOutlineLoading3Quarters/></span>
         </div>
     )

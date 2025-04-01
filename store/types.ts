@@ -96,6 +96,8 @@ export type RawOrder = {
   pageHistory: string;
   owner: string;
   version: string;
+  passed_num: number;
+  failed_num: number;
   data: any[];
 };
 

@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 import { SOCKET_URL } from '@/core/Constants';
 import { RawUser } from '@/store/types';
 class SocketServiceClient {
-    private socket: any;
+    public socket: any;
 
     connect(me: RawUser) {
 
