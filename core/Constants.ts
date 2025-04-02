@@ -5,9 +5,9 @@ const FAKE_DATA = {
 
 const IMAGE_URL = 'https://d2inr1ykkgbz5g.cloudfront.net/';
 
-export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://fillform.wele-learn.com';
+export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://appv2.fillform.info';
 
-export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://fillform.wele-learn.com';
+export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://appv2.fillform.info';
 
 export const FIREBASE_CONFIG =
   process.env.NODE_ENV !== 'production'
