@@ -128,7 +128,12 @@ export default function OrderLists() {
                                     <tr key={order.id} className="border-t">
                                         <td className="px-4 py-2">{(currentOrderPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
                                         <td title={order.name} className="px-4 py-2 line-clamp-2 flex align-center">{order.name}</td>
-                                        <td className="px-4 py-2">{order.passed_num} / {order.num}</td>
+
+                                        {order.status === ORDER_STATUS.SUCCESS ? (
+                                            <td className="px-4 py-2">{order.num} / {order.num}</td>
+                                        ) : (
+                                            <td className="px-4 py-2">{order.passed_num || 0} / {order.num}</td>
+                                        )}
                                         <td className="px-4 py-2">
                                             {order.type}
                                             <br />
