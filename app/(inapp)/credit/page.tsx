@@ -32,7 +32,7 @@ const CreditPage: FC<{}> = () => {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="space-y-4">
+                            <div className="space-y-2">
                                 <div className="flex items-center">
                                     <span className="w-1/3">Tên Ngân Hàng</span>
                                     <div className="flex items-center gap-2">

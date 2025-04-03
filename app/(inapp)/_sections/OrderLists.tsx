@@ -127,7 +127,9 @@ export default function OrderLists() {
                                 {dataOrder?.data?.orders?.map((order, index) => (
                                     <tr key={order.id} className="border-t">
                                         <td className="px-4 py-2">{(currentOrderPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
-                                        <td title={order.name} className="px-4 py-2 line-clamp-2 flex align-center">{order.name}</td>
+                                        <td title={order.name} className="px-4 py-2 truncate max-w-[200px]">
+                                            <div className="truncate">{order.name}</div>
+                                        </td>
 
                                         {order.status === ORDER_STATUS.SUCCESS ? (
                                             <td className="px-4 py-2">{order.num} / {order.num}</td>
@@ -164,7 +166,18 @@ export default function OrderLists() {
                                                         <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                                                     </svg>
                                                 </button>
-                                            ) : null}
+                                            ) : <>
+                                                <button
+                                                    disabled
+                                                    className="inline-flex items-center p-2 text-gray-300 hover:bg-gray-50 rounded"
+                                                    title="Tiếp tục chạy"
+                                                >
+                                                    <span className="sr-only">Order đã hoàn thành</span>
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                                                    </svg>
+                                                </button>
+                                            </>}
                                             <button
                                                 onClick={() => router.push(`/order/detail/${order.id}`)}
                                                 className="inline-flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded"

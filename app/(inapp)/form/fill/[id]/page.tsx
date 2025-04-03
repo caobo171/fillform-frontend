@@ -270,9 +270,6 @@ export default function FormRate() {
                             <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mr-2 mb-2 hover:bg-blue-50">
                                 Điền theo data có trước
                             </Link>
-                            <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mb-2 hover:bg-blue-50">
-                                Chạy form
-                            </Link>
                         </div>
                         <p className="mb-2">Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi nhé</p>
                         <p className="mb-2">
@@ -303,22 +300,22 @@ export default function FormRate() {
                     </form>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-6 rounded-lg">
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                             {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
-                                <div key={questionId} className="p-4 bg-white rounded shadow-sm">
+                                <div key={questionId} className="p-4 bg-white rounded shadow-sm text-sm">
                                     <div className="md:flex md:items-start">
-                                        <div className="md:w-1/3 mb-4 md:mb-0">
+                                        <div className="md:w-1/4 mb-4 md:mb-0">
                                             {question.description ? (
                                                 <>
                                                     <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
-                                                    <label className="block truncate w-full">{question.description}</label>
+                                                    <label className="block truncate w-full text-gray-400">{question.description}</label>
                                                 </>
                                             ) : (
                                                 <label className="block font-bold truncate w-full">{question.question}</label>
                                             )}
                                         </div>
 
-                                        <div className="md:w-2/3">
+                                        <div className="md:w-3/4">
                                             <div className="flex gap-x-2 flex-wrap gap-y-2">
                                                 {question.type ? (
                                                     <>
@@ -331,7 +328,7 @@ export default function FormRate() {
                                                                 <div key={answerId} className="flex">
                                                                     <div className="flex-1">
                                                                         <div className="flex">
-                                                                            <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 max-w-[280px]">{answer.data}</span>
+                                                                            <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 max-w-1/5">{answer.data}</span>
                                                                             <input
                                                                                 type="number"
                                                                                 min="0"
@@ -350,7 +347,7 @@ export default function FormRate() {
                                                     question.answer && question.answer.map((answer: any, answerId: any) => (
                                                         <div key={answerId} className="w-full">
                                                             <div className="flex">
-                                                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 text-sm">
+                                                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 text-xs">
                                                                     Chọn loại câu hỏi tự luận (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
                                                                 </span>
                                                                 <select
