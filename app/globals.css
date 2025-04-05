@@ -74,12 +74,6 @@ html {
 }
 
 
-body {
-  background-size: cover;
-  backdrop-filter: blur(8px); /* Add blur effect */
-  -webkit-backdrop-filter: blur(8px); /* For Safari support */
-}
-
 .custom-scrollbar::-webkit-scrollbar,
 .custom-scrollbar::-webkit-scrollbar-thumb {
   width: 16px;
