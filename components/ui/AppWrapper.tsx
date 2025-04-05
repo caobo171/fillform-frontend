@@ -7,6 +7,7 @@ import Cookie from "@/lib/core/fetch/Cookie";
 import posthog from 'posthog-js'
 import { SocketService } from "@/services/SocketClient";
 import { useMe } from "@/hooks/user";
+import { Toast } from "@/services/Toast";
 
 const AppWrapper = ({ children }: { children: ReactElement }) => {
 	const [isFullyLoaded, setFullyLoaded] = useState(false);;
@@ -16,8 +17,6 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 		(async () => {
 			await Startup.init();
 			await setFullyLoaded(true);
-
-
 		})()
 
 	}, []);
@@ -30,6 +29,7 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 
 			SocketService.socket.on('credit_update', (data: any) => {
 				console.log('credit_update', data);
+				Toast.success('Nạp tiền thành công!');
 				me.mutate();
 			});
 

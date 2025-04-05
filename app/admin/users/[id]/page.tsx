@@ -7,8 +7,6 @@ import { useMyOrders } from '@/hooks/order'
 import { useMe, useUserProfile } from '@/hooks/user'
 import { ORDER_STATUS, OPTIONS_DELAY, Code } from '@/core/Constants'
 import { useParams, useRouter } from 'next/navigation';
-import FormLists from '../_components/FormLists'
-import OrderLists from '../_components/OrderLists'
 import { Toast } from '@/services/Toast'
 import { toast } from 'react-toastify'
 import Fetch from '@/lib/core/fetch/Fetch'
@@ -16,6 +14,8 @@ import useSWRMutation from 'swr/mutation'
 import { FormItem } from '@/components/form/FormItem'
 import { TextArea, Input, Modal } from '@/components/common'
 import { AnyObject } from '@/store/interface'
+import OrderLists from '@/app/(inapp)/_sections/OrderLists'
+import FormLists from '@/app/(inapp)/_sections/FormLists'
 const ITEMS_PER_PAGE = 10;
 
 export default function UserDetailPage() {
@@ -86,7 +86,7 @@ export default function UserDetailPage() {
             <section className="py-8 px-4">
                 <div className="max-w-7xl mx-auto space-y-8">
                     {/* User Info */}
-                    <div className="bg-white rounded-lg p-6 shadow-sm">
+                    <div className="px-4 sm:px-6 lg:px-8">
                         <h5 className="text-lg font-medium">Xin chào</h5>
                         <h1 className="text-4xl font-bold">{user?.data?.username}</h1>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
@@ -102,8 +102,8 @@ export default function UserDetailPage() {
                     </div>
 
                     {/* Forms Table */}
-                    <FormLists />
-                    <OrderLists />
+                    <FormLists admin={true} />
+                    <OrderLists admin={true} />
 
                 </div>
             </section>

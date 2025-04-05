@@ -23,6 +23,7 @@ export default function FormRate() {
     const { data: dataForm, isLoading: isLoadingForm, mutate: mutateForm } = useFormById(params.id as string);
     const { register, handleSubmit, watch, setValue } = useForm();
     const [isLoading, setIsLoading] = useState(false);
+    const [reloadEvent, setReloadEvent] = useState(false);
 
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const [chatOpen, setChatOpen] = useState<boolean>(true);
@@ -80,6 +81,7 @@ export default function FormRate() {
             console.error(error);
         } finally {
             setIsLoading(false);
+            setReloadEvent(!reloadEvent);
         }
     };
 
@@ -137,7 +139,7 @@ export default function FormRate() {
         });
 
         // "Other" option validation
-        document.querySelectorAll(".answer-select").forEach((select: Element) => {
+        document.querySelectorAll(".js-answer-select").forEach((select: Element) => {
             if (select instanceof HTMLSelectElement) {
                 if (select.value.toLowerCase().includes("other")) {
                     addChatError(`Bạn chọn "other - bỏ qua không điền". Hãy kiểm tra lại đã tắt bắt buộc điền trên Google Form chưa?`, `select-error-${select.id}`, "warning");
@@ -203,7 +205,7 @@ export default function FormRate() {
 
             // Add event listeners for form validation
             const numberInputs = document.querySelectorAll("input[type='number']");
-            const selects = document.querySelectorAll(".answer-select");
+            const selects = document.querySelectorAll(".js-answer-select");
 
             const handleInputChange = () => validateInputs();
 
@@ -235,7 +237,7 @@ export default function FormRate() {
                 });
             };
         }
-    }, [dataForm]);
+    }, [dataForm, reloadEvent]);
 
 
     if (isLoadingForm || !dataForm || isLoading) {
@@ -303,7 +305,7 @@ export default function FormRate() {
                         <div className="space-y-2">
                             {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
                                 <div key={questionId} className="p-4 bg-white rounded shadow-sm text-xs">
-                                    <div className="md:flex md:items-start">
+                                    <div className="md:flex md:items-start gap-8">
                                         <div className="md:w-1/4 mb-4 md:mb-0">
                                             {question.description ? (
                                                 <>
@@ -316,63 +318,70 @@ export default function FormRate() {
                                         </div>
 
                                         <div className="md:w-3/4">
-                                            <div className="flex gap-x-2 flex-wrap gap-y-2">
-                                                {question.type ? (
-                                                    <>
+
+                                            {question.type ? (
+                                                <>
+                                                    <div className="grid grid-cols-5 gap-4">
                                                         <input type="hidden" {...register(`isMulti-${question.id}`)} defaultValue={question.isMulti} />
                                                         <input type="hidden" {...register(`totalans-${question.id}`)} defaultValue={question.totalAnswer} />
                                                         <input type="hidden" {...register(`type-${question.id}`)} defaultValue={question.type} />
 
                                                         {question.answer && question.answer.map((answer: any, answerId: any) => (
                                                             answer.data && (
-                                                                <div key={answerId} className="flex">
-                                                                    <div className="flex-1">
-                                                                        <div className="flex">
-                                                                            <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 max-w-1/5">{answer.data}</span>
-                                                                            <input
-                                                                                type="number"
-                                                                                min="0"
-                                                                                step="1"
-                                                                                className="rounded-r-md border-gray-300 w-24 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 answer-input"
-                                                                                {...register('answer_' + answer.id)}
-                                                                                defaultValue={answer.count}
-                                                                            />
-                                                                        </div>
-                                                                    </div>
+                                                                <div key={answerId} className="relative">
+                                                                    <label
+                                                                        htmlFor="name"
+                                                                        className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                                    >
+                                                                        {answer.data}
+                                                                    </label>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        step="1"
+                                                                        {...register('answer_' + answer.id)}
+                                                                        defaultValue={answer.count}
+                                                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                                                    />
                                                                 </div>
+
                                                             )
                                                         ))}
-                                                    </>
-                                                ) : (
-                                                    question.answer && question.answer.map((answer: any, answerId: any) => (
-                                                        <div key={answerId} className="w-full">
-                                                            <div className="flex">
-                                                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md truncate flex-1 text-xs">
-                                                                    Chọn loại câu hỏi tự luận (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
-                                                                </span>
-                                                                <select
-                                                                    className="rounded-r-md border-gray-300 w-1/3 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm answer-select"
-                                                                    id={`select-${answer.id}`}
-                                                                    {...register('answer_'+answer.id)}
-                                                                    defaultValue={answer.count}
-                                                                >
-                                                                    {answer.options && answer.options.map((option: any, optionId: any) => (
-                                                                        <option key={optionId} value={option}>{option}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                            
-                                                            <textarea
-                                                                className="mt-2 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm hidden custom-input"
-                                                                id={`custom-${answer.id}`}
-                                                                {...register(`custom-${answer.id}`)}
-                                                                defaultValue={answer.data}
-                                                                placeholder="Nhập mỗi dòng 1 câu trả lời (ấn enter để xuống dòng). Không để dòng trống. Tool sẽ điền lặp lại ngẫu nhiên nếu số lượng không đủ."
-                                                            />
-                                                        </div>
-                                                    ))
-                                                )}
-                                            </div>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                question.answer && question.answer.map((answer: any, answerId: any) => (
+                                                    <div key={answerId} className="relative w-full">
+                                                        <label
+                                                            htmlFor="name"
+                                                            className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                        >
+                                                            Chọn loại câu hỏi tự luận (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
+                                                        </label>
+                                                        <select
+                                                            className="js-answer-select block w-full rounded-md bg-white px-3 py-4 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                                            id={`select-${answer.id}`}
+                                                            {...register('answer_' + answer.id)}
+                                                            defaultValue={answer.count}
+                                                        >
+                                                            {answer.options && answer.options.map((option: any, optionId: any) => (
+                                                                <option key={optionId} value={option}>{option}</option>
+                                                            ))}
+                                                        </select>
+
+                                                        <textarea
+                                                            className="mt-2 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm hidden custom-input"
+                                                            id={`custom-${answer.id}`}
+                                                            {...register(`custom-${answer.id}`)}
+                                                            defaultValue={answer.data}
+                                                            placeholder="Nhập mỗi dòng 1 câu trả lời (ấn enter để xuống dòng). Không để dòng trống. Tool sẽ điền lặp lại ngẫu nhiên nếu số lượng không đủ."
+                                                        />
+                                                    </div>
+
+
+                                                ))
+                                            )}
+
                                         </div>
                                     </div>
                                 </div>
@@ -395,11 +404,12 @@ export default function FormRate() {
                             }
                         </div>
                     </form>
-                </div>
-            </section>
+                </div >
+            </section >
 
             {/* Chat Container - moved outside section */}
-            <div className={`fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 z-[9999] ${chatOpen ? 'h-96' : 'h-12'}`}>
+            < div className={`fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 z-[9999] ${chatOpen ? 'h-96' : 'h-12'}`
+            }>
                 <div
                     className="bg-blue-600 text-white p-3 flex items-center justify-between cursor-pointer"
                     onClick={toggleChat}
@@ -425,35 +435,37 @@ export default function FormRate() {
                     </div>
                 </div>
 
-                {chatOpen && (
-                    <div className="p-3 h-full overflow-y-auto">
-                        <div className="text-sm">
-                            <p>💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.</p>
+                {
+                    chatOpen && (
+                        <div className="p-3 h-full overflow-y-auto">
+                            <div className="text-sm">
+                                <p>💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.</p>
 
-                            {chatErrors.map((error) => (
-                                <div key={error.id} className="mt-2">
-                                    <div className={`p-2 rounded text-sm relative ${error.type === "error" ? "bg-red-100 text-red-800" :
-                                        error.type === "warning" ? "bg-yellow-100 text-yellow-800" :
-                                            "bg-blue-100 text-blue-800"
-                                        }`}>
-                                        <button
-                                            className="absolute top-1 right-1 text-xs"
-                                            onClick={() => removeChatError(error.id)}
-                                        >
-                                            ✖
-                                        </button>
-                                        <strong>
-                                            {error.type === "error" ? "Lỗi! " :
-                                                error.type === "warning" ? "Cẩn thận! " : ""}
-                                        </strong>
-                                        <span dangerouslySetInnerHTML={{ __html: error.message }} />
+                                {chatErrors.map((error) => (
+                                    <div key={error.id} className="mt-2">
+                                        <div className={`p-2 rounded text-sm relative ${error.type === "error" ? "bg-red-100 text-red-800" :
+                                            error.type === "warning" ? "bg-yellow-100 text-yellow-800" :
+                                                "bg-blue-100 text-blue-800"
+                                            }`}>
+                                            <button
+                                                className="absolute top-1 right-1 text-xs"
+                                                onClick={() => removeChatError(error.id)}
+                                            >
+                                                ✖
+                                            </button>
+                                            <strong>
+                                                {error.type === "error" ? "Lỗi! " :
+                                                    error.type === "warning" ? "Cẩn thận! " : ""}
+                                            </strong>
+                                            <span dangerouslySetInnerHTML={{ __html: error.message }} />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
-            </div>
+                    )
+                }
+            </div >
         </>
     );
 }

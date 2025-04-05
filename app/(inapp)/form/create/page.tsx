@@ -51,7 +51,7 @@ export default function FormCreate() {
         <section className="py-16">
             <div className="container mx-auto px-4 text-center">
                 {/* Header */}
-                <div className="mb-12">
+                <div className="mb-4">
                     <h2 className="text-3xl font-bold mb-4">Tạo Form mới</h2>
                     <p className="text-gray-600">
                         Nhập link edit form của bạn vào ô dưới đây <br />
