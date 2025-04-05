@@ -242,7 +242,7 @@ const OrderPage = () => {
                                 <div key={index} className="flex text-sm w-1/4">
                                     <div className="w-1/4 bg-gray-100 p-2">{detail.index}</div>
                                     <div className="w-1/4 bg-gray-100 p-2">{detail.result?.toUpperCase()}</div>
-                                    <div className="w-1/4 bg-gray-100 p-2">Start at {new Date(Number(detail.start_time)).toLocaleString()}</div>
+                                    {detail.start_time && <div className="w-1/4 bg-gray-100 p-2">Start at {new Date(Number(detail.start_time)).toLocaleString()}</div>}
                                     <a href={detail.data} target='_blank' className="w-1/4 border border-gray-300 text-center hover:bg-gray-50 flex items-center justify-center">
                                         Xem
                                     </a>

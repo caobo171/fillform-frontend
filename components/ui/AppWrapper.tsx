@@ -6,12 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 import Cookie from "@/lib/core/fetch/Cookie";
 import posthog from 'posthog-js'
 import { SocketService } from "@/services/SocketClient";
+import { useMe } from "@/hooks/user";
 
 const AppWrapper = ({ children }: { children: ReactElement }) => {
 	const [isFullyLoaded, setFullyLoaded] = useState(false);;
-	const route = useRouter();
-	const pathname = usePathname();
-	const me = MeHook.useMe();
+	const me = useMe();
 
 	useEffect(() => {
 		(async () => {
@@ -26,9 +25,13 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 
 
 	useEffect(() => {
-		console.log('me', me);
-		if (me) {
-			SocketService.connect(me);
+		if (me.data) {
+			SocketService.connect(me.data);
+
+			SocketService.socket.on('credit_update', (data: any) => {
+				console.log('credit_update', data);
+				me.mutate();
+			});
 
 		}
 

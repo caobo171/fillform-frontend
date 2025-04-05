@@ -56,7 +56,7 @@ export default function FormLists() {
                     <td className="px-4 py-2">{new Date(form.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2">
                       <button
-                        onClick={() => router.push(`/form/fill/${form.id}`)}
+                        onClick={() => router.push(`/form/${form.id}`)}
                         className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                       >
                         Chi tiết

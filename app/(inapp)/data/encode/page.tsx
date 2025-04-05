@@ -35,12 +35,8 @@ const formCreateSchema = z.object({
 type CreateFormValues = z.infer<typeof formCreateSchema>;
 
 export default function FormCreate() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const user = MeHook.useMe();
-
 
     const [errorMessage, setErrorMessage] = useState<string>();
-
     const {
         control,
         handleSubmit,

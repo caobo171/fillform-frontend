@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Constants from './core/Constants';
 import Fetch from './lib/core/fetch/Fetch';
 import ACL from './services/ACL';
-import { RawSubscription, RawUser, RawWeleClass } from './store/types';
+import { RawUser } from './store/types';
 
 const publicLinks = [
   '/notfound',
@@ -37,17 +37,7 @@ export default async function middleware(req: NextRequest) {
 
   const urlSearchParams = new URLSearchParams(req.nextUrl.search);
 
-  if (host === Constants.APP_HOST && path === '/') {
-    return NextResponse.redirect(
-      new URL(`/?${urlSearchParams.toString()}`, req.url)
-    );
-  }
 
-  if (host === Constants.LANDING_HOST && path !== '/') {
-    return NextResponse.redirect(
-      new URL(`${path}?${urlSearchParams.toString()}`, Constants.DOMAIN)
-    );
-  }
 
   if (req.nextUrl.searchParams.get('access_token')) {
     req.cookies.set(
@@ -57,7 +47,6 @@ export default async function middleware(req: NextRequest) {
   }
   // If it's the root path, just render it
   if (
-    path === '/' ||
     (publicLinks.some((e) => path.startsWith(e)) &&
       !authLinks.some((e) => path.startsWith(e)))
   ) {
@@ -69,8 +58,6 @@ export default async function middleware(req: NextRequest) {
   try {
     const res = await Fetch.postWithAccessToken<{
       user: RawUser;
-      weleclasses: RawWeleClass[];
-      sub: RawSubscription;
       code: number;
     }>(
       '/api/me/profile',
@@ -86,8 +73,6 @@ export default async function middleware(req: NextRequest) {
       user = res.data.user;
 
       req.cookies.set('user', JSON.stringify(res.data.user));
-      req.cookies.set('weleclasses', JSON.stringify(res.data.weleclasses));
-      req.cookies.set('sub', JSON.stringify(res.data.sub));
 
       if (adminLinks.some((e) => path.startsWith(e))) {
         if (!ACL.isAdmin(user)) {
@@ -97,18 +82,6 @@ export default async function middleware(req: NextRequest) {
 
       if (loginLinks.some((e) => path.startsWith(e))) {
         return NextResponse.redirect(new URL('/', req.url));
-      }
-
-      // if (contentCreatorLinks.some((e) => path.startsWith(e))) {
-      //   if (!ACL.isContentCreator(user) && !Number(res.data.sub?.is_paid_premium)) {
-      //     return NextResponse.redirect(new URL('/', req.url));
-      //   }
-      // }
-
-      if (teacherLinks.some((e) => path.startsWith(e))) {
-        if (!ACL.isTeacher(user)) {
-          return NextResponse.redirect(new URL('/', req.url));
-        }
       }
 
       return NextResponse.next();

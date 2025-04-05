@@ -10,6 +10,7 @@ import LoadingAbsolute from '@/components/loading';
 import { SocketService } from '@/services/SocketClient';
 import { MeHook } from '@/store/me/hooks';
 import { Helper } from '@/services/Helper';
+import { useMe } from '@/hooks/user';
 const ITEMS_PER_PAGE = 10;
 
 
@@ -18,14 +19,14 @@ export default function OrderLists() {
     const dataOrder = useMyOrders(currentOrderPage, ITEMS_PER_PAGE);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-    const me = MeHook.useMe();
+    const me = useMe();
 
     const totalOrderPages = Math.ceil((dataOrder?.data?.order_num || 0) / ITEMS_PER_PAGE)
 
 
     useEffect(() => {
 
-        if (me) {
+        if (me.data) {
             (async () => {
                 await Helper.waitUntil(() => {
                     return SocketService.socket;
@@ -47,7 +48,7 @@ export default function OrderLists() {
 
         }
 
-    }, [me]);
+    }, [me.data]);
 
 
     if (dataOrder.isLoading) {

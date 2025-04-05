@@ -302,7 +302,7 @@ export default function FormRate() {
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-6 rounded-lg">
                         <div className="space-y-2">
                             {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
-                                <div key={questionId} className="p-4 bg-white rounded shadow-sm text-sm">
+                                <div key={questionId} className="p-4 bg-white rounded shadow-sm text-xs">
                                     <div className="md:flex md:items-start">
                                         <div className="md:w-1/4 mb-4 md:mb-0">
                                             {question.description ? (

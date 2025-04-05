@@ -9,9 +9,11 @@ import { Container } from '@/components/layout/container/container';
 import Cookie from '@/lib/core/fetch/Cookie';
 import DateUtil from '@/services/Date';
 import { MeHook } from '@/store/me/hooks';
+import { useMe } from '@/hooks/user';
 
 export function SubscriptionBannerTop() {
   const pathname = usePathname();
+  const me = useMe();
 
   const sub = {
     is_effective: true,
@@ -20,7 +22,6 @@ export function SubscriptionBannerTop() {
     is_freetrial: true,
   };
 
-  const me = MeHook.useMe();
 
   const expireIn3Days =
     sub?.is_effective &&
@@ -42,7 +43,7 @@ export function SubscriptionBannerTop() {
   // 1. in free trial period
   // 2. 3 days until next auto payment
 
-  if (!me || !showBanner) {
+  if (!me.data || !showBanner) {
     return null;
   }
 

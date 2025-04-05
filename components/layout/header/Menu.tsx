@@ -7,6 +7,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Dropdown, PremiumIcon } from '@/components/common';
 import LogEvent from '@/packages/firebase/LogEvent';
 import { MeHook } from '@/store/me/hooks';
+import { useMe } from '@/hooks/user';
 
 export type MenuItemProps = {
   name: string;
@@ -22,18 +23,18 @@ export type MenuProps = {
 export function Menu({ main, subs }: MenuProps) {
   const pathName = usePathname();
 
-  const me = MeHook.useMe();
+  const me = useMe();
 
   const logClick = useCallback(
     (menuItem: MenuItemProps) => {
       LogEvent.sendEvent('click', {
         type: 'menu-item',
-        user: me?.id,
+        user: me?.data?.id,
         name: menuItem.name,
         href: menuItem.href,
       });
     },
-    [me?.id]
+    [me?.data]
   );
 
   const mainMenu = useMemo(() => {

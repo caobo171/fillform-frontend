@@ -55,8 +55,6 @@ export default function Login() {
       if (res && res.data && res.data.code === Code.SUCCESS) {
         Cookie.set('access_token', res.data.access_token, 100);
 
-        await MeFunctions.loadProfile();
-
         mutate('/api/me/profile');
 
         // router.push(from ?? '/home');

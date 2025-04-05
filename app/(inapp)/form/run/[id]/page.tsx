@@ -217,7 +217,7 @@ export default function FormRateOrder() {
                                     Bắt đầu điền form
                                 </button>
                                 <Link
-                                    href={`/form/fill/${formData?.form.id}`}
+                                    href={`/form/${formData?.form.id}`}
                                     className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded text-center w-full"
                                 >
                                     Quay lại

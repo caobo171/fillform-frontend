@@ -1,26 +1,15 @@
 'use client';
 
 import {
-  ArrowPathRoundedSquareIcon,
-  BellIcon,
-  ChatBubbleOvalLeftEllipsisIcon,
-  CheckBadgeIcon,
-  CircleStackIcon,
-  CreditCardIcon,
-  MicrophoneIcon,
-  RectangleStackIcon,
-  RocketLaunchIcon,
-  Square2StackIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
 import { PropsWithChildren, useMemo } from 'react';
 
 import { SidebarLayout } from '@/components/layout/sidebar/sidebar-layout';
-import ACL from '@/services/ACL';
-import { MeHook } from '@/store/me/hooks';
+import { useMe } from '@/hooks/user';
 
 export function SidebarLayoutWrapper({ children }: PropsWithChildren) {
-  const me = MeHook.useMe();
+  const me = useMe();
 
   const sections = useMemo(() => {
     const defaultSections = [
@@ -35,7 +24,7 @@ export function SidebarLayoutWrapper({ children }: PropsWithChildren) {
     ];
 
     return defaultSections;
-  }, [me]);
+  }, [me.data]);
 
   return <SidebarLayout sections={sections}>{children}</SidebarLayout>;
 }

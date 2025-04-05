@@ -19,7 +19,6 @@ export default function FormCreate() {
     const [form_link, setFormLink] = useState<string>('');
     const [msg, setMsg] = useState<string>('');
     const router = useRouter();
-    const [form, setForm] = useState<any>({});
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleCreateForm = async () => {
@@ -38,9 +37,8 @@ export default function FormCreate() {
 
             console.log(res);
             if (res.data?.form){
-                setForm(res.data?.form);
-                setMsg('Tạo form thành công!');
                 Toast.success('Tạo form thành công!');
+                router.push(`/form/${res.data?.form?.id}`);
             }
         } catch (e) {
             setMsg('Đã xảy ra lỗi!');
@@ -94,14 +92,6 @@ export default function FormCreate() {
                             <div className="bg-blue-100 border border-blue-200 text-blue-700 px-4 py-3 rounded text-center">
                                 {msg}
                             </div>
-                            {form.id && (
-                                <Link
-                                    href={`/form/fill/${form.id}`}
-                                    className="w-full text-center inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                                >
-                                    Xem form ngay
-                                </Link>
-                            )}
                         </div>
                     )}
                 </div>

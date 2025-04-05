@@ -1,10 +1,7 @@
 import Fetch from "@/lib/core/fetch/Fetch";
-import { MeFunctions } from '@/store/me/functions';
-import { PodcastCollectionFunctions } from '@/store/podcast.collection/functions';
 import * as firebase from 'firebase/app';
 import LogEvent from "@/packages/firebase/LogEvent";
 import { FIREBASE_CONFIG } from "@/core/Constants";
-import { ChallengeFunctions } from "@/store/challenge/funtions";
 import Cookie from "@/lib/core/fetch/Cookie";
 import { Helper } from "@/services/Helper";
 
@@ -28,13 +25,6 @@ class Startup {
 
 		if (access_token) {
 			Cookie.set("access_token", access_token, 100);
-			try {
-			
-				await MeFunctions.loadProfile();
-			} catch (e) {
-
-			}
-
 		} else {
 
 		}
