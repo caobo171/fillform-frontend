@@ -255,8 +255,11 @@ export default function FormRate() {
 
                     {
                         isSaved && (
-                            <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4" role="alert">
-                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 rounded-md" role="alert">
+                                <div className='mb-4'>
+                                    Đã lưu dữ liệu thành công
+                                </div>
+                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">
                                     Tạo yêu cầu điền đơn ngay!
                                 </Link>
                             </div>
@@ -266,10 +269,10 @@ export default function FormRate() {
                     <div className="mb-10">
                         <h2 className="text-3xl font-bold mb-4">Điền theo tỉ lệ mong muốn</h2>
                         <div className="mb-4">
-                            <Link href="" className="inline-block px-4 py-2 bg-blue-600 text-white rounded mr-2 mb-2 hover:bg-blue-700">
+                            <Link href="" className="inline-block px-4 py-2 bg-primary-600 text-white rounded mr-2 mb-2 hover:bg-primary-700">
                                 Điền theo tỉ lệ mong muốn
                             </Link>
-                            <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-blue-600 text-blue-600 rounded mr-2 mb-2 hover:bg-blue-50">
+                            <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-primary-600 text-blue-600 rounded mr-2 mb-2 hover:bg-primary-50">
                                 Điền theo data có trước
                             </Link>
                         </div>
@@ -388,15 +391,18 @@ export default function FormRate() {
                             ))}
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             >
                                 Lưu lại và tiếp tục
                             </button>
 
                             {
                                 isSaved && (
-                                    <div className="bg-blue-100 border-blue-500 border-primary-1 text-blue-700 p-4 mb-4 text-center" role="alert">
-                                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 text-center" role="alert">
+                                        <div className='mb-4'>
+                                            Đã lưu dữ liệu thành công
+                                        </div>
+                                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">
                                             Tạo yêu cầu điền đơn ngay!
                                         </Link>
                                     </div>
@@ -411,7 +417,7 @@ export default function FormRate() {
             < div className={`fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 z-[9999] ${chatOpen ? 'h-96' : 'h-12'}`
             }>
                 <div
-                    className="bg-blue-600 text-white p-3 flex items-center justify-between cursor-pointer"
+                    className="bg-primary-600 text-white p-3 flex items-center justify-between cursor-pointer"
                     onClick={toggleChat}
                 >
                     <div className="flex items-center">
@@ -445,7 +451,7 @@ export default function FormRate() {
                                     <div key={error.id} className="mt-2">
                                         <div className={`p-2 rounded text-sm relative ${error.type === "error" ? "bg-red-100 text-red-800" :
                                             error.type === "warning" ? "bg-yellow-100 text-yellow-800" :
-                                                "bg-blue-100 text-blue-800"
+                                                "bg-primary-100 text-blue-800"
                                             }`}>
                                             <button
                                                 className="absolute top-1 right-1 text-xs"

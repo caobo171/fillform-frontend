@@ -41,7 +41,8 @@ export default function FormCreate() {
                 router.push(`/form/${res.data?.form?.id}`);
             }
         } catch (e) {
-            setMsg('Đã xảy ra lỗi!');
+            setMsg(`Đã xảy ra lỗi, bạn hãy kiểm tra xem form đã được mở quyền truy cập cho tất có mọi người có link và tắt thu thập email, tắt cho phép chỉnh sửa câu trả lời và phải tắt mỗi mail chỉ điền 1 lần hay chưa nha ! 
+                Một số câu hỏi bọn mình cũng chưa hỗ trợ ví dụ như file nè !`);
         } finally {
             setLoading(false);
         }
@@ -89,7 +90,7 @@ export default function FormCreate() {
                     {/* Alert Message */}
                     {msg && (
                         <div className="mt-4">
-                            <div className="bg-blue-100 border border-blue-200 text-blue-700 px-4 py-3 rounded text-center">
+                            <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center">
                                 {msg}
                             </div>
                         </div>
@@ -162,8 +163,8 @@ export default function FormCreate() {
                             <p className="font-bold mb-2">Bước 3: Cấu hình form</p>
                             <p className="mb-4">
                                 Bạn lưu ý Form <strong>phải tắt thu thập email</strong>,
-                                <strong>tắt cho phép chỉnh sửa câu trả lời</strong> và
-                                <strong>phải tắt mỗi mail chỉ điền 1 lần</strong>.
+                                &nbsp;<strong>tắt cho phép chỉnh sửa câu trả lời</strong> và
+                                &nbsp;<strong>phải tắt mỗi mail chỉ điền 1 lần</strong>.
                                 Hãy cấu hình form như hình bên nhé!
                             </p>
                             <p>
