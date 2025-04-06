@@ -93,14 +93,14 @@ export default function FormRate() {
         setChatErrors(chatErrors.filter(error => error.id !== errorId));
     };
 
-    const addChatError = (message: string, errorId: string, type: 'error' | 'warning' | 'note'): void => {
+    const addChatError = (chatErrors: ChatError[], message: string, errorId: string, type: 'error' | 'warning' | 'note'): void => {
         // Check if error already exists
         if (chatErrors.some(error => error.id === errorId)) return;
-        setChatErrors([...chatErrors, { id: errorId, message, type }]);
+        chatErrors.push({ id: errorId, message, type });
     };
 
 
-    const validateInputs = (): void => {
+    const validateInputs = (chatErrors: ChatError[]): void => {
         // Validation logic here
         // Similar to the original but using React state
 
@@ -111,7 +111,7 @@ export default function FormRate() {
                 const errorId = `error-${input.id}`;
 
                 if (value < 0 || value > 100) {
-                    addChatError(`Giá trị không hợp lệ (${value}). Hãy điền tỉ lệ (%) là số tự nhiên từ 0-100`, errorId, "error");
+                    addChatError(chatErrors, `Giá trị không hợp lệ (${value}). Hãy điền tỉ lệ (%) là số tự nhiên từ 0-100`, errorId, "error");
                 }
             }
         });
@@ -132,7 +132,7 @@ export default function FormRate() {
                     });
 
                     if (sum < 120) {
-                        addChatError(`Câu chọn nhiều đáp án. Cần điền tỉ lệ (%) là số tự nhiên từ 0-100. Và tổng tỉ lệ nên lớn hơn 120, để trộn tốt nhất (hiện tại: ${sum})`, `multi-error-${questionId}`, "error");
+                        addChatError(chatErrors, `Câu chọn nhiều đáp án. Cần điền tỉ lệ (%) là số tự nhiên từ 0-100. Và tổng tỉ lệ nên lớn hơn 120, để trộn tốt nhất (hiện tại: ${sum})`, `multi-error-${questionId}`, "error");
                     }
                 }
             }
@@ -142,46 +142,46 @@ export default function FormRate() {
         document.querySelectorAll(".js-answer-select").forEach((select: Element) => {
             if (select instanceof HTMLSelectElement) {
                 if (select.value.toLowerCase().includes("other")) {
-                    addChatError(`Bạn chọn "other - bỏ qua không điền". Hãy kiểm tra lại đã tắt bắt buộc điền trên Google Form chưa?`, `select-error-${select.id}`, "warning");
+                    addChatError(chatErrors, `Bạn chọn "other - bỏ qua không điền". Hãy kiểm tra lại đã tắt bắt buộc điền trên Google Form chưa?`, `select-error-${select.id}`, "warning");
                 }
             }
         });
     };
 
-    const validateConfig = (): void => {
+    const validateConfig = (chatErrors: ChatError[]): void => {
         // Config validation logic
         if (dataForm?.config?.lang === null) {
-            addChatError(`Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt thu thập email và tắt giới hạn trả lời nhé`, `00000`, "warning");
+            addChatError(chatErrors, `Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt thu thập email và tắt giới hạn trả lời nhé`, `00000`, "warning");
         } else {
             if (dataForm?.config?.isValidPublished === "false") {
-                addChatError(`<b>Google Form!</b> Form chưa Xuất bản/Publish. Nếu là Form cũ (trước 2025) có thể bỏ qua lỗi này.`, `00004`, "error");
+                addChatError(chatErrors, `<b>Google Form!</b> Form chưa Xuất bản/Publish. Nếu là Form cũ (trước 2025) có thể bỏ qua lỗi này.`, `00004`, "error");
             } else if (dataForm?.config?.isValidPublished === "null") {
-                addChatError(`<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ Xuất bản/Publish Form nhé!`, `00004`, "warning");
+                addChatError(chatErrors, `<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ Xuất bản/Publish Form nhé!`, `00004`, "warning");
             }
 
             if (dataForm?.config?.isValidCollectEmail === "false") {
-                addChatError(`<b>Google Form!</b> Phải chọn "Không thu thập email/ Do not Collect" trong setting.`, `00001`, "error");
+                addChatError(chatErrors, `<b>Google Form!</b> Phải chọn "Không thu thập email/ Do not Collect" trong setting.`, `00001`, "error");
             } else if (dataForm?.config?.isValidCollectEmail === "null") {
-                addChatError(`Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt thu thập email. Phải chọn "Không thu thập email/ Do not Collect" trong setting nhé!`, `00001`, "warning");
+                addChatError(chatErrors, `Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt thu thập email. Phải chọn "Không thu thập email/ Do not Collect" trong setting nhé!`, `00001`, "warning");
             }
 
             if (dataForm?.config?.isValidEditAnswer === "false") {
-                addChatError(`<b>Google Form!</b> Phải tắt cho phép chỉnh sửa câu trả lời trong setting.`, `00002`, "error");
+                addChatError(chatErrors, `<b>Google Form!</b> Phải tắt cho phép chỉnh sửa câu trả lời trong setting.`, `00002`, "error");
             } else if (dataForm?.config?.isValidEditAnswer === "null") {
-                addChatError(`<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt "cho phép chỉnh sửa câu trả lời" trong setting nhé!`, `00001`, "warning");
+                addChatError(chatErrors, `<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt "cho phép chỉnh sửa câu trả lời" trong setting nhé!`, `00001`, "warning");
             }
 
             if (dataForm?.config?.isValidLimitRes === "false") {
-                addChatError(`<b>Google Form!</b> Phải tắt mọi giới hạn trả lời trong setting.`, `00003`, "error");
+                addChatError(chatErrors, `<b>Google Form!</b> Phải tắt mọi giới hạn trả lời trong setting.`, `00003`, "error");
             } else if (dataForm?.config?.isValidLimitRes === "null") {
-                addChatError(`<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt mọi giới hạn trả lời trong setting nhé!`, `00001`, "warning");
+                addChatError(chatErrors, `<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt mọi giới hạn trả lời trong setting nhé!`, `00001`, "warning");
             }
 
             if (dataForm?.config?.isValidCollectEmail === "true" &&
                 dataForm?.config?.isValidEditAnswer === "true" &&
                 dataForm?.config?.isValidLimitRes === "true" &&
                 dataForm?.config?.isValidPublished === "true") {
-                addChatError(`Tuyệt! Google form này setting OK. Hãy config tỉ lệ nhé.`, `00005`, "note");
+                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy config tỉ lệ nhé.`, `00005`, "note");
             }
         }
     };
@@ -200,14 +200,20 @@ export default function FormRate() {
 
     useEffect(() => {
         if (dataForm?.form && dataForm?.form.loaddata) {
-            validateConfig();
-            validateInputs();
+            const validateAll = () => {
+                let chatErrors: ChatError[] = [];
+                validateInputs(chatErrors);
+                validateConfig(chatErrors);
+                setChatErrors(chatErrors);
+            }
 
             // Add event listeners for form validation
             const numberInputs = document.querySelectorAll("input[type='number']");
             const selects = document.querySelectorAll(".js-answer-select");
 
-            const handleInputChange = () => validateInputs();
+            const handleInputChange = () => {
+                validateAll();
+            }
 
             numberInputs.forEach(input => {
                 input.addEventListener('input', handleInputChange);
@@ -222,8 +228,13 @@ export default function FormRate() {
             // Add event listeners for select changes
             selects.forEach((select: Element) => {
                 const selectElement = select as HTMLSelectElement;
-                selectElement.addEventListener('change', () => handleSelectChange(selectElement.id));
+                selectElement.addEventListener('change', () => {
+                    handleSelectChange(selectElement.id);
+                    validateAll();
+                });
             });
+
+            validateAll();
 
             // Cleanup event listeners
             return () => {
@@ -443,7 +454,7 @@ export default function FormRate() {
 
                 {
                     chatOpen && (
-                        <div className="p-3 h-full overflow-y-auto">
+                        <div className="p-3 h-80 overflow-y-auto">
                             <div className="text-sm">
                                 <p>💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.</p>
 

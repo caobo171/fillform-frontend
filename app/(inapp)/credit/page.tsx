@@ -21,7 +21,10 @@ const CreditPage: FC<{}> = () => {
                 <div className="card mx-auto p-6 mt-0 max-w-4xl">
                     <div className="card-body">
                         <h3 className="text-2xl font-bold mb-2">Nạp tiền vào tài khoản</h3>
-                        <h6 className="text-gray-600 mb-4">{me?.data?.username}</h6>
+                        <h3 className="text-2xl items-center gap-2 mb-2">
+                            Số dư hiện tại: <span className="font-bold">{me?.data?.credit.toLocaleString()} VND</span>
+                        </h3>
+                        <h6 className="text-gray-600 mb-4">Username: <span className="font-bold">{me?.data?.username}</span></h6>
 
                         <div className="mb-6 text-left">
                             <p className="mb-4">
