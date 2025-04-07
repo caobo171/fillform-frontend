@@ -173,241 +173,432 @@ export default function FormPrefill() {
 
     return (
         <>
-            <section className="py-12 bg-white">
-                <div className="container mx-auto text-center" data-aos="fade-up">
-                    <div className="mb-10">
-                        <h2 className="text-3xl font-bold mb-4">Điền theo data có trước</h2>
-                        <div className="mb-4">
-                            <Link href={`/form/${formData?.form.id}`} className="inline-block px-4 py-2 border border-primary-600 text-blue-600 rounded mr-2 mb-2 hover:bg-primary-50">
+            <section className="bg-gradient-to-b from-primary-50 to-white">
+                <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
+                    <div className="container mx-auto mb-8">
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo data có trước</h1>
+                        
+                        <div className="flex flex-wrap justify-center gap-2 my-6">
+                            <Link href={`/form/${formData?.form.id}`} className="flex items-center px-5 py-2.5 border border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-50 transition">
+                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
                                 Điền theo tỉ lệ mong muốn
                             </Link>
-                            <Link href="" className="inline-block px-4 py-2 bg-primary-600 text-white rounded mr-2 mb-2 hover:bg-primary-700">
+                            <Link href="" className="flex items-center px-5 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition shadow-sm">
+                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z M8 4.5V7 M12 4.5V7 M16 4.5V7 M8 12h8" />
+                                </svg>
                                 Điền theo data có trước
                             </Link>
                         </div>
-                        <p className="mb-2">Hãy nhập link Google Sheet bộ data có sẵn của bạn vào ô dưới dây</p>
-                        <p className="mb-2">Hãy xem kĩ hướng dẫn dưới đây bạn nhé</p>
-                        <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=5UM5Q2-jsBI" className="text-blue-600">https://www.youtube.com/watch?v=5UM5Q2-jsBI</a></p>
+
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                            <div className="space-y-4 text-sm text-gray-700">
+                                <div className="flex items-center gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p>Hãy nhập link Google Sheet bộ data có sẵn của bạn vào ô dưới đây</p>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <p>Vui lòng xem kỹ hướng dẫn bên dưới trước khi thực hiện</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=5UM5Q2-jsBI" className="text-primary-600 font-medium hover:underline">Xem tại đây</a></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <form onSubmit={(e) => onCheckData(e)} className="mb-6">
-                        <div className="mb-4">
-                            <div className="flex mb-3 w-full">
-                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Form</span>
-                                <input
-                                    type="text"
-                                    readOnly
-                                    className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-50"
-                                    value={formData?.form?.urlMain}
-                                />
+                    <div className="container mx-auto mb-8">
+                        <form onSubmit={(e) => onCheckData(e)} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Thông tin Form</h3>
+                            <div className="space-y-4">
+                                <div className="relative">
+                                    <label htmlFor="urlMain" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                                        Link Form
+                                    </label>
+                                    <div className="flex">
+                                        <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                            </svg>
+                                        </span>
+                                        <input 
+                                            type="text" 
+                                            id="urlMain" 
+                                            readOnly
+                                            value={formData?.form?.urlMain}
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-gray-50 text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" 
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className="relative">
+                                    <label htmlFor="formName" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                                        Tên Form
+                                    </label>
+                                    <div className="flex">
+                                        <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </span>
+                                        <input 
+                                            type="text" 
+                                            id="formName" 
+                                            readOnly
+                                            value={formData?.form?.name}
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-gray-50 text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" 
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className="relative">
+                                    <label htmlFor="dataUrl" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                                        Link Data của bạn
+                                    </label>
+                                    <div className="flex">
+                                        <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        </span>
+                                        <input 
+                                            type="text" 
+                                            id="dataUrl" 
+                                            value={urlData}
+                                            onChange={(e) => setUrlData(e.target.value)}
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" 
+                                            placeholder="Nhập đường dẫn Google Sheet có đuôi /edit của bạn..."
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex mb-3 w-full">
-                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Tên Form</span>
-                                <input
-                                    type="text"
-                                    readOnly
-                                    className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-50"
-                                    value={formData?.form?.name}
-                                />
-                            </div>
-                            <div className="flex mb-3 w-full">
-                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Data của bạn</span>
-                                <input
-                                    type="text"
-                                    className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                                    value={urlData}
-                                    onChange={(e) => setUrlData(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <button
-                            type="submit"
-                            className="px-6 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none focus:shadow-outline"
-                        >
-                            Kiểm tra dữ liệu
-                        </button>
-                    </form>
+                            
+                            <button
+                                type="submit"
+                                className="mt-6 inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                            >
+                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Kiểm tra dữ liệu
+                            </button>
+                        </form>
+                    </div>
 
                     {error && (
-                        <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 rounded-md" role="alert">
-                            {error}
+                        <div className="container mx-auto mb-8">
+                            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm" role="alert">
+                                <div className="flex items-center">
+                                    <svg className="h-6 w-6 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <p className="text-red-700 font-medium">{error}</p>
+                                </div>
+                            </div>
                         </div>
                     )}
-
+                    
                     {fields ? (
-                        <form onSubmit={handleSubmit(onSubmitPrefill)} className="text-left bg-gray-50 p-6 rounded-lg">
-                            <div className="space-y-2">
-                                {prefillForm?.loaddata && prefillForm?.loaddata?.map((data: any, index: any) => (
-                                    <div key={index} className="p-4 bg-white rounded shadow-sm text-xs">
-                                        <div className="md:flex md:items-start gap-8">
-                                            <div className="md:w-1/4 mb-4 md:mb-0">
-                                                {data.description ? (
-                                                    <>
-                                                        <label className="block font-bold mb-1 truncate w-full">{data.question}</label>
-                                                        <label className="block truncate w-full text-gray-400">{data.description}</label>
-                                                    </>
-                                                ) : (
-                                                    <label className="block font-bold truncate w-full">{data.question}</label>
-                                                )}
+                        <form onSubmit={handleSubmit(onSubmitPrefill)} className="container mx-auto">
+                            <div className="space-y-6">
+                                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-900">Liên kết dữ liệu với câu hỏi</h3>
+                                    <div className="space-y-4">
+                                        {prefillForm?.loaddata && prefillForm?.loaddata?.map((data: any, index: any) => (
+                                            <div key={index} className="p-5 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
+                                                <div className="md:flex md:items-start gap-8">
+                                                    <div className="md:w-2/5 mb-3 md:mb-0">
+                                                        <div className="bg-white p-3 rounded-md shadow-sm">
+                                                            {data.description ? (
+                                                                <>
+                                                                    <label className="block font-semibold text-sm mb-1 text-gray-900">{data.question}</label>
+                                                                    <label className="block text-xs text-gray-500">{data.description}</label>
+                                                                </>
+                                                            ) : (
+                                                                <label className="block font-semibold text-sm text-gray-900">{data.question}</label>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="md:w-3/5">
+                                                        <div className="relative">
+                                                            <label
+                                                                htmlFor={`question_${data.id}`}
+                                                                className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-600"
+                                                            >
+                                                                Chọn cột để liên kết dữ liệu
+                                                            </label>
+                                                            <select
+                                                                id={`question_${data.id}`}
+                                                                {...register('question_' + data.id, { value: data.field })}
+                                                                className="block w-full rounded-md bg-white px-3 py-3 text-sm text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                                                                defaultValue={data.field}
+                                                            >
+                                                                {fields && fields.map((field: any) => (
+                                                                    <option key={field.value} value={field.value}>
+                                                                        {field.value}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="md:w-3/4">
-                                                <div className="relative">
-                                                    <label
-                                                        htmlFor="name"
-                                                        className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
-                                                    >
-                                                        Chọn cột để liên kết dữ liệu
-                                                    </label>
-                                                    <select
-                                                        {...register('question_' + data.id, { value: data.field })}
-                                                        className="block w-full rounded-md bg-white px-3 py-4 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                                                        defaultValue={data.field}
-                                                    >
-                                                        {fields && fields.map((field: any) => (
-                                                            <option key={field.value} value={field.value}>
-                                                                {field.value}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <svg className="flex-shrink-0 h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                        <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU ĐIỀN FORM</h3>
+                                    </div>
+
+                                    <div className="bg-gray-50 rounded-lg p-5 border border-gray-100">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
+                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
+                                                Số dư tài khoản
+                                            </div>
+                                            <div className="col-span-2 flex items-center">
+                                                <div className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold w-40">
+                                                    {(user?.credit || 0).toLocaleString()} <span className="text-xs font-normal text-gray-500">VND</span>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
 
-                                <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 rounded-md mt-8">
-                                    <h3 className="text-xl font-bold mb-4">TẠO YÊU CẦU ĐIỀN FORM</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
+                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
+                                                Đơn giá mỗi câu trả lời
+                                            </div>
+                                            <div className="col-span-2 flex items-center">
+                                                <div className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold">
+                                                    {pricePerAnswer.toLocaleString()} <span className="text-xs font-normal text-gray-500">VND</span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                    <div className="grid grid-cols-3 gap-4 mb-4">
-                                        <label className="col-span-2 md:col-span-1 flex items-center">Số dư tài khoản</label>
-                                        <div className="col-span-1 md:col-span-2">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                className="w-full bg-transparent"
-                                                value={(user?.credit || 0).toLocaleString()}
-                                            />
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
+                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
+                                                Số lượng câu trả lời cần tăng
+                                            </div>
+                                            <div className="col-span-2 flex items-center">
+                                                <input
+                                                    type="number"
+                                                    readOnly
+                                                    className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold w-40"
+                                                    value={numRequest}
+                                                    {...register("num_request")}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
+                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
+                                                Điền rải random như người thật
+                                            </div>
+                                            <div className="col-span-2">
+                                                <select
+                                                    className="block w-full rounded-md bg-white px-3 py-2.5 text-sm text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                                                    {...register("delay")}
+                                                >
+                                                    <option value="0">Không cần điền rải</option>
+                                                    <option value="1">Điền giãn cách ngắn</option>
+                                                    <option value="2">Điền giãn cách tiêu chuẩn</option>
+                                                    <option value="3">Điền giãn cách dài</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-4 mb-4">
-                                        <label className="col-span-2 md:col-span-1 flex items-center">Đơn giá mỗi câu trả lời (VND)</label>
-                                        <div className="col-span-1 md:col-span-2">
-                                            <p>{pricePerAnswer.toLocaleString()}</p>
+                                    <div className="mt-6 bg-primary-50 border-l-4 border-primary-500 p-4 rounded-md">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <svg className="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <h3 className="text-xl font-bold text-primary-800">TỔNG CỘNG: {total.toLocaleString()} VND</h3>
                                         </div>
+                                        
+                                        <p className="mb-3 text-primary-700 font-medium">
+                                            {insufficientFunds 
+                                                ? <span className="text-red-600 font-bold">KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ</span> 
+                                                : `Bạn xác nhận sẽ buff ${numRequest} câu trả lời cho form này.`}
+                                        </p>
+                                        
+                                        <div className="bg-white p-3 rounded-md text-sm" dangerouslySetInnerHTML={{ __html: delayNote }}></div>
                                     </div>
-
-                                    <div className="grid grid-cols-3 gap-4 mb-4">
-                                        <label className="col-span-2 md:col-span-1 flex items-center">Số lượng câu trả lời cần tăng</label>
-                                        <div className="col-span-1 md:col-span-2">
-                                            <input
-                                                type="number"
-                                                readOnly
-                                                className="w-full bg-transparent"
-                                                value={numRequest}
-                                                {...register("num_request")}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-4 mb-4">
-                                        <label className="col-span-2 md:col-span-1 flex items-center">Điền rải random như người thật</label>
-                                        <div className="col-span-1 md:col-span-2">
-                                            <select
-                                                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                                                {...register("delay")}
-                                            >
-                                                <option value="0">Không cần điền rải</option>
-                                                <option value="1">Điền giãn cách ngắn</option>
-                                                <option value="2">Điền giãn cách tiêu chuẩn</option>
-                                                <option value="3">Điền giãn cách dài</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <h3 className="text-xl font-bold mb-2">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
-                                    <p className="mb-2">{message}</p>
-                                    <p className="text-sm" dangerouslySetInnerHTML={{ __html: delayNote }}></p>
                                 </div>
 
                                 <button
                                     type="submit"
-                                    className={`w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                                        insufficientFunds || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                                    }`}
+                                    className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                        ${insufficientFunds || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={insufficientFunds || submitDisabled}
                                 >
+                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
                                     Bắt đầu điền form
                                 </button>
                             </div>
                         </form>
                     ) : (
-                        <div className="text-left bg-gray-50 p-6 rounded-lg">
-                            <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
-                                <div>
-                                    <p className="mb-4">
-                                        <strong>Note: </strong> Nếu bạn <strong>thao tác lần đầu</strong>, hãy tạo bản sao cho form của mình và thực hiện trên bản sao trước nhé!
-                                    </p>
-                                    <h1 className="text-2xl font-bold mb-4">Hướng Dẫn</h1>
-                                    <p className="font-bold mb-2">Bước 1: Chuẩn hoá dữ liệu</p>
-                                    <p className="mb-4">
-                                        - Dòng đầu tiên là label cột dữ liệu, các cột nên sắp xếp theo thứ tự câu hỏi trong Google Form.<br />
-                                        - Trắc nhiệm (chọn 1 đáp án): Nhập <strong>số thứ tự</strong> của đáp án trong form, bắt đầu từ 1<br />
-                                        - Trắc nhiệm (chọn nhiều đáp án): Nhập số tự tự đáp án ngăn cách bằng //, ví dụ: 1//3//4<br />
-                                        - Tự luận: Nhập trực tiếp đáp án, cố hạn chế dấu , ; và xuống dòng<br />
-                                        <strong>Data mẫu (thông tin cá nhân đều là thông tin ảo):</strong><br />
-                                        https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit<br /><br />
-                                        Bạn có thể sử dụng tính năng <strong>mã hóa data</strong> để có data chuẩn hóa nhanh chóng (Hướng dẫn tại link video đầu trang).
-                                    </p>
+                        <div className="container mx-auto bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                            <div className="border-b border-gray-200 pb-4 mb-6">
+                                <div className="flex items-center text-amber-600 gap-2 mb-3">
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p className="font-medium">Nếu bạn <strong>thao tác lần đầu</strong>, hãy tạo bản sao cho form của mình và thực hiện trên bản sao trước nhé!</p>
                                 </div>
-                                <div>
-                                    <Image
-                                        src="/static/img/prefill-s1.png"
-                                        alt="Fillform Step 1"
-                                        width={500}
-                                        height={300}
-                                        className="w-full rounded shadow"
-                                    />
+                                <h2 className="text-2xl font-bold mb-2 text-gray-900 flex items-center gap-2">
+                                    <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    Hướng Dẫn
+                                </h2>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-8 items-start mb-10">
+                                <div className="p-5 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-sm">1</span>
+                                        <h3 className="text-lg font-bold text-gray-900">Chuẩn hoá dữ liệu</h3>
+                                    </div>
+                                    <div className="space-y-2 ml-8">
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span>Dòng đầu tiên là label cột dữ liệu, các cột nên sắp xếp theo thứ tự câu hỏi trong Google Form</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span><strong>Trắc nhiệm (chọn 1 đáp án):</strong> Nhập <strong>số thứ tự</strong> của đáp án trong form, bắt đầu từ 1</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span><strong>Trắc nhiệm (chọn nhiều đáp án):</strong> Nhập số tự tự đáp án ngăn cách bằng //, ví dụ: 1//3//4</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span><strong>Tự luận:</strong> Nhập trực tiếp đáp án, cố hạn chế dấu , ; và xuống dòng</span>
+                                        </p>
+                                        
+                                        <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 text-blue-800">
+                                            <p className="font-semibold mb-1">Data mẫu (thông tin cá nhân đều là thông tin ảo):</p>
+                                            <a href="https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit" 
+                                               className="text-blue-600 hover:underline" 
+                                               target="_blank" 
+                                               rel="noopener noreferrer">
+                                                https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit
+                                            </a>
+                                        </div>
+                                        
+                                        <div className="mt-3 p-3 bg-yellow-50 rounded-md border border-yellow-100 text-yellow-800">
+                                            <p>Bạn có thể sử dụng tính năng <strong>mã hóa data</strong> để có data chuẩn hóa nhanh chóng (Hướng dẫn tại link video đầu trang).</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex justify-center items-center">
+                                    <div className="relative rounded-md overflow-hidden shadow-md border border-gray-200">
+                                        <Image
+                                            src="/static/img/prefill-s1.png"
+                                            alt="Fillform Step 1"
+                                            width={500}
+                                            height={300}
+                                            className="w-full object-contain"
+                                        />
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-sm">
+                                            Ví dụ về dữ liệu chuẩn hóa
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
-                                <div>
-                                    <p className="font-bold mb-2">Bước 2: Căn sửa data</p>
-                                    <p className="mb-4">
-                                        - Chọn toàn bộ <strong>phần data trong câu hỏi chọn nhiều đáp án</strong> và chuyển về định dạng kí tự <strong>"Plain Text".</strong><br />
-                                        - Chỉnh sửa, thêm xóa dữ liệu theo điều hướng session phù hợp (nếu có).
-                                    </p>
+                            <div className="grid md:grid-cols-2 gap-8 items-start mb-10">
+                                <div className="p-5 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-sm">2</span>
+                                        <h3 className="text-lg font-bold text-gray-900">Căn sửa data</h3>
+                                    </div>
+                                    <div className="space-y-2 ml-8">
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span>Chọn toàn bộ <strong>phần data trong câu hỏi chọn nhiều đáp án</strong> và chuyển về định dạng kí tự <strong>"Plain Text"</strong></span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span>Chỉnh sửa, thêm xóa dữ liệu theo điều hướng session phù hợp (nếu có)</span>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <Image
-                                        src="/static/img/prefill-s3.png"
-                                        alt="Fillform Step 2"
-                                        width={500}
-                                        height={300}
-                                        className="w-full rounded shadow"
-                                    />
+                                
+                                <div className="flex justify-center items-center">
+                                    <div className="relative rounded-md overflow-hidden shadow-md border border-gray-200">
+                                        <Image
+                                            src="/static/img/prefill-s3.png"
+                                            alt="Fillform Step 2"
+                                            width={500}
+                                            height={300}
+                                            className="w-full object-contain"
+                                        />
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-sm">
+                                            Định dạng "Plain Text" cho dữ liệu
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
-                                <div>
-                                    <p className="font-bold mb-2">Bước 3: Copy đường dẫn edit của data sheet Google</p>
-                                    <p className="mb-4">
-                                        - Tải bộ data excel của bạn lên <strong>google sheet</strong>.<br />
-                                        - Mở <strong>quyền truy cập edit</strong> cho file này.<br />
-                                        - Copy đường dẫn edit của sheet vào ô phía trên, <strong>phải có đuôi /edit</strong>.<br />
-                                        - Ấn <strong>Kiểm tra dữ liệu</strong>, sau đó chỉnh sửa liên kết dữ liệu với câu hỏi
-                                    </p>
+                            <div className="grid md:grid-cols-2 gap-8 items-start mb-6">
+                                <div className="p-5 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-sm">3</span>
+                                        <h3 className="text-lg font-bold text-gray-900">Copy đường dẫn edit của data sheet Google</h3>
+                                    </div>
+                                    <div className="space-y-2 ml-8">
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span>Tải bộ data excel của bạn lên <strong>google sheet</strong></span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span>Mở <strong>quyền truy cập edit</strong> cho file này</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span>Copy đường dẫn edit của sheet vào ô phía trên, <strong>phải có đuôi /edit</strong></span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="text-primary-600 font-bold">•</span>
+                                            <span>Ấn <strong>Kiểm tra dữ liệu</strong>, sau đó chỉnh sửa liên kết dữ liệu với câu hỏi</span>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <Image
-                                        src="/static/img/prefill-s2.png"
-                                        alt="Fillform Step 3"
-                                        width={500}
-                                        height={300}
-                                        className="w-full rounded shadow"
-                                    />
+                                
+                                <div className="flex justify-center items-center">
+                                    <div className="relative rounded-md overflow-hidden shadow-md border border-gray-200">
+                                        <Image
+                                            src="/static/img/prefill-s2.png"
+                                            alt="Fillform Step 3"
+                                            width={500}
+                                            height={300}
+                                            className="w-full object-contain"
+                                        />
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-sm">
+                                            Đường dẫn Google Sheet có đuôi /edit
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

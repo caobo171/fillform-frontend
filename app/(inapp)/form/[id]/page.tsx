@@ -261,51 +261,116 @@ export default function FormRate() {
 
     return (
         <>
-            <section className="py-12 bg-white">
-                <div className="container mx-auto text-center" data-aos="fade-up">
-
-                    {
-                        isSaved && (
-                            <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 rounded-md" role="alert">
-                                <div className='mb-4'>
-                                    Đã lưu dữ liệu thành công
-                                </div>
-                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">
-                                    Tạo yêu cầu điền đơn ngay!
+            <section className="bg-gradient-to-b from-primary-50 to-white">
+                <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
+                    {isSaved && (
+                        <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md shadow-sm" role="alert">
+                            <div className="flex items-center">
+                                <svg className="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <p className="text-green-700 font-medium">Đã lưu dữ liệu thành công</p>
+                            </div>
+                            <div className="mt-3 text-center">
+                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                                    <span>Tạo yêu cầu điền đơn ngay!</span>
+                                    <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
                                 </Link>
                             </div>
-                        )
-                    }
+                        </div>
+                    )}
 
-                    <div className="mb-10">
-                        <h2 className="text-3xl font-bold mb-4">Điền theo tỉ lệ mong muốn</h2>
-                        <div className="mb-4">
-                            <Link href="" className="inline-block px-4 py-2 bg-primary-600 text-white rounded mr-2 mb-2 hover:bg-primary-700">
+                    <div className="container mx-auto mb-8">
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo tỉ lệ mong muốn</h1>
+                        
+                        <div className="flex flex-wrap justify-center gap-2 my-6">
+                            <Link href="" className="flex items-center px-5 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition shadow-sm">
+                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
                                 Điền theo tỉ lệ mong muốn
                             </Link>
-                            <Link href={`/form/prefill/${dataForm?.form.id}`} className="inline-block px-4 py-2 border border-primary-600 text-blue-600 rounded mr-2 mb-2 hover:bg-primary-50">
+                            <Link href={`/form/prefill/${dataForm?.form.id}`} className="flex items-center px-5 py-2.5 border border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-50 transition">
+                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z M8 4.5V7 M12 4.5V7 M16 4.5V7 M8 12h8" />
+                                </svg>
                                 Điền theo data có trước
                             </Link>
                         </div>
-                        <p className="mb-2">Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi nhé</p>
-                        <p className="mb-2">
-                            Nếu bạn chưa biết điền. Hãy thử <span onClick={autoFillHandle} className="text-blue-600 text-lg font-bold cursor-pointer">ấn vào đây</span> để fillform <b>đề xuất tỉ lệ</b> cho bạn tham khảo nha!(Tỉ lệ mang tính chất tham khảo để bạn duyệt trước).
-                        </p>
-                        <p className="mb-2"><b>Hãy chỉnh sửa tỉ lệ để phù hợp nhất với đề tài của bạn</b> FillForm sẽ chỉ cam kết điền form đúng theo yêu cầu tỉ lệ</p>
-                        <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=3_r-atbIiAI" className="text-blue-600">https://www.youtube.com/watch?v=3_r-atbIiAI</a></p>
+
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                            <div className="space-y-4 text-sm text-gray-700">
+                                <div className="flex items-center gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p>Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi</p>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                    <p>
+                                        Nếu bạn chưa biết điền, hãy thử 
+                                        <button onClick={autoFillHandle} className="mx-1 px-3 py-0.5 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 transition inline-flex items-center">
+                                            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                            </svg>
+                                            tự động đề xuất tỉ lệ
+                                        </button>
+                                        để tham khảo
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <p><b>Hãy chỉnh sửa tỉ lệ để phù hợp nhất với đề tài của bạn.</b> FillForm sẽ chỉ cam kết điền form đúng theo yêu cầu tỉ lệ</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=3_r-atbIiAI" className="text-primary-600 font-medium hover:underline">Xem tại đây</a></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <form className="mb-6">
-                        <div className="mb-4">
-                            <div className="flex mb-3 w-full">
-                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Form</span>
-                                <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                                    id="urlMain" name="urlMain" defaultValue={dataForm?.form.urlMain} />
-                            </div>
-                            <div className="flex mb-3 w-full">
-                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Tên Form</span>
-                                <input type="text" className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                                    id="urlCopy" name="urlCopy" defaultValue={dataForm?.form.name} />
+                    <div className="container mx-auto mb-10">
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Thông tin Form</h3>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="relative">
+                                    <label htmlFor="urlMain" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                                        Link Form
+                                    </label>
+                                    <div className="flex">
+                                        <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                            </svg>
+                                        </span>
+                                        <input type="text" id="urlMain" name="urlMain" defaultValue={dataForm?.form.urlMain}
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" />
+                                    </div>
+                                </div>
+                                <div className="relative">
+                                    <label htmlFor="urlCopy" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                                        Tên Form
+                                    </label>
+                                    <div className="flex">
+                                        <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </span>
+                                        <input type="text" id="urlCopy" name="urlCopy" defaultValue={dataForm?.form.name}
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" />
+                                    </div>
+                                </div>
                             </div>
                             <input type="hidden" id="lang" name="lang" value={dataForm?.config?.lang || ''} />
                             <input type="hidden" id="isValidCollectEmail" name="isValidCollectEmail" value={dataForm?.config?.isValidCollectEmail || ''} />
@@ -313,29 +378,30 @@ export default function FormRate() {
                             <input type="hidden" id="isValidLimitRes" name="isValidLimitRes" value={dataForm?.config?.isValidLimitRes || ''} />
                             <input type="hidden" id="isValidPublished" name="isValidPublished" value={dataForm?.config?.isValidPublished || ''} />
                         </div>
-                    </form>
+                    </div>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-6 rounded-lg">
+                    <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-6 rounded-lg container mx-auto">
                         <div className="space-y-2">
                             {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
-                                <div key={questionId} className="p-4 bg-white rounded shadow-sm text-xs">
+                                <div key={questionId} className="p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
-                                        <div className="md:w-1/4 mb-4 md:mb-0">
-                                            {question.description ? (
-                                                <>
-                                                    <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
-                                                    <label className="block truncate w-full text-gray-400">{question.description}</label>
-                                                </>
-                                            ) : (
-                                                <label className="block font-bold truncate w-full">{question.question}</label>
-                                            )}
+                                        <div className="md:w-1/4 mb-3 md:mb-0">
+                                            <div className="bg-gray-50 p-3 rounded-md">
+                                                {question.description ? (
+                                                    <>
+                                                        <label className="block font-semibold text-sm mb-1 text-gray-900">{question.question}</label>
+                                                        <label className="block text-xs text-gray-500">{question.description}</label>
+                                                    </>
+                                                ) : (
+                                                    <label className="block font-semibold text-sm text-gray-900">{question.question}</label>
+                                                )}
+                                            </div>
                                         </div>
 
                                         <div className="md:w-3/4">
-
                                             {question.type ? (
                                                 <>
-                                                    <div className="grid grid-cols-5 gap-4">
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                                                         <input type="hidden" {...register(`isMulti-${question.id}`)} defaultValue={question.isMulti} />
                                                         <input type="hidden" {...register(`totalans-${question.id}`)} defaultValue={question.totalAnswer} />
                                                         <input type="hidden" {...register(`type-${question.id}`)} defaultValue={question.type} />
@@ -344,7 +410,7 @@ export default function FormRate() {
                                                             answer.data && (
                                                                 <div key={answerId} className="relative">
                                                                     <label
-                                                                        htmlFor="name"
+                                                                        htmlFor={`answer_${answer.id}`}
                                                                         className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
                                                                     >
                                                                         {answer.data}
@@ -353,12 +419,12 @@ export default function FormRate() {
                                                                         type="number"
                                                                         min="0"
                                                                         step="1"
-                                                                        {...register('answer_' + answer.id)}
+                                                                        id={`answer_${answer.id}`}
+                                                                        {...register(`answer_${answer.id}`)}
                                                                         defaultValue={answer.count}
-                                                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                                        className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
                                                                     />
                                                                 </div>
-
                                                             )
                                                         ))}
                                                     </div>
@@ -367,15 +433,20 @@ export default function FormRate() {
                                                 question.answer && question.answer.map((answer: any, answerId: any) => (
                                                     <div key={answerId} className="relative w-full">
                                                         <label
-                                                            htmlFor="name"
+                                                            htmlFor={`select-${answer.id}`}
                                                             className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
                                                         >
-                                                            Chọn loại câu hỏi tự luận (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
+                                                            Chọn loại câu hỏi tự luận
+
+                                                            <span className="text-xs text-gray-500">
+                                                                &nbsp; (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
+                                                            </span>
                                                         </label>
+                                                   
                                                         <select
-                                                            className="js-answer-select block w-full rounded-md bg-white px-3 py-4 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                            className="js-answer-select block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
                                                             id={`select-${answer.id}`}
-                                                            {...register('answer_' + answer.id)}
+                                                            {...register(`answer_${answer.id}`)}
                                                             defaultValue={answer.count}
                                                         >
                                                             {answer.options && answer.options.map((option: any, optionId: any) => (
@@ -384,105 +455,154 @@ export default function FormRate() {
                                                         </select>
 
                                                         <textarea
-                                                            className="mt-2 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm hidden custom-input"
+                                                            className="mt-3 w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600 text-sm hidden custom-input"
                                                             id={`custom-${answer.id}`}
                                                             {...register(`custom-${answer.id}`)}
                                                             defaultValue={answer.data}
+                                                            rows={4}
                                                             placeholder="Nhập mỗi dòng 1 câu trả lời (ấn enter để xuống dòng). Không để dòng trống. Tool sẽ điền lặp lại ngẫu nhiên nếu số lượng không đủ."
                                                         />
                                                     </div>
-
-
                                                 ))
                                             )}
-
                                         </div>
                                     </div>
                                 </div>
                             ))}
                             <button
                                 type="submit"
-                                className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                className="w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center"
                             >
+                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                </svg>
                                 Lưu lại và tiếp tục
                             </button>
 
                             {
                                 isSaved && (
-                                    <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 text-center" role="alert">
-                                        <div className='mb-4'>
+                                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4 text-center" role="alert">
+                                        <div className='mb-4 text-green-700 font-medium'>
                                             Đã lưu dữ liệu thành công
                                         </div>
-                                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-block px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700">
-                                            Tạo yêu cầu điền đơn ngay!
+                                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                                            <span>Tạo yêu cầu điền đơn ngay!</span>
+                                            <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
                                         </Link>
                                     </div>
                                 )
                             }
                         </div>
                     </form>
-                </div >
-            </section >
+                </div>
+            </section>
 
-            {/* Chat Container - moved outside section */}
-            < div className={`fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 z-[9999] ${chatOpen ? 'h-96' : 'h-12'}`
-            }>
+            {/* Chat Container */}
+            <div className={`fixed bottom-4 right-4 w-80 bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 z-[9999] ${chatOpen ? 'h-96' : 'h-14'} border border-gray-200`}>
                 <div
-                    className="bg-primary-600 text-white p-3 flex items-center justify-between cursor-pointer"
+                    className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-3 flex items-center justify-between cursor-pointer"
                     onClick={toggleChat}
                 >
                     <div className="flex items-center">
-                        <Image src="/static/img/logo-white-short.png" alt="Logo" width={24} height={24} className="mr-2" />
+                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white bg-opacity-20 mr-2">
+                            <Image src="/static/img/logo-white-short.png" alt="Logo" width={20} height={20} className="h-5 w-auto" />
+                        </div>
                         <span className="font-medium">Bé Fill Điền Form</span>
                     </div>
                     <div className="flex items-center">
                         <div className="relative mr-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white text-opacity-90" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
                             </svg>
                             {chatErrors.length > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white">
                                     {chatErrors.length}
                                 </span>
                             )}
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transform ${chatOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transform transition-transform duration-300 ${chatOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                     </div>
                 </div>
 
-                {
-                    chatOpen && (
-                        <div className="p-3 h-80 overflow-y-auto">
-                            <div className="text-sm">
-                                <p>💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.</p>
-
-                                {chatErrors.map((error) => (
-                                    <div key={error.id} className="mt-2">
-                                        <div className={`p-2 rounded text-sm relative ${error.type === "error" ? "bg-red-100 text-red-800" :
-                                            error.type === "warning" ? "bg-yellow-100 text-yellow-800" :
-                                                "bg-primary-100 text-blue-800"
-                                            }`}>
-                                            <button
-                                                className="absolute top-1 right-1 text-xs"
-                                                onClick={() => removeChatError(error.id)}
-                                            >
-                                                ✖
-                                            </button>
-                                            <strong>
-                                                {error.type === "error" ? "Lỗi! " :
-                                                    error.type === "warning" ? "Cẩn thận! " : ""}
-                                            </strong>
-                                            <span dangerouslySetInnerHTML={{ __html: error.message }} />
-                                        </div>
-                                    </div>
-                                ))}
+                {chatOpen && (
+                    <div className="p-4 h-[calc(100%-3.5rem)] overflow-y-auto">
+                        <div className="flex items-center space-x-2 mb-4 pb-2 border-b border-gray-100">
+                            <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
+                                <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                             </div>
+                            <p className="text-sm font-medium text-gray-800">Bé Fill kiểm tra cấu hình</p>
                         </div>
-                    )
-                }
-            </div >
+
+                        <div className="text-sm space-y-3">
+                            <p className="bg-primary-50 p-2 rounded-lg rounded-tl-none text-gray-700 max-w-[90%]">
+                                💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.
+                            </p>
+
+                            {chatErrors.length === 0 && (
+                                <div className="flex justify-center my-8">
+                                    <div className="text-center text-gray-500 text-sm">
+                                        <svg className="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p>Chưa có lỗi nào</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {chatErrors.map((error) => (
+                                <div key={error.id} className="mt-2 relative">
+                                    <div className={`p-3 rounded-lg rounded-tl-none text-sm relative
+                                        ${error.type === "error" ? "bg-red-50 text-red-800" :
+                                        error.type === "warning" ? "bg-yellow-50 text-yellow-800" :
+                                        "bg-primary-50 text-blue-800"
+                                        } max-w-[90%]`}>
+                                        <button
+                                            className="absolute top-1 right-1 text-xs opacity-70 hover:opacity-100 transition-opacity"
+                                            onClick={() => removeChatError(error.id)}
+                                            aria-label="Close"
+                                        >
+                                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        {error.type === "error" && (
+                                            <div className="flex items-center gap-1 mb-1 font-semibold">
+                                                <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span>Lỗi!</span>
+                                            </div>
+                                        )}
+                                        {error.type === "warning" && (
+                                            <div className="flex items-center gap-1 mb-1 font-semibold">
+                                                <svg className="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span>Cẩn thận!</span>
+                                            </div>
+                                        )}
+                                        {error.type === "note" && (
+                                            <div className="flex items-center gap-1 mb-1 font-semibold">
+                                                <svg className="h-4 w-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span>Thông báo</span>
+                                            </div>
+                                        )}
+                                        <span className="text-sm" dangerouslySetInnerHTML={{ __html: error.message }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
         </>
     );
 }
