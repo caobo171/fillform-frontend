@@ -11,7 +11,7 @@ import { SocketService } from '@/services/SocketClient'
 import { Toast } from '@/services/Toast'
 import { RawOrder } from '@/store/types'
 import { useParams } from 'next/navigation'
-import { FC, useState, useMemo, useEffect } from 'react'
+import { FC, useState, useMemo, useEffect, use } from 'react'
 import Link from 'next/link'
 import clsx from 'clsx'
 
@@ -26,6 +26,14 @@ const OrderPage = () => {
     const [isFetching, setIsFetching] = useState(false)
     // Note: You'll need to fetch this data from your API
     const isAdmin = me.data?.is_super_admin;
+
+    const [owner, setOwner] = useState(order.data?.order.owner)
+    const [delay, setDelay] = useState(order.data?.order.delay);
+    
+    useEffect(() => {
+        setOwner(order.data?.order.owner)
+        setDelay(order.data?.order.delay)
+    }, [order.data?.order])
 
     let estimatedEndTime = useMemo(() => {
         if (!order.data?.order_detail_list) {
@@ -71,6 +79,26 @@ const OrderPage = () => {
             }
         } catch (error) {
             Toast.error('Lỗi khi dừng order');
+        } finally {
+            setIsFetching(false)
+        }
+    };
+
+    const onSaveChange = async () => {
+        setIsFetching(true)
+        try {
+            const res = await Fetch.postWithAccessToken<{ code: number }>('/api/order/update', {
+                id: params.id as string,
+                owner: owner,
+                delay: delay
+            })
+
+            if (res.data.code === Code.SUCCESS) {
+                order.mutate();
+                Toast.success('Thay đổi đã được lưu');
+            }
+        } catch (error) {
+            Toast.error('Lỗi khi lưu thay đổi');
         } finally {
             setIsFetching(false)
         }
@@ -150,6 +178,7 @@ const OrderPage = () => {
         return <Loading />
     }
 
+    console.log(order.data?.order.status)
 
 
     return (
@@ -182,7 +211,7 @@ const OrderPage = () => {
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-600">Tình trạng:</span>
-                                    <span className={clsx("font-semibold px-2 py-1 rounded-full text-xs", 
+                                    <span className={clsx("font-semibold px-2 py-1 rounded-full text-xs",
                                         order.data?.order.status === ORDER_STATUS.RUNNING ? "bg-blue-100 text-blue-800" : "",
                                         order.data?.order.status === ORDER_STATUS.PAUSE ? "bg-yellow-100 text-yellow-800" : "",
                                         order.data?.order.status === ORDER_STATUS.CANCELED ? "bg-red-100 text-red-800" : "",
@@ -247,7 +276,7 @@ const OrderPage = () => {
                                         )}
                                     </div>
                                 </div>
-                                
+
                                 <div className="pt-2 border-t border-gray-100 mt-2">
                                     <div className="flex items-center justify-between">
                                         <span className="text-gray-600">Tiến độ:</span>
@@ -256,9 +285,9 @@ const OrderPage = () => {
                                         </span>
                                     </div>
                                     <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                                        <div 
-                                            className="bg-primary-600 h-2.5 rounded-full" 
-                                            style={{width: `${Math.round(((order.data?.order_detail_list?.filter(e => e.result === "completed")?.length || 0) / (order.data?.order.num || 1)) * 100)}%`}}
+                                        <div
+                                            className="bg-primary-600 h-2.5 rounded-full"
+                                            style={{ width: `${Math.round(((order.data?.order_detail_list?.filter(e => e.result === "completed")?.length || 0) / (order.data?.order.num || 1)) * 100)}%` }}
                                         ></div>
                                     </div>
                                 </div>
@@ -306,6 +335,63 @@ const OrderPage = () => {
                                 Clone
                             </button>
                         </div>
+
+
+                        {
+                            order.data?.order.status === ORDER_STATUS.PAUSE || order.data?.order.status === ORDER_STATUS.CANCELED ? (
+
+                                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 mb-8">
+
+                                    <div className="sm:col-span-2 sm:col-start-1">
+                                        <label htmlFor="city" className="block text-sm/6 font-medium text-gray-900">
+                                            Owner
+                                        </label>
+                                        <div className="mt-2">
+                                            <input
+                                                id="owner"
+                                                value={owner}
+                                                onChange={(e) => setOwner(e.target.value)}
+                                                name="owner"
+                                                type="text"
+                                                autoComplete="owner"
+                                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="sm:col-span-2">
+                                        <label htmlFor="region" className="block text-sm/6 font-medium text-gray-900">
+                                            Loại điền rải
+                                        </label>
+                                        <div className="mt-2">
+                                            <select
+                                                id="delay"
+                                                name="delay"
+                                                value={delay}
+                                                onChange={(e) => setDelay(e.target.value)}
+                                                className="block w-full rounded-md bg-white px-3 py-2.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                            >
+                                                {
+                                                    Object.keys(OPTIONS_DELAY).map((delay, index) => (
+                                                        <option key={index} value={delay}>{OPTIONS_DELAY[delay as keyof typeof OPTIONS_DELAY].name}</option>
+                                                    ))
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="sm:col-span-2">
+                                        <button
+                                            onClick={() => onSaveChange()}
+                                            className="mt-8 px-4 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded transition-colors"
+                                        >
+                                            Lưu thay đổi
+                                        </button>
+                                    </div>
+                                </div>
+
+                            ) : <></>
+                        }
 
                         {/* Order Details List */}
                         <h3 className="text-2xl font-bold mb-3">Danh sách request</h3>
