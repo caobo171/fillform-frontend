@@ -56,6 +56,7 @@ export default function FormPrefill() {
     const [prefillForm, setPrefillForm] = useState<any>(null);
     const [prefillData, setPrefillData] = useState<any>({});
     const [urlData, setUrlData] = useState('');
+    const [submitDisabled, setSubmitDisabled] = useState(false);
     const { data: user } = useMe()
 
     const { register, handleSubmit, control, watch, setValue } = useForm();
@@ -87,6 +88,7 @@ export default function FormPrefill() {
         // This would be your API call to run the prefill
         console.log("Running prefill with data:", data);
         setIsLoading(true);
+        setSubmitDisabled(true);
         try {
             const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.prefill.run', {
                 form_id: formData?.form?.id,
@@ -111,8 +113,10 @@ export default function FormPrefill() {
             Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
             console.error('Form submission failed');
             setIsLoading(false);
+
         }
 
+        setSubmitDisabled(false);
     };
 
 
@@ -326,7 +330,7 @@ export default function FormPrefill() {
                                     ? 'bg-gray-400 text-white cursor-not-allowed'
                                     : 'bg-blue-600 text-white hover:bg-blue-700'
                                     }`}
-                                disabled={insufficientFunds}
+                                disabled={insufficientFunds || submitDisabled}
                             >
                                 Bắt đầu điền form
                             </button>

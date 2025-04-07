@@ -21,6 +21,8 @@ export default function FormCreate() {
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
 
+    const [submitDisabled, setSubmitDisabled] = useState<boolean>(false);
+
     const handleCreateForm = async () => {
 
         if (!form_link) {
@@ -28,6 +30,7 @@ export default function FormCreate() {
             return;
         }
 
+        setSubmitDisabled(true);
         setLoading(true);
 
         try {
@@ -46,6 +49,8 @@ export default function FormCreate() {
         } finally {
             setLoading(false);
         }
+
+        setSubmitDisabled(false);
     };
 
     return (
@@ -81,6 +86,7 @@ export default function FormCreate() {
                     </div>
                     <button
                         onClick={handleCreateForm}
+                        disabled={submitDisabled}
                         className="bg-blue-600 text-center text-white px-6 py-2 w-full rounded-md hover:bg-blue-700 transition-colors"
                     >
                         Tạo ngay

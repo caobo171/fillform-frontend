@@ -117,6 +117,7 @@ export default function FormRateOrder() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
+        setSubmitDisabled(true);
         try {
 
             const response = await Fetch.postWithAccessToken<{
@@ -143,7 +144,10 @@ export default function FormRateOrder() {
             console.error('Error submitting form:', error);
         } finally {
             setIsLoading(false);
+
         }
+
+        setSubmitDisabled(false);
     };
 
     return (
