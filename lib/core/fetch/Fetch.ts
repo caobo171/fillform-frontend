@@ -3,7 +3,7 @@ import axios, { AxiosPromise } from 'axios';
 import { AnyObject } from '@/store/interface';
 
 import Cookie from './Cookie';
-import { API_URL } from '@/core/Constants';
+import { API_URL, Code } from '@/core/Constants';
 
 type GetFetcherOptions = [string, AnyObject | undefined | null] | string;
 
@@ -56,6 +56,10 @@ class Fetch {
         data: params,
         responseType: 'blob',
       });
+
+      if (response.data.code == Code.Error) {
+        throw new Error(response.data.message);
+      }
 
       // Create a URL for the blob
       const blob = new Blob([response.data]);

@@ -23,8 +23,10 @@ import { Code } from '@/core/Constants';
 import Cookie from '@/lib/core/fetch/Cookie';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { AnyObject } from '@/store/interface';
-import { MeFunctions } from '@/store/me/functions';
+import ExcelJS from 'exceljs';
 import { Container } from '@/components/layout/container/container'
+import { Helper } from '@/services/Helper'
+import { CSVLink } from 'react-csv'
 
 
 const formCreateSchema = z.object({
@@ -37,6 +39,15 @@ type CreateFormValues = z.infer<typeof formCreateSchema>;
 export default function FormCreate() {
 
     const [errorMessage, setErrorMessage] = useState<string>();
+    const [sheetData, setSheetData] = useState<{
+        data: any,
+        headers: any,
+        name: string,
+    }>({
+        data: [],
+        headers: [],
+        name: '',
+    });
     const {
         control,
         handleSubmit,
@@ -51,10 +62,39 @@ export default function FormCreate() {
         }
 
         try {
-            await Fetch.downloadWithAccessToken('/api/form/data.encode', {
+            const res = await Fetch.postWithAccessToken<{
+                data: any,
+                form: any,
+                sheet: any,
+                name: string,
+            }>('/api/form/data.encode', {
                 form_link,
                 sheet_data_link,
             });
+
+            console.log(res);
+
+            const data = res.data.data;
+            const form = res.data.form;
+            const sheet = res.data.sheet;
+            console.log(data, form, sheet);
+
+            let headers: AnyObject = {};
+            for (let i = 0; i < data[0].length; i++) {
+               headers[data[0][i]] = data[0][i];
+            }
+
+            let rows: AnyObject[] = [];
+            for (let row_index = 1; row_index < data.length; row_index++) {
+                let row: AnyObject = {};
+                for (let col_index = 0; col_index < data[0].length; col_index++) {
+                    row[data[0][col_index]] = data[row_index][col_index];
+                }
+                rows.push(row);
+            }
+
+            Helper.exportCSVFile(headers, rows, Helper.purify(res.data.name));
+
 
         } catch (e) {
             setErrorMessage('Something went wrong!');
@@ -118,6 +158,8 @@ export default function FormCreate() {
                             <Button className="w-full" size="large" loading={isSubmitting}>
                                 Mã hoá dữ liệu ngay
                             </Button>
+
+                            <CSVLink data={sheetData.data} headers={sheetData.headers} filename={`${Helper.purify(sheetData.name)}_result.csv`}></CSVLink>
                         </form>
 
                         {errorMessage && (
