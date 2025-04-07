@@ -26,7 +26,7 @@ export default function HomePage() {
 
     return (
         <section className="py-8 px-4">
-            <div className="max-w-7xl mx-auto space-y-8">
+            <div className="container mx-auto space-y-8">
                 {/* User Info */}
                 <div className="bg-white rounded-lg p-6 shadow-sm">
                     <h5 className="text-lg font-medium">Xin chào</h5>

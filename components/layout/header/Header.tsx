@@ -76,7 +76,7 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
       >
         <nav
           className={clsx('mx-auto flex items-center justify-between px-6', {
-            'max-w-7xl': !isAdminPage,
+            'container': !isAdminPage,
           })}
         >
           <div className="flex items-center gap-x-20">
@@ -100,7 +100,7 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
       >
         <nav
           className={clsx('mx-auto flex items-center justify-between px-6', {
-            'max-w-7xl': !isAdminPage,
+            'container': !isAdminPage,
           })}
         >
           <Logo />

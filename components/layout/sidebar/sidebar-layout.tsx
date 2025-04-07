@@ -146,7 +146,7 @@ export function SidebarLayout(
       </div>
 
       <main className="lg:pl-52">
-        <div className="mx-auto max-w-7xl pt-20 pb-10 px-4 sm:px-6">
+        <div className="mx-auto container pt-20 pb-10 px-4 sm:px-6">
           <button
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"

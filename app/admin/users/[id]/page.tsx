@@ -84,7 +84,7 @@ export default function UserDetailPage() {
                 </div>
             </Modal>
             <section className="py-8 px-4">
-                <div className="max-w-7xl mx-auto space-y-8">
+                <div className="container mx-auto space-y-8">
                     {/* User Info */}
                     <div className="px-4 sm:px-6 lg:px-8">
                         <h5 className="text-lg font-medium">Xin chào</h5>

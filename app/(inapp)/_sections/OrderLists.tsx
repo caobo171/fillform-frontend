@@ -83,7 +83,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
         setIsLoading(true);
         try {
             const rest = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/continue', { id });
-            if (rest.data.code === Code.SUCCESS) {
+            if (rest.data.code == Code.SUCCESS) {
                 Toast.success('Đã tiếp tục đơn hàng');
                 dataOrder.mutate();
             } else {

@@ -355,7 +355,7 @@ export default function FormRate() {
                                                                         step="1"
                                                                         {...register('answer_' + answer.id)}
                                                                         defaultValue={answer.count}
-                                                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                                                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
                                                                     />
                                                                 </div>
 
@@ -373,7 +373,7 @@ export default function FormRate() {
                                                             Chọn loại câu hỏi tự luận (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
                                                         </label>
                                                         <select
-                                                            className="js-answer-select block w-full rounded-md bg-white px-3 py-4 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                                            className="js-answer-select block w-full rounded-md bg-white px-3 py-4 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
                                                             id={`select-${answer.id}`}
                                                             {...register('answer_' + answer.id)}
                                                             defaultValue={answer.count}

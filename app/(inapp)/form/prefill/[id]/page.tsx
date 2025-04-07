@@ -165,95 +165,102 @@ export default function FormPrefill() {
 
     const { pricePerAnswer, total, insufficientFunds, delayNote, message } = calculatePriceAndDelay();
 
-    if (!formData) return <LoadingAbsolute />;
+    if (isLoadingForm || !formData || isLoading) {
+        return (
+            <LoadingAbsolute />
+        );
+    }
 
     return (
-        <section className="py-12 bg-gray-50">
-            <div className="container mx-auto px-4 text-center">
-                <div className="mb-8">
-                    {(isLoading || isLoadingForm) ? <LoadingAbsolute /> : <></>}
-                    <h2 className="text-2xl font-bold mb-4">Điền theo data có trước</h2>
-                    <div className="flex flex-wrap justify-center gap-2 mb-4">
-                        <Link
-                            href={`/form/${formData?.form.id}`}
-                            className="px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-50"
-                        >
-                            Điền theo tỉ lệ mong muốn
-                        </Link>
-                        <Link
-                            href="#"
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
-                            Điền theo data có trước
-                        </Link>
+        <>
+            <section className="py-12 bg-white">
+                <div className="container mx-auto text-center" data-aos="fade-up">
+                    <div className="mb-10">
+                        <h2 className="text-3xl font-bold mb-4">Điền theo data có trước</h2>
+                        <div className="mb-4">
+                            <Link href={`/form/${formData?.form.id}`} className="inline-block px-4 py-2 border border-primary-600 text-blue-600 rounded mr-2 mb-2 hover:bg-primary-50">
+                                Điền theo tỉ lệ mong muốn
+                            </Link>
+                            <Link href="" className="inline-block px-4 py-2 bg-primary-600 text-white rounded mr-2 mb-2 hover:bg-primary-700">
+                                Điền theo data có trước
+                            </Link>
+                        </div>
+                        <p className="mb-2">Hãy nhập link Google Sheet bộ data có sẵn của bạn vào ô dưới dây</p>
+                        <p className="mb-2">Hãy xem kĩ hướng dẫn dưới đây bạn nhé</p>
+                        <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=5UM5Q2-jsBI" className="text-blue-600">https://www.youtube.com/watch?v=5UM5Q2-jsBI</a></p>
                     </div>
-                    <p className="mb-1">Hãy nhập link Google Sheet bộ data có sẵn của bạn vào ô dưới dây</p>
-                    <p className="mb-1">Hãy xem kĩ hướng dẫn dưới đây bạn nhé</p>
-                    <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=5UM5Q2-jsBI" className="text-blue-600 hover:underline">https://www.youtube.com/watch?v=5UM5Q2-jsBI</a></p>
-                </div>
-                <form onSubmit={(e) => onCheckData(e)} className=" mx-auto mb-8">
-                    <div className="mb-4">
-                        <div className="flex mb-3 w-full">
-                            <span className="w-1/3 bg-gray-100 border border-gray-300 text-gray-700 px-4 py-2 rounded-l">Link Form</span>
-                            <input
-                                type="text"
-                                readOnly
-                                className="w-2/3 border border-gray-300 px-4 py-2 rounded-r bg-gray-50"
-                                value={formData?.form?.urlMain}
-                            />
-                        </div>
-                        <div className="flex mb-3 w-full">
-                            <span className="w-1/3 bg-gray-100 border border-gray-300 text-gray-700 px-4 py-2 rounded-l">Tên Form</span>
-                            <input
-                                type="text"
-                                readOnly
-                                className="w-2/3 border border-gray-300 px-4 py-2 rounded-r bg-gray-50"
-                                value={formData?.form?.name}
-                            />
-                        </div>
-                        <div className="flex mb-3 w-full">
-                            <span className="w-1/3 bg-gray-100 border border-gray-300 text-gray-700 px-4 py-2 rounded-l">Link Data của bạn</span>
-                            <input
-                                type="text"
-                                className="w-2/3 border border-gray-300 px-4 py-2 rounded-r"
-                                value={urlData}
-                                onChange={(e) => setUrlData(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <button
-                        type="submit"
-                        className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Kiểm tra dữ liệu
-                    </button>
-                </form>
 
-                {error && (
-                    <div className="bg-blue-100 border border-blue-200 text-blue-800 p-4 rounded mb-6">
-                        {error}
-                    </div>
-                )}
+                    <form onSubmit={(e) => onCheckData(e)} className="mb-6">
+                        <div className="mb-4">
+                            <div className="flex mb-3 w-full">
+                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Form</span>
+                                <input
+                                    type="text"
+                                    readOnly
+                                    className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-50"
+                                    value={formData?.form?.urlMain}
+                                />
+                            </div>
+                            <div className="flex mb-3 w-full">
+                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Tên Form</span>
+                                <input
+                                    type="text"
+                                    readOnly
+                                    className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-50"
+                                    value={formData?.form?.name}
+                                />
+                            </div>
+                            <div className="flex mb-3 w-full">
+                                <span className="inline-flex items-center px-3 py-2 text-gray-900 bg-gray-200 border rounded-l-md w-3/12">Link Data của bạn</span>
+                                <input
+                                    type="text"
+                                    className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                    value={urlData}
+                                    onChange={(e) => setUrlData(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <button
+                            type="submit"
+                            className="px-6 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none focus:shadow-outline"
+                        >
+                            Kiểm tra dữ liệu
+                        </button>
+                    </form>
 
-                {fields ? (
-                    <form onSubmit={handleSubmit(onSubmitPrefill)} className=" mx-auto text-left">
-                        <div className="bg-gray-100 bg-opacity-15 p-4 rounded mb-6">
-                            {prefillForm?.loaddata && prefillForm?.loaddata?.map((data: any, index: any) => {
-                                return (
-                                    <div key={index} className="p-2 mb-2 border-b border-gray-200">
-                                        <div className="flex flex-col md:flex-row gap-4">
-                                            <div className="md:w-1/2">
-                                                <label className="font-bold block mb-1">{data.question}</label>
-                                                <span className="text-sm text-gray-600 block">{data.description}</span>
+                    {error && (
+                        <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 rounded-md" role="alert">
+                            {error}
+                        </div>
+                    )}
+
+                    {fields ? (
+                        <form onSubmit={handleSubmit(onSubmitPrefill)} className="text-left bg-gray-50 p-6 rounded-lg">
+                            <div className="space-y-2">
+                                {prefillForm?.loaddata && prefillForm?.loaddata?.map((data: any, index: any) => (
+                                    <div key={index} className="p-4 bg-white rounded shadow-sm text-xs">
+                                        <div className="md:flex md:items-start gap-8">
+                                            <div className="md:w-1/4 mb-4 md:mb-0">
+                                                {data.description ? (
+                                                    <>
+                                                        <label className="block font-bold mb-1 truncate w-full">{data.question}</label>
+                                                        <label className="block truncate w-full text-gray-400">{data.description}</label>
+                                                    </>
+                                                ) : (
+                                                    <label className="block font-bold truncate w-full">{data.question}</label>
+                                                )}
                                             </div>
-                                            <div className="md:w-1/2">
-                                                <div className="flex flex-col">
-                                                    <label className="bg-gray-100 p-2 border border-gray-300 rounded-t text-sm">
+                                            <div className="md:w-3/4">
+                                                <div className="relative">
+                                                    <label
+                                                        htmlFor="name"
+                                                        className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                    >
                                                         Chọn cột để liên kết dữ liệu
                                                     </label>
                                                     <select
                                                         {...register('question_' + data.id, { value: data.field })}
-                                                        className="border border-gray-300 p-2 rounded-b text-sm"
+                                                        className="block w-full rounded-md bg-white px-3 py-4 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                                         defaultValue={data.field}
                                                     >
                                                         {fields && fields.map((field: any) => (
@@ -266,148 +273,147 @@ export default function FormPrefill() {
                                             </div>
                                         </div>
                                     </div>
-                                )
-                            })}
+                                ))}
 
-                            <h3 className="text-xl font-bold mt-8 mb-4">TẠO YÊU CẦU ĐIỀN FORM</h3>
+                                <div className="bg-primary-100 border-primary-500 border-primary-1 text-blue-700 p-4 mb-4 rounded-md mt-8">
+                                    <h3 className="text-xl font-bold mb-4">TẠO YÊU CẦU ĐIỀN FORM</h3>
 
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <label className="col-span-2 md:col-span-1 flex items-center">Số dư tài khoản</label>
-                                <div className="col-span-1 md:col-span-2">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        className="w-full bg-transparent"
-                                        value={(user?.credit || 0).toLocaleString()}
-                                    />
+                                    <div className="grid grid-cols-3 gap-4 mb-4">
+                                        <label className="col-span-2 md:col-span-1 flex items-center">Số dư tài khoản</label>
+                                        <div className="col-span-1 md:col-span-2">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                className="w-full bg-transparent"
+                                                value={(user?.credit || 0).toLocaleString()}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4 mb-4">
+                                        <label className="col-span-2 md:col-span-1 flex items-center">Đơn giá mỗi câu trả lời (VND)</label>
+                                        <div className="col-span-1 md:col-span-2">
+                                            <p>{pricePerAnswer.toLocaleString()}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4 mb-4">
+                                        <label className="col-span-2 md:col-span-1 flex items-center">Số lượng câu trả lời cần tăng</label>
+                                        <div className="col-span-1 md:col-span-2">
+                                            <input
+                                                type="number"
+                                                readOnly
+                                                className="w-full bg-transparent"
+                                                value={numRequest}
+                                                {...register("num_request")}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4 mb-4">
+                                        <label className="col-span-2 md:col-span-1 flex items-center">Điền rải random như người thật</label>
+                                        <div className="col-span-1 md:col-span-2">
+                                            <select
+                                                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                                {...register("delay")}
+                                            >
+                                                <option value="0">Không cần điền rải</option>
+                                                <option value="1">Điền giãn cách ngắn</option>
+                                                <option value="2">Điền giãn cách tiêu chuẩn</option>
+                                                <option value="3">Điền giãn cách dài</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <h3 className="text-xl font-bold mb-2">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
+                                    <p className="mb-2">{message}</p>
+                                    <p className="text-sm" dangerouslySetInnerHTML={{ __html: delayNote }}></p>
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <label className="col-span-2 md:col-span-1 flex items-center">Đơn giá mỗi câu trả lời (VND)</label>
-                                <div className="col-span-1 md:col-span-2">
-                                    <p>{pricePerAnswer.toLocaleString()}</p>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <label className="col-span-2 md:col-span-1 flex items-center">Số lượng câu trả lời cần tăng</label>
-                                <div className="col-span-1 md:col-span-2">
-                                    <input
-                                        type="number"
-                                        readOnly
-                                        className="w-full bg-transparent"
-                                        value={numRequest}
-                                        {...register("num_request")}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <label className="col-span-2 md:col-span-1 flex items-center">Điền rải random như người thật</label>
-                                <div className="col-span-1 md:col-span-2">
-                                    <select
-                                        className="w-full border border-gray-300 p-2 rounded"
-                                        {...register("delay")}
-                                    >
-                                        <option value="0">Không cần điền rải</option>
-                                        <option value="1">Điền giãn cách ngắn</option>
-                                        <option value="2">Điền giãn cách tiêu chuẩn</option>
-                                        <option value="3">Điền giãn cách dài</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="bg-blue-50 border border-blue-100 p-4 rounded mb-6">
-                                <h3 className="text-xl font-bold mb-2">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
-                                <p className="mb-2">{message}</p>
-                                <p className="text-sm" dangerouslySetInnerHTML={{ __html: delayNote }}></p>
-                            </div>
-
-                            <button
-                                type="submit"
-                                className={`w-full py-3 rounded font-medium ${insufficientFunds
-                                    ? 'bg-gray-400 text-white cursor-not-allowed'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                                <button
+                                    type="submit"
+                                    className={`w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                                        insufficientFunds || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
-                                disabled={insufficientFunds || submitDisabled}
-                            >
-                                Bắt đầu điền form
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    <div className="mx-auto">
-                        <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
-                            <div className="text-left">
-                                <p className="mb-4">
-                                    <strong>Note: </strong> Nếu bạn <strong>thao tác lần đầu</strong>, hãy tạo bản sao cho form của mình và thực hiện trên bản sao trước nhé!
-                                </p>
-                                <h1 className="text-2xl font-bold mb-4">Hướng Dẫn</h1>
-                                <p className="font-bold mb-2">Bước 1: Chuẩn hoá dữ liệu</p>
-                                <p className="mb-4">
-                                    - Dòng đầu tiên là label cột dữ liệu, các cột nên sắp xếp theo thứ tự câu hỏi trong Google Form.<br />
-                                    - Trắc nhiệm (chọn 1 đáp án): Nhập <strong>số thứ tự</strong> của đáp án trong form, bắt đầu từ 1<br />
-                                    - Trắc nhiệm (chọn nhiều đáp án): Nhập số tự tự đáp án ngăn cách bằng //, ví dụ: 1//3//4<br />
-                                    - Tự luận: Nhập trực tiếp đáp án, cố hạn chế dấu , ; và xuống dòng<br />
-                                    <strong>Data mẫu (thông tin cá nhân đều là thông tin ảo):</strong><br />
-                                    https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit<br /><br />
-                                    Bạn có thể sử dụng tính năng <strong>mã hóa data</strong> để có data chuẩn hóa nhanh chóng (Hướng dẫn tại link video đầu trang).
-                                </p>
+                                    disabled={insufficientFunds || submitDisabled}
+                                >
+                                    Bắt đầu điền form
+                                </button>
                             </div>
-                            <div>
-                                <Image
-                                    src="/static/img/prefill-s1.png"
-                                    alt="Fillform Step 1"
-                                    width={500}
-                                    height={300}
-                                    className="w-full rounded shadow"
-                                />
+                        </form>
+                    ) : (
+                        <div className="text-left bg-gray-50 p-6 rounded-lg">
+                            <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
+                                <div>
+                                    <p className="mb-4">
+                                        <strong>Note: </strong> Nếu bạn <strong>thao tác lần đầu</strong>, hãy tạo bản sao cho form của mình và thực hiện trên bản sao trước nhé!
+                                    </p>
+                                    <h1 className="text-2xl font-bold mb-4">Hướng Dẫn</h1>
+                                    <p className="font-bold mb-2">Bước 1: Chuẩn hoá dữ liệu</p>
+                                    <p className="mb-4">
+                                        - Dòng đầu tiên là label cột dữ liệu, các cột nên sắp xếp theo thứ tự câu hỏi trong Google Form.<br />
+                                        - Trắc nhiệm (chọn 1 đáp án): Nhập <strong>số thứ tự</strong> của đáp án trong form, bắt đầu từ 1<br />
+                                        - Trắc nhiệm (chọn nhiều đáp án): Nhập số tự tự đáp án ngăn cách bằng //, ví dụ: 1//3//4<br />
+                                        - Tự luận: Nhập trực tiếp đáp án, cố hạn chế dấu , ; và xuống dòng<br />
+                                        <strong>Data mẫu (thông tin cá nhân đều là thông tin ảo):</strong><br />
+                                        https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit<br /><br />
+                                        Bạn có thể sử dụng tính năng <strong>mã hóa data</strong> để có data chuẩn hóa nhanh chóng (Hướng dẫn tại link video đầu trang).
+                                    </p>
+                                </div>
+                                <div>
+                                    <Image
+                                        src="/static/img/prefill-s1.png"
+                                        alt="Fillform Step 1"
+                                        width={500}
+                                        height={300}
+                                        className="w-full rounded shadow"
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
-                            <div className="text-left">
-                                <p className="font-bold mb-2">Bước 2: Căn sửa data</p>
-                                <p className="mb-4">
-                                    - Chọn toàn bộ <strong>phần data trong câu hỏi chọn nhiều đáp án</strong> và chuyển về định dạng kí tự <strong>"Plain Text".</strong><br />
-                                    - Chỉnh sửa, thêm xóa dữ liệu theo điều hướng session phù hợp (nếu có).
-                                </p>
+                            <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
+                                <div>
+                                    <p className="font-bold mb-2">Bước 2: Căn sửa data</p>
+                                    <p className="mb-4">
+                                        - Chọn toàn bộ <strong>phần data trong câu hỏi chọn nhiều đáp án</strong> và chuyển về định dạng kí tự <strong>"Plain Text".</strong><br />
+                                        - Chỉnh sửa, thêm xóa dữ liệu theo điều hướng session phù hợp (nếu có).
+                                    </p>
+                                </div>
+                                <div>
+                                    <Image
+                                        src="/static/img/prefill-s3.png"
+                                        alt="Fillform Step 2"
+                                        width={500}
+                                        height={300}
+                                        className="w-full rounded shadow"
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <Image
-                                    src="/static/img/prefill-s3.png"
-                                    alt="Fillform Step 2"
-                                    width={500}
-                                    height={300}
-                                    className="w-full rounded shadow"
-                                />
-                            </div>
-                        </div>
 
-                        <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
-                            <div className="text-left">
-                                <p className="font-bold mb-2">Bước 3: Copy đường dẫn edit của data sheet Google</p>
-                                <p className="mb-4">
-                                    - Tải bộ data excel của bạn lên <strong>google sheet</strong>.<br />
-                                    - Mở <strong>quyền truy cập edit</strong> cho file này.<br />
-                                    - Copy đường dẫn edit của sheet vào ô phía trên, <strong>phải có đuôi /edit</strong>.<br />
-                                    - Ấn <strong>Kiểm tra dữ liệu</strong>, sau đó chỉnh sửa liên kết dữ liệu với câu hỏi
-                                </p>
-                            </div>
-                            <div>
-                                <Image
-                                    src="/static/img/prefill-s2.png"
-                                    alt="Fillform Step 3"
-                                    width={500}
-                                    height={300}
-                                    className="w-full rounded shadow"
-                                />
+                            <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
+                                <div>
+                                    <p className="font-bold mb-2">Bước 3: Copy đường dẫn edit của data sheet Google</p>
+                                    <p className="mb-4">
+                                        - Tải bộ data excel của bạn lên <strong>google sheet</strong>.<br />
+                                        - Mở <strong>quyền truy cập edit</strong> cho file này.<br />
+                                        - Copy đường dẫn edit của sheet vào ô phía trên, <strong>phải có đuôi /edit</strong>.<br />
+                                        - Ấn <strong>Kiểm tra dữ liệu</strong>, sau đó chỉnh sửa liên kết dữ liệu với câu hỏi
+                                    </p>
+                                </div>
+                                <div>
+                                    <Image
+                                        src="/static/img/prefill-s2.png"
+                                        alt="Fillform Step 3"
+                                        width={500}
+                                        height={300}
+                                        className="w-full rounded shadow"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </div>
-        </section>
+                    )}
+                </div>
+            </section>
+        </>
     );
 }

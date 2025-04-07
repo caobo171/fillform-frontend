@@ -56,7 +56,7 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
       { name: 'Manage account', href: '/user/account' },
       {
         name: 'Profile page',
-        href: `/profile/${Helper.generateCode(user ? user.username : '')}/${user?.id}`,
+        href: `/`,
       },
     ];
 
@@ -87,7 +87,7 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
           <div className="w-full flex items-center justify-between">
             {user ? (
               <Link
-                href={`/profile/${Helper.generateCode(user.username)}/${user?.id}`}
+                href={`/`}
                 className="flex gap-4 cursor-pointer"
               >
                 <Avatar user={user} unlink size={40} />

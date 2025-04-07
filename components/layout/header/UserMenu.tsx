@@ -34,7 +34,7 @@ export function UserMenu({ data }: UserMenuProps) {
         ),
         value: 'profile',
         className: '',
-        href: `/profile/${Helper.generateCode(data ? data.username : '')}/${data?.id}`,
+        href: `/`,
       },
     ];
 

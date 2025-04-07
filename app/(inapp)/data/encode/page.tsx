@@ -1,43 +1,29 @@
 'use client'
 
-import { Fragment, useState } from 'react'
-import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import {
-    ArrowDownCircleIcon,
-    ArrowPathIcon,
-    ArrowUpCircleIcon,
-    CursorArrowRippleIcon,
-} from '@heroicons/react/20/solid'
-import { MeHook } from '@/store/me/hooks'
-import Link from 'next/link';
-import { XCircle } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { mutate } from 'swr';
-import { z } from 'zod';
+import { useState } from 'react'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { XCircle } from 'lucide-react'
+import { z } from 'zod'
 
-import { Button, Checkbox, Input } from '@/components/common';
-import { FormItem } from '@/components/form/FormItem';
-import Meta from '@/components/ui/Meta';
-import { Code } from '@/core/Constants';
-import Cookie from '@/lib/core/fetch/Cookie';
-import Fetch from '@/lib/core/fetch/Fetch';
-import { AnyObject } from '@/store/interface';
-import ExcelJS from 'exceljs';
+import { Button, Input } from '@/components/common'
+import { FormItem } from '@/components/form/FormItem'
+import Fetch from '@/lib/core/fetch/Fetch'
 import { Container } from '@/components/layout/container/container'
 import { Helper } from '@/services/Helper'
 import { CSVLink } from 'react-csv'
-
+import LoadingAbsolute from '@/components/loading'
+import { Toast } from '@/services/Toast'
+import { AnyObject } from '@/store/interface'
 
 const formCreateSchema = z.object({
-    form_link: z.string(),
-    sheet_data_link: z.string(),
+    form_link: z.string().min(1, 'Vui lòng nhập đường dẫn edit form!'),
+    sheet_data_link: z.string().min(1, 'Vui lòng nhập đường dẫn sheet data!'),
 });
 
 type CreateFormValues = z.infer<typeof formCreateSchema>;
 
 export default function FormCreate() {
-
+    const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [sheetData, setSheetData] = useState<{
         data: any,
@@ -48,18 +34,22 @@ export default function FormCreate() {
         headers: [],
         name: '',
     });
+    
     const {
         control,
         handleSubmit,
-        formState: { isSubmitting },
+        formState: { isSubmitting, errors },
     } = useForm<CreateFormValues>();
 
     const onSubmit: SubmitHandler<CreateFormValues> = async (formData) => {
         const { form_link, sheet_data_link } = formData;
 
-        if (!form_link) {
+        if (!form_link || !sheet_data_link) {
+            setErrorMessage('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
+
+        setLoading(true);
 
         try {
             const res = await Fetch.postWithAccessToken<{
@@ -72,12 +62,9 @@ export default function FormCreate() {
                 sheet_data_link,
             });
 
-            console.log(res);
-
             const data = res.data.data;
             const form = res.data.form;
             const sheet = res.data.sheet;
-            console.log(data, form, sheet);
 
             let headers: AnyObject = {};
             for (let i = 0; i < data[0].length; i++) {
@@ -94,36 +81,40 @@ export default function FormCreate() {
             }
 
             Helper.exportCSVFile(headers, rows, Helper.purify(res.data.name));
-
+            Toast.success('Mã hóa dữ liệu thành công!');
 
         } catch (e) {
-            setErrorMessage('Something went wrong!');
+            setErrorMessage('Đã xảy ra lỗi! Hãy kiểm tra quyền truy cập của form và sheet của bạn.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <>
-            <Container>
-                <div className="relative isolate overflow-hidden pt-0">
+        <Container>
+            <div className="relative isolate overflow-hidden py-12">
+                {loading && <LoadingAbsolute />}
 
-                    <div className="text-center text-sm leading-5 mb-[60px] w-full sm:w-auto">
-
-                        <h1 className="mt-12 text-3xl font-bold text-center leading-8 text-gray-900 mb-2">
-                            Mã hóa data từ kết quả có sẵn
-                        </h1>
-
-                        <p className="mb-1 text-gray-500">
-                            Hãy nhập link /edit vủa Google Form và Google Sheet tương ứng của form vào ô dưới dây
+                <div className="container mx-auto">
+                    {/* Header */}
+                    <div className="mb-8 text-center">
+                        <h2 className="text-3xl font-bold mb-3">Mã hóa data từ kết quả có sẵn</h2>
+                        <p className="text-gray-600">
+                            Nhập link edit form và link sheet data vào ô dưới đây. Hãy nhớ mở quyền truy cập cho cả sheet và form.
                         </p>
-                        <p className="mb-1 text-gray-500">
-                            Hãy nhớ mở quyền truy cập all cho cả sheet và form bạn nhé
-                        </p>
+                    </div>
 
+                    {/* Form Section */}
+                    <div className="bg-white shadow-sm rounded-lg pb-6 mb-10">
                         <form
                             onSubmit={handleSubmit(onSubmit)}
-                            className="w-full mb-6 mt-6"
+                            className="p-6"
                         >
-                            <FormItem label="Điền Edit Link Form" className="mb-6">
+                            <FormItem 
+                                label="Điền Edit Link Form" 
+                                className="mb-6"
+                                error={errors.form_link?.message}
+                            >
                                 <Controller
                                     render={({ field }) => (
                                         <Input
@@ -132,13 +123,18 @@ export default function FormCreate() {
                                             type="text"
                                             {...field}
                                             size="large"
+                                            state={errors.form_link ? 'error' : 'normal'}
                                         />
                                     )}
                                     name="form_link"
                                     control={control}
                                 />
                             </FormItem>
-                            <FormItem label="Điền Link sheet data" className="mb-6">
+                            <FormItem 
+                                label="Điền Link sheet data" 
+                                className="mb-6"
+                                error={errors.sheet_data_link?.message}
+                            >
                                 <Controller
                                     render={({ field }) => (
                                         <Input
@@ -147,6 +143,7 @@ export default function FormCreate() {
                                             type="text"
                                             {...field}
                                             size="large"
+                                            state={errors.sheet_data_link ? 'error' : 'normal'}
                                         />
                                     )}
                                     name="sheet_data_link"
@@ -154,22 +151,62 @@ export default function FormCreate() {
                                 />
                             </FormItem>
 
-
-                            <Button className="w-full" size="large" loading={isSubmitting}>
+                            <Button 
+                                className="w-full" 
+                                size="large" 
+                                loading={isSubmitting || loading}
+                                htmlType="submit"
+                            >
                                 Mã hoá dữ liệu ngay
                             </Button>
 
-                            <CSVLink data={sheetData.data} headers={sheetData.headers} filename={`${Helper.purify(sheetData.name)}_result.csv`}></CSVLink>
+                            <CSVLink 
+                                data={sheetData.data} 
+                                headers={sheetData.headers} 
+                                filename={`${Helper.purify(sheetData.name)}_result.csv`}
+                                className="hidden"
+                            ></CSVLink>
                         </form>
 
+                        {/* Alert Message */}
                         {errorMessage && (
-                            <p className="text-red-500 flex items-center gap-2">
-                                <XCircle className="w-5 h-5" /> {errorMessage}
-                            </p>
+                            <div className="px-6">
+                                <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
+                                    <XCircle className="w-5 h-5 flex-shrink-0" /> 
+                                    <span>{errorMessage}</span>
+                                </div>
+                            </div>
                         )}
                     </div>
+
+                    {/* Guide Section */}
+                    <div className="space-y-12">
+                        <div className="border border-gray-100 rounded-lg overflow-hidden">
+                            <h3 className="text-xl font-bold p-4 bg-gray-50 border-b border-gray-100">Hướng Dẫn Sử Dụng</h3>
+                            
+                            <div className="p-6">
+                                <div className="space-y-4">
+                                    <p className="font-medium text-gray-900">Để mã hóa dữ liệu từ form có sẵn:</p>
+                                    <ol className="list-decimal pl-5 space-y-2 text-gray-700">
+                                        <li>Nhập đường dẫn edit form của bạn (URL có đuôi /edit)</li>
+                                        <li>Nhập đường dẫn Google Sheet chứa dữ liệu form</li>
+                                        <li>Mở quyền truy cập cho cả form và sheet để hệ thống có thể đọc dữ liệu</li>
+                                        <li>Nhấn "Mã hoá dữ liệu ngay" để tiến hành mã hóa</li>
+                                        <li>File CSV kết quả sẽ được tải về máy của bạn</li>
+                                    </ol>
+                                    
+                                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-blue-800 mt-4">
+                                        <p>
+                                            <strong className="text-blue-600">Lưu ý: </strong>
+                                            File CSV được tạo ra sẽ chứa dữ liệu đã được mã hóa, giúp bạn điền form nhanh chóng hơn với FillForm.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </Container>
-        </>
+            </div>
+        </Container>
     )
 }

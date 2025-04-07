@@ -78,7 +78,7 @@ function Avatar({ user, size, unlink, className, textClassName }: Props) {
 
   return (
     <Link
-      href={`/profile/${Helper.generateCode(user.username ? user.username : '')}/${user.id}`}
+      href={`/`}
     >
       <div
         style={{ ...style }}
