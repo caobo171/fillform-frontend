@@ -31,14 +31,19 @@ const navigation = {
     },
     {
       name: 'Youtube',
-      href: 'https://www.youtube.com/channel/UC-bVLpxpdo1GWQGvbQ5QXqA',
+      href: 'https://www.youtube.com/@FillForm-info',
       icon: '/static/svg/youtube.svg',
     },
     {
-      name: 'Discord',
-      href: 'https://discord.com/channels/1189814075539067011/1190324247978061959',
-      icon: '/static/svg/discord.svg',
-    },
+      name: 'Tiktok',
+      href: 'https://www.tiktok.com/@fillform.info',
+      icon: '/static/svg/tiktok.svg',
+    }
+    // {
+    //   name: 'Discord',
+    //   href: 'https://discord.com/channels/1189814075539067011/1190324247978061959',
+    //   icon: '/static/svg/discord.svg',
+    // },
   ],
   contacts: [{ name: 'Contact us', href: 'https://www.facebook.com/welevn' }],
 };
