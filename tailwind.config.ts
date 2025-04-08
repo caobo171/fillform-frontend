@@ -8,6 +8,15 @@ const config: Config = {
     './modules/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontSize: {
+      'xs': '12px',
+      'sm': '14px',
+      'base': '16px',
+      'lg': '18px',
+      'xl': '20px',
+      '2xl': '24px',
+      '3xl': '32px',
+    },
     screens: {
       xs: '468px',
 

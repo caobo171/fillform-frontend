@@ -258,6 +258,14 @@ export default function FormRate() {
                 let chatErrors: ChatError[] = [];
                 validateInputs(chatErrors);
                 validateConfig(chatErrors);
+                chatErrors.sort((a, b) => {
+                    if (a.type === "error" && b.type !== "error") {
+                        return -1;
+                    } else if (a.type !== "error" && b.type === "error") {
+                        return 1;
+                    }
+                    return 0;
+                });
                 setChatErrors(chatErrors);
             }
 
@@ -355,7 +363,7 @@ export default function FormRate() {
                         </div>
 
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                            <div className="space-y-4 text-sm text-gray-700">
+                            <div className="space-y-4 text-xs text-gray-700">
                                 <div className="flex items-center gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -374,7 +382,7 @@ export default function FormRate() {
                                             </svg>
                                             tự động đề xuất tỉ lệ
                                         </button>
-                                        để tham khảo
+                                        để tham khảo, chỉ mang tính chất tham khảo.
                                     </p>
                                 </div>
                                 <div className="flex items-start gap-2">
@@ -382,7 +390,7 @@ export default function FormRate() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                     </svg>
                                     <p>
-                                        Nếu bạn đã thay đổi cấu hình ở Google Form, hãy
+                                        Nếu bạn có thay đổi ở Google Form, hãy
                                         <button onClick={syncFormHandle} className="mx-1 px-3 py-0.5 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 transition inline-flex items-center">
                                             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -408,7 +416,7 @@ export default function FormRate() {
                         </div>
                     </div>
 
-                    <div className="container mx-auto mb-10">
+                    <div className="container mx-auto mb-2">
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                             <h3 className="text-lg font-semibold mb-4 text-gray-900">Thông tin Form</h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -449,20 +457,20 @@ export default function FormRate() {
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-6 rounded-lg container mx-auto">
+                    <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-1 rounded-lg container mx-auto">
                         <div className="space-y-2">
                             {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
-                                <div key={questionId} className="p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                <div key={questionId} className="p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
-                                        <div className="md:w-1/4 mb-3 md:mb-0">
-                                            <div className="bg-gray-50 p-3 rounded-md">
+                                        <div className="md:w-1/4 mb-1 md:mb-0">
+                                            <div className="bg-gray-50 p-1 rounded-md">
                                                 {question.description ? (
                                                     <>
-                                                        <label className="block font-semibold text-sm mb-1 text-gray-900">{question.question}</label>
-                                                        <label className="block text-xs text-gray-500">{question.description}</label>
+                                                        <label className="block font-semibold text-xs mb-1 text-gray-900 truncate">{question.question}</label>
+                                                        <label className="block text-xs text-gray-500 truncate">{question.description}</label>
                                                     </>
                                                 ) : (
-                                                    <label className="block font-semibold text-sm text-gray-900">{question.question}</label>
+                                                    <label className="block font-semibold text-xs text-gray-900">{question.question}</label>
                                                 )}
                                             </div>
                                         </div>
@@ -491,7 +499,7 @@ export default function FormRate() {
                                                                         id={`answer_${answer.id}`}
                                                                         {...register(`answer_${answer.id}`)}
                                                                         defaultValue={answer.count}
-                                                                        className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                                        className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-xs/6"
                                                                     />
                                                                 </div>
                                                             )
@@ -513,7 +521,7 @@ export default function FormRate() {
                                                         </label>
                                                    
                                                         <select
-                                                            className="js-answer-select block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                            className="js-answer-select block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-xs/6"
                                                             id={`select-${answer.id}`}
                                                             {...register(`answer_${answer.id}`)}
                                                             defaultValue={answer.count}
@@ -524,7 +532,7 @@ export default function FormRate() {
                                                         </select>
 
                                                         <textarea
-                                                            className="mt-3 w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600 text-sm hidden custom-input"
+                                                            className="mt-3 w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600 text-xs hidden custom-input"
                                                             id={`custom-${answer.id}`}
                                                             {...register(`custom-${answer.id}`)}
                                                             defaultValue={answer.data}
@@ -605,17 +613,17 @@ export default function FormRate() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <p className="text-sm font-medium text-gray-800">Bé Fill kiểm tra cấu hình</p>
+                            <p className="text-xs font-medium text-gray-800">Bé Fill kiểm tra cấu hình</p>
                         </div>
 
-                        <div className="text-sm space-y-3">
+                        <div className="text-xs space-y-3">
                             <p className="bg-primary-50 p-2 rounded-lg rounded-tl-none text-gray-700 max-w-[90%]">
                                 💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.
                             </p>
 
                             {chatErrors.length === 0 && (
                                 <div className="flex justify-center my-8">
-                                    <div className="text-center text-gray-500 text-sm">
+                                    <div className="text-center text-gray-500 text-xs">
                                         <svg className="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
@@ -626,7 +634,7 @@ export default function FormRate() {
 
                             {chatErrors.map((error) => (
                                 <div key={error.id} className="mt-2 relative">
-                                    <div className={`p-3 rounded-lg rounded-tl-none text-sm relative
+                                    <div className={`p-3 rounded-lg rounded-tl-none text-xs relative
                                         ${error.type === "error" ? "bg-red-50 text-red-800" :
                                         error.type === "warning" ? "bg-yellow-50 text-yellow-800" :
                                         "bg-primary-50 text-blue-800"
@@ -664,7 +672,7 @@ export default function FormRate() {
                                                 <span>Thông báo</span>
                                             </div>
                                         )}
-                                        <span className="text-sm" dangerouslySetInnerHTML={{ __html: error.message }} />
+                                        <span className="text-xs" dangerouslySetInnerHTML={{ __html: error.message }} />
                                     </div>
                                 </div>
                             ))}
