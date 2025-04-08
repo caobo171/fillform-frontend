@@ -128,7 +128,7 @@ export default function FormLists({ admin }: { admin?: boolean }) {
                     <td className="whitespace-nowrap py-4 md:pl-4 pr-3 text-sm sm:pl-0">
                       <div className="flex items-center">
                         <div className="">
-                          <div className="font-medium text-gray-900 truncate w-[120px] md:w-[300px] lg:w-[700px]">{form.name}</div>
+                          <div className="font-medium text-gray-900 truncate w-[120px] md:w-[300px] lg:w-[700px]">{form?.name || 'Unknown'}</div>
                         </div>
                       </div>
                     </td>

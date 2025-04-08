@@ -191,11 +191,11 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                         <td className="whitespace-nowrap py-2 md:pl-4 pr-3 text-sm sm:pl-0">
                                             <div className="flex items-center">
                                                 <div className="">
-                                                    <div className="font-medium text-gray-900 truncate w-[120px] md:w-[300px] lg:w-[600px]">{order.name}</div>
+                                                    <div className="font-medium text-gray-900 truncate w-[120px] md:w-[300px] lg:w-[600px]">{order?.name || 'Unknown'}</div>
                                                     <div className="mt-1 text-gray-500">
                                                         {order.type}
                                                         &nbsp;-&nbsp;
-                                                        {OPTIONS_DELAY[order.delay as keyof typeof OPTIONS_DELAY].name}
+                                                        {OPTIONS_DELAY[order.delay as keyof typeof OPTIONS_DELAY]?.name || 'Unknown'}
                                                     </div>
                                                 </div>
                                             </div>

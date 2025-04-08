@@ -85,6 +85,22 @@ export default function FormRate() {
         }
     };
 
+    const syncFormHandle = async (): Promise<void> => {
+        setIsLoading(true);
+        try {
+            await Fetch.postWithAccessToken('/api/form/sync.config', {
+                id: dataForm?.form.id,
+            });
+
+            await mutateForm();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+            setReloadEvent(!reloadEvent);
+        }
+    };
+
     const toggleChat = (): void => {
         setChatOpen(!chatOpen);
     };
@@ -303,7 +319,7 @@ export default function FormRate() {
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
                     {isSaved && (
                         <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md shadow-sm" role="alert">
-                            <div className="flex items-center">
+                            <div className="flex items-center text-center justify-center">
                                 <svg className="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -359,6 +375,21 @@ export default function FormRate() {
                                             tự động đề xuất tỉ lệ
                                         </button>
                                         để tham khảo
+                                    </p>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                    <p>
+                                        Nếu bạn đã thay đổi cấu hình ở Google Form, hãy
+                                        <button onClick={syncFormHandle} className="mx-1 px-3 py-0.5 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 transition inline-flex items-center">
+                                            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                            </svg>
+                                            đồng bộ lại cấu hình
+                                        </button>
+                                        để cập nhật lại nhé
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2">
