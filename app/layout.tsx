@@ -14,12 +14,15 @@ import AppWrapper from '@/components/ui/AppWrapper';
 
 import store from '../store/store';
 import './globals.css';
+import Meta from '@/components/ui/Meta';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }: { children: ReactElement }) {
   return (
     <html lang="en">
+
+      <Meta title="Fillform" description="Fillform - Tạo form điền thông tin, điền rải, điền động, điền tự động" />
       <body className={inter.className}>
         <SWRConfig
           value={{

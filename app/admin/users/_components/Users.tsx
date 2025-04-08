@@ -208,6 +208,14 @@ export default function Users() {
             >
               Add credit
             </span>
+
+            <span
+              aria-hidden="true"
+              onClick={() => router.push(`/admin/users/${data.id}`)}
+              className="text-sm text-gray-500 underline hover:text-gray-900 cursor-pointer"
+            >
+              View detail 
+            </span>
           </div>
         ),
       },

@@ -63,6 +63,7 @@ export default function FormPrefill() {
 
 
     const onCheckData = async (event: any) => {
+        setIsLoading(true);
         event.preventDefault();
         // This would be your API call to check the data
         try {
@@ -76,11 +77,14 @@ export default function FormPrefill() {
             setFields(res.data?.fields);
             setPrefillData(res.data?.prefillData);
             setPrefillForm(res.data?.form);
+            setError('');
 
 
             // And update formData with loaddata
         } catch (err) {
-            setError("Error checking data. Please verify your Google Sheet link.");
+            setError("Lỗi khi kiểm tra dữ liệu, vui lòng kiểm tra lại quyền truy cập Google Sheet của bạn!");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -165,7 +169,7 @@ export default function FormPrefill() {
 
     const { pricePerAnswer, total, insufficientFunds, delayNote, message } = calculatePriceAndDelay();
 
-    if (isLoadingForm || !formData || isLoading) {
+    if (isLoadingForm || !formData) {
         return (
             <LoadingAbsolute />
         );
@@ -173,6 +177,7 @@ export default function FormPrefill() {
 
     return (
         <>
+            {isLoading && <LoadingAbsolute />}
             <section className="bg-gradient-to-b from-primary-50 to-white">
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
                     <div className="container mx-auto mb-8">
@@ -194,7 +199,7 @@ export default function FormPrefill() {
                         </div>
 
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                            <div className="space-y-4 text-sm text-gray-700">
+                            <div className="space-y-4 text-xs text-gray-700">
                                 <div className="flex items-center gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -315,17 +320,17 @@ export default function FormPrefill() {
                                     <h3 className="text-lg font-semibold mb-4 text-gray-900">Liên kết dữ liệu với câu hỏi</h3>
                                     <div className="space-y-4">
                                         {prefillForm?.loaddata && prefillForm?.loaddata?.map((data: any, index: any) => (
-                                            <div key={index} className="p-5 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
+                                            <div key={index} className="p-2 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
                                                 <div className="md:flex md:items-start gap-8">
                                                     <div className="md:w-2/5 mb-3 md:mb-0">
                                                         <div className="bg-white p-3 rounded-md shadow-sm">
                                                             {data.description ? (
                                                                 <>
-                                                                    <label className="block font-semibold text-sm mb-1 text-gray-900">{data.question}</label>
-                                                                    <label className="block text-xs text-gray-500">{data.description}</label>
+                                                                    <label className="block font-semibold text-xs mb-1 text-gray-900 truncate max-w-[90%]">{data.question}</label>
+                                                                    <label className="block text-xs text-gray-500 truncate max-w-[90%]">{data.description}</label>
                                                                 </>
                                                             ) : (
-                                                                <label className="block font-semibold text-sm text-gray-900">{data.question}</label>
+                                                                <label className="block font-semibold text-xs text-gray-900 truncate max-w-[90%]">{data.question}</label>
                                                             )}
                                                         </div>
                                                     </div>
@@ -340,7 +345,7 @@ export default function FormPrefill() {
                                                             <select
                                                                 id={`question_${data.id}`}
                                                                 {...register('question_' + data.id, { value: data.field })}
-                                                                className="block w-full rounded-md bg-white px-3 py-3 text-sm text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                                                                className="block w-full rounded-md bg-white px-3 py-3 text-xs text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                                                                 defaultValue={data.field}
                                                             >
                                                                 {fields && fields.map((field: any) => (
@@ -409,7 +414,7 @@ export default function FormPrefill() {
                                             </div>
                                             <div className="col-span-2">
                                                 <select
-                                                    className="block w-full rounded-md bg-white px-3 py-2.5 text-sm text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                                                    className="block w-full rounded-md bg-white px-3 py-2.5 text-xs text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                                                     {...register("delay")}
                                                 >
                                                     <option value="0">Không cần điền rải</option>
@@ -473,7 +478,7 @@ export default function FormPrefill() {
                             <div className="grid md:grid-cols-2 gap-8 items-start mb-10">
                                 <div className="p-5 bg-gray-50 rounded-lg border border-gray-100">
                                     <div className="flex items-center gap-2 mb-3">
-                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-sm">1</span>
+                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-xs">1</span>
                                         <h3 className="text-lg font-bold text-gray-900">Chuẩn hoá dữ liệu</h3>
                                     </div>
                                     <div className="space-y-2 ml-8">
@@ -519,7 +524,7 @@ export default function FormPrefill() {
                                             height={300}
                                             className="w-full object-contain"
                                         />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-sm">
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-xs">
                                             Ví dụ về dữ liệu chuẩn hóa
                                         </div>
                                     </div>
@@ -529,7 +534,7 @@ export default function FormPrefill() {
                             <div className="grid md:grid-cols-2 gap-8 items-start mb-10">
                                 <div className="p-5 bg-gray-50 rounded-lg border border-gray-100">
                                     <div className="flex items-center gap-2 mb-3">
-                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-sm">2</span>
+                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-xs">2</span>
                                         <h3 className="text-lg font-bold text-gray-900">Căn sửa data</h3>
                                     </div>
                                     <div className="space-y-2 ml-8">
@@ -553,7 +558,7 @@ export default function FormPrefill() {
                                             height={300}
                                             className="w-full object-contain"
                                         />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-sm">
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-xs">
                                             Định dạng "Plain Text" cho dữ liệu
                                         </div>
                                     </div>
@@ -563,7 +568,7 @@ export default function FormPrefill() {
                             <div className="grid md:grid-cols-2 gap-8 items-start mb-6">
                                 <div className="p-5 bg-gray-50 rounded-lg border border-gray-100">
                                     <div className="flex items-center gap-2 mb-3">
-                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-sm">3</span>
+                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white font-bold text-xs">3</span>
                                         <h3 className="text-lg font-bold text-gray-900">Copy đường dẫn edit của data sheet Google</h3>
                                     </div>
                                     <div className="space-y-2 ml-8">
@@ -595,7 +600,7 @@ export default function FormPrefill() {
                                             height={300}
                                             className="w-full object-contain"
                                         />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-sm">
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-center py-2 text-xs">
                                             Đường dẫn Google Sheet có đuôi /edit
                                         </div>
                                     </div>

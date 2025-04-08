@@ -179,7 +179,7 @@ export default function FormRate() {
 
             if (question.type != latest_question.type) {
                 console.log(question, latest_question);
-                addChatError(chatErrors, `Có sự khác nhau giữa câu hỏi ${question.question} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+                addChatError(chatErrors, `Có sự khác nhau giữa câu hỏi ${question.question} - ${question.description} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
                 continue;
             }
 
@@ -187,7 +187,7 @@ export default function FormRate() {
             let answers = question.answer || [];
 
             if (latest_answers.length !== answers.length) {
-                addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi ${question.question} với config mới nhất`, `00000`, "error");
+                addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
                 continue;
             }
 
@@ -196,7 +196,7 @@ export default function FormRate() {
                 const answer = answers[j];
 
                 if (latest_answer.data != answer.data) {
-                    addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi ${question.question} với config mới nhất`, `00000`, "error");
+                    addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
                     break;
                 }
             }
@@ -317,7 +317,11 @@ export default function FormRate() {
 
 
 
-
+    if (isLoadingForm || !dataForm) {
+        return (
+            <LoadingAbsolute />
+        );
+    }
 
 
     return (
@@ -325,7 +329,7 @@ export default function FormRate() {
             <section className="bg-gradient-to-b from-primary-50 to-white">
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
 
-                    {(isLoadingForm || !dataForm || isLoading) &&  <LoadingAbsolute />}
+                    {(isLoading) &&  <LoadingAbsolute />}
 
                     {isSaved && (
                         <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md shadow-sm" role="alert">
@@ -469,7 +473,7 @@ export default function FormRate() {
                                                 {question.description ? (
                                                     <>
                                                         <label className="block font-semibold text-xs mb-1 text-gray-900 truncate">{question.question}</label>
-                                                        <label className="block text-xs text-gray-500 truncate">{question.description}</label>
+                                                        <label className="block text-xs text-gray-500 truncate max-w-[90%]">{question.description}</label>
                                                     </>
                                                 ) : (
                                                     <label className="block font-semibold text-xs text-gray-900">{question.question}</label>

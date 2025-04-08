@@ -6,7 +6,7 @@ import { XCircle } from 'lucide-react'
 import { z } from 'zod'
 
 import { Button, Input } from '@/components/common'
-import { FormItem } from '@/components/form/FormItem'
+import { FormItem, InlineFormItem } from '@/components/form/FormItem'
 import Fetch from '@/lib/core/fetch/Fetch'
 import { Container } from '@/components/layout/container/container'
 import { Helper } from '@/services/Helper'
@@ -110,7 +110,7 @@ export default function FormCreate() {
                             onSubmit={handleSubmit(onSubmit)}
                             className="p-6"
                         >
-                            <FormItem 
+                            <InlineFormItem  
                                 label="Điền Edit Link Form" 
                                 className="mb-6"
                                 error={errors.form_link?.message}
@@ -129,8 +129,8 @@ export default function FormCreate() {
                                     name="form_link"
                                     control={control}
                                 />
-                            </FormItem>
-                            <FormItem 
+                            </InlineFormItem>
+                            <InlineFormItem 
                                 label="Điền Link sheet data" 
                                 className="mb-6"
                                 error={errors.sheet_data_link?.message}
@@ -149,7 +149,7 @@ export default function FormCreate() {
                                     name="sheet_data_link"
                                     control={control}
                                 />
-                            </FormItem>
+                            </InlineFormItem>
 
                             <Button 
                                 className="w-full" 

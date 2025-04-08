@@ -8,15 +8,8 @@ import { Container } from '../container/container';
 
 const navigation = {
   detail: [
-    { name: 'Về chúng mình', href: '/#about' },
-    {
-      name: 'Tính năng',
-      href: '/#features',
-    },
-    {
-      name: 'Bảng giá',
-      href: '/#pricing',
-    },
+    { name: 'Về fillform', href: 'https://fillform.info' },
+   
   ],
   social: [
     {

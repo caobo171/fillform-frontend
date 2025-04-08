@@ -118,6 +118,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                             id="email"
                             name="email"
                             type="text"
+                            placeholder="Nhấn enter để tìm kiếm order"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             onKeyDown={(e) => {
@@ -204,7 +205,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                             {order.status === ORDER_STATUS.SUCCESS ? (
                                                 <div className="text-gray-900">{order.num} / {order.num}</div>
                                             ) : (
-                                                <div className="text-gray-900">{order.passed_num || 0} / {order.num}</div>
+                                                <div className="text-gray-900">{order.passed_num === undefined ? '' : order.passed_num + '/'} {order.num}</div>
                                             )}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">

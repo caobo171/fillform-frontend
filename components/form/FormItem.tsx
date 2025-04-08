@@ -72,3 +72,51 @@ export function FormItem(props: FormItemProps) {
     </div>
   );
 }
+
+export function FormItemWithIcon(props: FormItemProps) {
+  const { label, error, optional, className, coinNumber, coinBlockClassName, children } = props;
+
+  return (
+    <div className={clsx('relative flex flex-col gap-2', className)}>
+      <label>
+        {label}
+        {optional && <span className="text-gray-400"> (optional)</span>}
+      </label>
+
+      <div className="flex items-center gap-2">
+        {children}
+
+        <div className="flex items-center gap-2"></div>
+      </div>
+
+      {error && (
+        <span className="absolute z-1 left-0 bottom-0 translate-y-full text-red-500">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function InlineFormItem(props: FormItemProps) {
+  const { label, error, optional, className, children } = props;
+
+  return (
+    <div className={clsx('relative group', className)}>
+      <div className="flex items-center gap-4">
+        <label className="min-w-[180px] max-w-[240px] flex-shrink-0 truncate text-sm font-medium text-gray-700">
+          {label}
+          {optional && <span className="text-gray-400 ml-1">(optional)</span>}
+        </label>
+        <div className="flex-grow relative">
+          {children}
+          {error && (
+            <span className="absolute z-10 left-0 -bottom-6 text-sm text-red-500 transition-opacity duration-200">
+              {error}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

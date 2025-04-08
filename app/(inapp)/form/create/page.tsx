@@ -13,7 +13,7 @@ import { Toast } from '@/services/Toast'
 import LoadingAbsolute from '@/components/loading'
 import { Container } from '@/components/layout/container/container'
 import { Button, Input } from '@/components/common'
-import { FormItem } from '@/components/form/FormItem'
+import { FormItem, InlineFormItem } from '@/components/form/FormItem'
 
 const formCreateSchema = z.object({
     form_link: z.string().min(1, 'Vui lòng nhập đường dẫn edit form!'),
@@ -74,7 +74,7 @@ export default function FormCreate() {
                     {/* Form Section */}
                     <div className="bg-white shadow-sm rounded-lg pb-6 mb-10">
                         <form onSubmit={handleSubmit(onSubmit)} className="mb-4">
-                            <FormItem 
+                            <InlineFormItem 
                                 label="Điền Edit Link Form" 
                                 className="mb-6"
                                 error={errors.form_link?.message}
@@ -92,7 +92,7 @@ export default function FormCreate() {
                                     name="form_link"
                                     control={control}
                                 />
-                            </FormItem>
+                            </InlineFormItem>
 
                             <Button 
                                 htmlType="submit" 
