@@ -118,9 +118,9 @@ export default function FormCreate() {
                     {/* Guide Sections */}
                     <div className="space-y-12">
                         {/* Warning Note */}
-                        <div className="bg-red-50 border border-red-100 rounded-lg p-4 text-red-800">
+                        <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-4 text-yellow-800">
                             <p className="font-medium">
-                                <strong className="text-red-600">Lưu ý quan trọng: </strong>
+                                <strong className="text-yellow-600">Lưu ý quan trọng: </strong>
                                 Nếu bạn <strong>thao tác lần đầu</strong>, hãy tạo bản sao cho form của mình và thực hiện trên bản sao trước nhé!
                             </p>
                         </div>
