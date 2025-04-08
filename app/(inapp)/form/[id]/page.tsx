@@ -31,7 +31,7 @@ export default function FormRate() {
 
     const onSubmit = async (data: any) => {
         // Handle form submission
-
+        setIsSaved(true);
         try {
             await Fetch.postWithAccessToken('/api/form/save', {
                 id: dataForm?.form.id,
@@ -41,6 +41,7 @@ export default function FormRate() {
             console.error(error);
         }
 
+        setIsLoading(false);
         setIsSaved(true);
     };
 
@@ -275,6 +276,7 @@ export default function FormRate() {
 
             const handleInputChange = () => {
                 validateAll();
+                setIsSaved(false);
             }
 
             numberInputs.forEach(input => {
@@ -293,6 +295,7 @@ export default function FormRate() {
                 selectElement.addEventListener('change', () => {
                     handleSelectChange(selectElement.id);
                     validateAll();
+                    setIsSaved(false);
                 });
             });
 
@@ -313,11 +316,7 @@ export default function FormRate() {
     }, [dataForm, reloadEvent]);
 
 
-    if (isLoadingForm || !dataForm || isLoading) {
-        return (
-            <LoadingAbsolute />
-        );
-    }
+
 
 
 
@@ -325,6 +324,9 @@ export default function FormRate() {
         <>
             <section className="bg-gradient-to-b from-primary-50 to-white">
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
+
+                    {(isLoadingForm || !dataForm || isLoading) &&  <LoadingAbsolute />}
+
                     {isSaved && (
                         <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md shadow-sm" role="alert">
                             <div className="flex items-center text-center justify-center">
@@ -346,7 +348,7 @@ export default function FormRate() {
 
                     <div className="container mx-auto mb-8">
                         <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo tỉ lệ mong muốn</h1>
-                        
+
                         <div className="flex flex-wrap justify-center gap-2 my-6">
                             <Link href="" className="flex items-center px-5 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition shadow-sm">
                                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -375,7 +377,7 @@ export default function FormRate() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                     </svg>
                                     <p>
-                                        Nếu bạn chưa biết điền, hãy thử 
+                                        Nếu bạn chưa biết điền, hãy thử
                                         <button onClick={autoFillHandle} className="mx-1 px-3 py-0.5 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 transition inline-flex items-center">
                                             <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -519,7 +521,7 @@ export default function FormRate() {
                                                                 &nbsp; (Nếu chọn "other-Bỏ qua không điền" thì bạn phải "tắt bắt buộc điền trên Google Form")
                                                             </span>
                                                         </label>
-                                                   
+
                                                         <select
                                                             className="js-answer-select block w-full rounded-md bg-white px-3 py-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-xs/6"
                                                             id={`select-${answer.id}`}
@@ -636,8 +638,8 @@ export default function FormRate() {
                                 <div key={error.id} className="mt-2 relative">
                                     <div className={`p-3 rounded-lg rounded-tl-none text-xs relative
                                         ${error.type === "error" ? "bg-red-50 text-red-800" :
-                                        error.type === "warning" ? "bg-yellow-50 text-yellow-800" :
-                                        "bg-primary-50 text-blue-800"
+                                            error.type === "warning" ? "bg-yellow-50 text-yellow-800" :
+                                                "bg-primary-50 text-blue-800"
                                         }`}>
                                         <button
                                             className="absolute top-1 right-1 text-xs opacity-70 hover:opacity-100 transition-opacity"
