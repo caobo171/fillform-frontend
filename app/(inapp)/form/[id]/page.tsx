@@ -617,7 +617,7 @@ export default function FormRate() {
                         </div>
 
                         <div className="text-xs space-y-3">
-                            <p className="bg-primary-50 p-2 rounded-lg rounded-tl-none text-gray-700 max-w-[90%]">
+                            <p className="bg-primary-50 p-2 rounded-lg rounded-tl-none text-gray-700">
                                 💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.
                             </p>
 
@@ -638,7 +638,7 @@ export default function FormRate() {
                                         ${error.type === "error" ? "bg-red-50 text-red-800" :
                                         error.type === "warning" ? "bg-yellow-50 text-yellow-800" :
                                         "bg-primary-50 text-blue-800"
-                                        } max-w-[90%]`}>
+                                        }`}>
                                         <button
                                             className="absolute top-1 right-1 text-xs opacity-70 hover:opacity-100 transition-opacity"
                                             onClick={() => removeChatError(error.id)}
