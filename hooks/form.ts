@@ -59,14 +59,16 @@ export const useFormById = (id: string) => {
 	const res = useSWR(`/api/form/detail?id=${id}`, async (url) => {
 		const rest = await Fetch.postWithAccessToken<{
 			form: RawForm,
-			config: any
+			config: any,
+			latest_form_questions: any[]
 		}>(url, {
 			id: id
 		});
 
 		return {
 			form: rest.data.form as RawForm,
-			config: rest.data.config as any
+			config: rest.data.config as any,
+			latest_form_questions: rest.data.latest_form_questions as any[]
 		};
 	});
 

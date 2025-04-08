@@ -149,6 +149,44 @@ export default function FormRate() {
     };
 
     const validateConfig = (chatErrors: ChatError[]): void => {
+
+        const latest_form_questions = dataForm?.latest_form_questions || [];
+        if (latest_form_questions.length !== dataForm?.form.loaddata?.length) {
+            addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu form hiện tại và dữ liệu form mới nhất. Hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+        }
+
+
+        for (let i = 0; i < latest_form_questions.length; i++) {
+            const latest_question = latest_form_questions[i];
+            const question = dataForm?.form.loaddata[i];
+
+            if (question.type != latest_question.type) {
+                console.log(question, latest_question);
+                addChatError(chatErrors, `Có sự khác nhau giữa câu hỏi ${question.question} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+                continue;
+            }
+
+            let latest_answers = latest_question.answer || [];
+            let answers = question.answer || [];
+
+            if (latest_answers.length !== answers.length) {
+                addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi ${question.question} với config mới nhất`, `00000`, "error");
+                continue;
+            }
+
+            for (let j = 0; j < latest_answers.length; j++) {
+                const latest_answer = latest_answers[j];
+                const answer = answers[j];
+
+                if (latest_answer.data != answer.data) {
+                    addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi ${question.question} với config mới nhất`, `00000`, "error");
+                    break;
+                }
+            }
+        }
+
+
+
         // Config validation logic
         if (dataForm?.config?.lang === null) {
             addChatError(chatErrors, `Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt thu thập email và tắt giới hạn trả lời nhé`, `00000`, "warning");
