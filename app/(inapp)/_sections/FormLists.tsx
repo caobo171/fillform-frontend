@@ -11,15 +11,20 @@ const ITEMS_PER_PAGE = 10;
 
 export default function FormLists({ admin }: { admin?: boolean }) {
   const [currentFormPage, setCurrentFormPage] = useState(1);
+  const [search, setSearch] = useState('');
   const router = useRouter();
 
   let dataForm = null;
   const params = useParams();
   const userId = params.id as string;
   if (admin) {
-    dataForm = useUserForms(currentFormPage, ITEMS_PER_PAGE, userId);
+    dataForm = useUserForms(currentFormPage, ITEMS_PER_PAGE, userId, {
+      q: search
+    });
   } else {
-    dataForm = useMyForms(currentFormPage, ITEMS_PER_PAGE);
+    dataForm = useMyForms(currentFormPage, ITEMS_PER_PAGE, {
+      q: search
+    });
   }
 
   const totalFormPages = Math.ceil((dataForm?.data?.form_num || 0) / ITEMS_PER_PAGE)
@@ -58,6 +63,14 @@ export default function FormLists({ admin }: { admin?: boolean }) {
               id="email"
               name="email"
               type="text"
+              value={search}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setCurrentFormPage(1);
+                  dataForm.mutate();
+                }
+              }}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Nhấn enter để tìm form"
               className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pl-10 pr-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:pl-9 sm:text-sm/6"
             />

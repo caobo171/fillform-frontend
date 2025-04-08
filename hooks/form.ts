@@ -4,13 +4,14 @@ import useSWR from 'swr'
 
 
 
-export const useUserForms = (page: number, limit: number, userId: string) => {
+export const useUserForms = (page: number, limit: number, userId: string, params: any) => {
 
 	const res = useSWR('/api/form/user.list?page=' + page + '&limit=' + limit + '&user_id=' + userId, async (url) => {
 		const rest = await Fetch.postWithAccessToken<{
 			forms: RawForm[],
 			form_num: number,
 		}>(url, {
+			...params,
 			page: page,
 			page_size: limit,
 			user_id: userId
@@ -29,13 +30,14 @@ export const useUserForms = (page: number, limit: number, userId: string) => {
 }
 
 
-export const useMyForms = (page: number, limit: number) => {
+export const useMyForms = (page: number, limit: number, params: any) => {
 			
 	const res = useSWR('/api/form/list?page=' + page + '&limit=' + limit, async (url) => {
 		const rest = await Fetch.postWithAccessToken<{
 			forms: RawForm[],
 			form_num: number,
 		}>(url, {
+			...params,
 			page: page,
 			page_size: limit
 		});
