@@ -76,7 +76,7 @@ function ConfirmRegister() {
 
         <Button
           onClick={() =>
-            router.push('/authentication/login?from=onboarding/welcome')
+            router.push('/authentication/login')
           }
         >
           Bắt đầu sử dụng Fillform

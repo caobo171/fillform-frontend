@@ -198,7 +198,7 @@ export default function Register() {
               </p>
             )}
 
-            <p className="mb-40">
+            <p className="mb-20">
               Bạn đã có tài khoản? &nbsp;
               <Link
                 href="/authentication/login"
