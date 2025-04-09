@@ -169,15 +169,17 @@ export default function FormRate() {
 
         const latest_form_questions = dataForm?.latest_form_questions || [];
         if (latest_form_questions.length !== dataForm?.form.loaddata?.length) {
-            addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu form hiện tại và dữ liệu form mới nhất. Hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+             addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu form hiện tại và dữ liệu form mới nhất. Hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
         }
 
+        let min_length = Math.min(latest_form_questions.length, dataForm?.form.loaddata?.length || 0);
 
-        for (let i = 0; i < latest_form_questions.length; i++) {
+
+        for (let i = 0; i < min_length; i++) {
             const latest_question = latest_form_questions[i];
             const question = dataForm?.form.loaddata[i];
 
-            if (question.type != latest_question.type) {
+            if (question?.type != latest_question?.type) {
                 console.log(question, latest_question);
                 addChatError(chatErrors, `Có sự khác nhau giữa câu hỏi ${question.question} - ${question.description} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
                 continue;
@@ -469,7 +471,7 @@ export default function FormRate() {
                                 <div key={questionId} className="p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
                                         <div className="md:w-1/4 mb-1 md:mb-0">
-                                            <div className="bg-gray-50 p-1 rounded-md">
+                                            <div className=" p-1">
                                                 {question.description ? (
                                                     <>
                                                         <label className="block font-semibold text-xs mb-1 text-gray-900 truncate">{question.question}</label>
