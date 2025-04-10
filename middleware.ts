@@ -26,9 +26,6 @@ const authLinks = ['/podcasts/listen'];
 
 const adminLinks = ['/admin'];
 
-
-const teacherLinks = ['/teacher'];
-
 export default async function middleware(req: NextRequest) {
   // Get the pathname of the request (e.g. /, /protected)
   const path = req.nextUrl.pathname;
@@ -36,8 +33,6 @@ export default async function middleware(req: NextRequest) {
   const host = req.headers.get('host');
 
   const urlSearchParams = new URLSearchParams(req.nextUrl.search);
-
-
 
   if (req.nextUrl.searchParams.get('access_token')) {
     req.cookies.set(
@@ -47,8 +42,8 @@ export default async function middleware(req: NextRequest) {
   }
   // If it's the root path, just render it
   if (
-    (publicLinks.some((e) => path.startsWith(e)) &&
-      !authLinks.some((e) => path.startsWith(e)))
+    publicLinks.some((e) => path.startsWith(e)) &&
+    !authLinks.some((e) => path.startsWith(e))
   ) {
     return NextResponse.next();
   }

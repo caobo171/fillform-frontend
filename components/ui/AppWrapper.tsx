@@ -23,6 +23,7 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 
 
 
+
 	useEffect(() => {
 		if (me.data) {
 			SocketService.connect(me.data);
@@ -31,6 +32,18 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 				console.log('credit_update', data);
 				Toast.success('Nạp tiền thành công!');
 				me.mutate();
+			});
+
+
+			// TODO: Replace with current user unique ID (required)
+			//@ts-ignore
+			window.satismeter?.({
+				writeKey: "PPJTTMQ1CNMiCSrFb29AZRuAJ2JwJEwj",
+				userId: me.data.id, // TODO Replace with current user unique ID (required)
+				traits: {
+					name: me.data.username, // TODO Replace with current user name (optional)
+					email: me.data.email, // TODO Replace with current user email (optional)
+				}
 			});
 
 		}

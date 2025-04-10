@@ -470,12 +470,12 @@ export default function FormRate() {
                             {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
                                 <div key={questionId} className="p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
-                                        <div className="md:w-1/4 mb-1 md:mb-0">
-                                            <div className=" p-1">
+                                        <div className="md:w-1/4 md:max-w-1/4 md:min-w-1/4 mb-1 md:mb-0 flex-shrink-0">
+                                            <div className="w-full">
                                                 {question.description ? (
                                                     <>
                                                         <label className="block font-semibold text-xs mb-1 text-gray-900 truncate">{question.question}</label>
-                                                        <label className="block text-xs text-gray-500 truncate max-w-[90%]">{question.description}</label>
+                                                        <label className="block text-xs text-gray-500 truncate">{question.description}</label>
                                                     </>
                                                 ) : (
                                                     <label className="block font-semibold text-xs text-gray-900">{question.question}</label>
@@ -483,7 +483,7 @@ export default function FormRate() {
                                             </div>
                                         </div>
 
-                                        <div className="md:w-3/4">
+                                        <div className="md:w-3/4 md:max-w-3/4 md:min-w-3/4 flex-grow">
                                             {question.type ? (
                                                 <>
                                                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">

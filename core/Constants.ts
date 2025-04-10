@@ -9,6 +9,9 @@ export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localh
 
 export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://appv2.fillform.info';
 
+export const POSTHOG_KEY = process.env.NODE_ENV !== 'production' ? 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD' : 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD';
+export const POSTHOG_HOST = process.env.NODE_ENV !== 'production' ? 'https://us.i.posthog.com' : 'https://us.i.posthog.com';
+
 export const FIREBASE_CONFIG =
   process.env.NODE_ENV !== 'production'
     ? {

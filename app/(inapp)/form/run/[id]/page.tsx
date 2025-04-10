@@ -134,6 +134,9 @@ export default function FormRateOrder() {
             if (response.data?.code == Code.SUCCESS) {
                 Toast.success('Đã tạo yêu cầu điền form thành công!');
                 router.push(`/`);
+
+                //@ts-ignore
+                window.satismeter?.('track', { event: 'order.created' })
             } else {
                 Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
                 console.error('Form submission failed');
