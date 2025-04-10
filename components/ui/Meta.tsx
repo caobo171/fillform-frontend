@@ -29,22 +29,22 @@ function Meta({
       <meta property="og:type" content="website" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:url" content={url || 'https://wele-learn.com/'} />
+      <meta property="og:url" content={url || 'https://appv2.fillform.info/'} />
       <meta property="og:site_name" content="Fillform" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta
         property="og:image"
-        content={image || 'https://wele-learn.com/static/logo.png'}
+        content={image || 'https://appv2.fillform.info/static/logo.webp'}
       />
       <meta
         property="og:image:secure_url"
-        content={image || 'https://wele-learn.com/static/logo.png'}
+        content={image || 'https://appv2.fillform.info/static/logo.webp'}
       />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:title" content={title} />
-      <meta name="twitter:image" content={image || 'https://wele-learn.com/'} />
+      <meta name="twitter:image" content={image || 'https://appv2.fillform.info/static/logo.webp'} />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="keywords" content={keywords || 'e-learning, english, free'} />
       <meta name="description" content={description} />

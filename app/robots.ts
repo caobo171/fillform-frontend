@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/user/', '/admin/'],
     },
-    sitemap: 'https://wele-learn.com//sitemap.xml',
+    sitemap: 'https://appv2.fillform.info/sitemap.xml',
   };
 }

@@ -38,7 +38,7 @@ const navigation = {
     //   icon: '/static/svg/discord.svg',
     // },
   ],
-  contacts: [{ name: 'Contact us', href: 'https://www.facebook.com/welevn' }],
+  contacts: [{ name: 'Contact us', href: 'https://www.facebook.com/fillformvn' }],
 };
 
 export function LayoutFooter() {

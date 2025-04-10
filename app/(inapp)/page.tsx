@@ -27,7 +27,7 @@ export async function generateMetadata(
       languages: MetaData.defaultLanguages,
     },
     openGraph: {
-      images: ['https://wele-learn.com/static/logo.png', ...previousImages],
+      images: ['https://appv2.fillform.info/static/logo.webp', ...previousImages],
     },
   };
 }

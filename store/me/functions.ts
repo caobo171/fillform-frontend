@@ -27,7 +27,6 @@ const logout = async (storex = store) => {
 	localStorage.removeItem("access_token");
 	Cookie.set("access_token", "", 1);
 	Cookie.set("mobile", "", 1);
-	Cookie.set("weleclass", "", 1);
 	Cookie.set("user", "", 1);
 	Cookie.set("hide_banner", "", 1);
 	await storex.dispatch(MeSlice.loadProfile({ user: null }));

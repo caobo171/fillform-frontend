@@ -1,7 +1,7 @@
 class MetaData {
-  static landingPageDomain = 'https://wele-learn.com/';
+  static landingPageDomain = 'https://fillform.info/';
 
-  static appDomain = 'https://app.wele-learn.com';
+  static appDomain = 'https://appv2.fillform.info';
 
   static defaultKeywords =
     'Điền đơn tự động, tự học tiếng anh, học tiếng anh miễn phí';
