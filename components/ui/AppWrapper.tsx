@@ -21,6 +21,10 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 
 	}, []);
 
+	useEffect(() => {
+
+	}, []);
+
 
 
 
@@ -35,16 +39,14 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 			});
 
 
-			// TODO: Replace with current user unique ID (required)
+			const win = window as any;
+
 			//@ts-ignore
-			window.satismeter?.({
-				writeKey: "PPJTTMQ1CNMiCSrFb29AZRuAJ2JwJEwj",
-				userId: me.data.id, // TODO Replace with current user unique ID (required)
-				traits: {
-					name: me.data.username, // TODO Replace with current user name (optional)
-					email: me.data.email, // TODO Replace with current user email (optional)
-				}
-			});
+			window.Frill('container', {
+				key: '8cfa155f-37e4-4e84-98f0-fe3bc9826335',
+				// Identify your users (optional)
+				user: { email: me.data?.email, name: me.data?.username }
+			})
 
 		}
 

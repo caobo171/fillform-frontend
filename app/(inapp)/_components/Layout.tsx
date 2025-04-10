@@ -13,7 +13,7 @@ export default function NormalLayout({ children }: PropsWithChildren) {
 
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full js-main-layout">
       <Header
         searchUrl="podcasts"
         menu={{

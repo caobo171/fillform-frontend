@@ -10,12 +10,15 @@ import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
 import { Toast } from '@/services/Toast';
 import { useMe } from '@/hooks/user';
 import LoadingAbsolute from '@/components/loading';
+import { usePostHog } from 'posthog-js/react';
 
 export default function FormRateOrder() {
     const params = useParams();
     const { data: formData, isLoading: isLoadingForm } = useFormById(params.id as string);
     const [isLoading, setIsLoading] = useState(false);
     const me = useMe();
+
+    const posthog = usePostHog();
 
     const [numRequest, setNumRequest] = useState('');
     const [delayType, setDelayType] = useState('0');
@@ -136,7 +139,7 @@ export default function FormRateOrder() {
                 router.push(`/`);
 
                 //@ts-ignore
-                window.satismeter?.('track', { event: 'order.created' })
+                window.Frill?.('survey', { key: "fae72769-c0ae-4300-bf53-c7f787f9555d" })
             } else {
                 Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
                 console.error('Form submission failed');

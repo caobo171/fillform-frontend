@@ -27,11 +27,12 @@ export default function RootLayout({ children }: { children: ReactElement }) {
         title="Fillform"
         description="Fillform - Tạo form điền thông tin, điền rải, điền động, điền tự động"
       />
-
-      <Script id="673b20fa1928d1aa8b0bffcf-setup">
-        {`
-              (function() { window.satismeter = window.satismeter || function() {(window.satismeter.q = window.satismeter.q || []).push(arguments);};window.satismeter.l = 1 * new Date();var script = document.createElement("script");var parent = document.getElementsByTagName("script")[0].parentNode;script.async = 1;script.src = "https://app.satismeter.com/js";parent.appendChild(script);})();
-          `}
+      <Script>
+        {
+          `
+          (function(t,r){function s(){var a=r.getElementsByTagName("script")[0],e=r.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://widget.frill.co/v2/container.js",a.parentNode.insertBefore(e,a)}if(!t.Frill){var o=0,i={};t.Frill=function(e,p){var n,l=o++,c=new Promise(function(v,d){i[l]={params:[e,p],resolve:function(f){n=f,v(f)},reject:d}});return c.destroy=function(){delete i[l],n&&n.destroy()},c},t.Frill.q=i}r.readyState==="complete"||r.readyState==="interactive"?s():r.addEventListener("DOMContentLoaded",s)})(window,document);
+          `
+        }
       </Script>
       <body className={inter.className}>
         <PostHogProvider>
