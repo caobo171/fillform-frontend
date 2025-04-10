@@ -58,7 +58,7 @@ export default function UserDetailPage() {
         } else {
             Toast.error(res?.data?.message);
         }
-    }, [addCredit]);
+    }, [addCredit, user]);
 
     return (
         <>
