@@ -362,7 +362,7 @@ export default function FormRate() {
                                 </svg>
                                 Điền theo tỉ lệ mong muốn
                             </Link>
-                            <Link href={`/form/prefill/${dataForm?.form.id}`} className="flex items-center px-5 py-2.5 border border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-50 transition">
+                            <Link href={`/form/prefill/${dataForm?.form?.id}`} className="flex items-center px-5 py-2.5 border border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-50 transition">
                                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z M8 4.5V7 M12 4.5V7 M16 4.5V7 M8 12h8" />
                                 </svg>
