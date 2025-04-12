@@ -53,11 +53,6 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
 
   const moreItems = useMemo(() => {
     const items = [
-      { name: 'Manage account', href: '/user/account' },
-      {
-        name: 'Profile page',
-        href: `/`,
-      },
     ];
 
     if (ACL.isAdmin(user)) {
