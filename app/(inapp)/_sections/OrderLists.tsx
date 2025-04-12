@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useMyOrders, useUserOrders } from '@/hooks/order';
+import { useAdminOrders, useMyOrders, useUserOrders } from '@/hooks/order';
 import { ORDER_STATUS, OPTIONS_DELAY, Code } from '@/core/Constants';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { Toast } from '@/services/Toast';
@@ -13,6 +13,7 @@ import { Helper } from '@/services/Helper';
 import { useMe } from '@/hooks/user';
 import { SearchIcon } from 'lucide-react';
 import clsx from 'clsx';
+import Link from 'next/link';
 const ITEMS_PER_PAGE = 10;
 
 
@@ -23,9 +24,15 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
     const [search, setSearch] = useState('');   
     const userId = params.id as string;
     if (admin){
-        dataOrder = useUserOrders(currentOrderPage, ITEMS_PER_PAGE, userId, {
-            q: search
-        })
+        if (!userId) {
+            dataOrder = useAdminOrders(currentOrderPage, ITEMS_PER_PAGE, {
+                q: search
+            })
+        } else {
+            dataOrder = useUserOrders(currentOrderPage, ITEMS_PER_PAGE, userId, {
+                q: search
+            })
+        }
     } else {
         dataOrder = useMyOrders(currentOrderPage, ITEMS_PER_PAGE, {
             q: search
@@ -145,11 +152,11 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                 <div className="flex flex-col gap-4">
                     <div className="w-[150px] h-[28px] rounded-lg bg-gray-200 animate-pulse" />
 
-                    <div className="flex flex-nowrap gap-10">
+                    <div className="flex flex-wrap gap-4">
                         {[1, 2, 3, 4].map((item) => (
                             <div
                                 key={`recent_podcast_${item}`}
-                                className="h-[96px] w-1/2 rounded-lg bg-gray-200 animate-pulse"
+                                className="h-[32px] w-full rounded-lg bg-gray-200 animate-pulse"
                             />
                         ))}
                     </div>
@@ -197,6 +204,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                         {order.type}
                                                         &nbsp;-&nbsp;
                                                         {OPTIONS_DELAY[order.delay as keyof typeof OPTIONS_DELAY]?.name || 'Unknown'}
+                                                        &nbsp; {me.data?.is_super_admin ? `- v${order.version}` : ''}
                                                     </div>
                                                 </div>
                                             </div>
@@ -254,8 +262,8 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                     </svg>
                                                 </button>
                                             </>}
-                                            <button
-                                                onClick={() => router.push(`/order/detail/${order.id}`)}
+                                            <Link
+                                                href={`/order/detail/${order.id}`}
                                                 className="inline-flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded"
                                                 title="Xem chi tiết Order"
                                             >
@@ -264,7 +272,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
-                                            </button>
+                                            </Link>
                                             <button
                                                 onClick={() => window.open(order.url, '_blank', 'noopener,noreferrer')}
                                                 className="inline-flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded"
@@ -285,7 +293,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
             </div>
 
             {/* Orders Pagination */}
-            <div className="mt-4 flex justify-center gap-2">
+            <div className="mt-4 flex justify-center gap-2 flex-wrap">
                 {[...Array(totalOrderPages)].map((_, i) => (
                     <button
                         key={i}

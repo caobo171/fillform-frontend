@@ -36,11 +36,11 @@ export default function FormLists({ admin }: { admin?: boolean }) {
       <div className="flex flex-col gap-4">
         <div className="w-[150px] h-[28px] rounded-lg bg-gray-200 animate-pulse" />
 
-        <div className="flex flex-nowrap gap-10">
+        <div className="flex gap-4 flex-wrap">
           {[1, 2, 3, 4].map((item) => (
             <div
               key={`recent_podcast_${item}`}
-              className="h-[96px] w-1/2 rounded-lg bg-gray-200 animate-pulse"
+              className="h-[32px] w-full rounded-lg bg-gray-200 animate-pulse"
             />
           ))}
         </div>
@@ -82,21 +82,6 @@ export default function FormLists({ admin }: { admin?: boolean }) {
         </div>
       </div>
 
-
-      {dataForm.isLoading ? (
-        <div className="flex flex-col gap-4">
-          <div className="w-[150px] h-[28px] rounded-lg bg-gray-200 animate-pulse" />
-
-          <div className="flex flex-nowrap gap-10">
-            {[1, 2, 3, 4].map((item) => (
-              <div
-                key={`recent_podcast_${item}`}
-                className="h-[96px] w-1/2 rounded-lg bg-gray-200 animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
-      ) : <></>}
 
       <div className="mt-4 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -152,7 +137,7 @@ export default function FormLists({ admin }: { admin?: boolean }) {
       </div>
 
       {/* Forms Pagination */}
-      <div className="mt-4 flex justify-center gap-2">
+      <div className="mt-4 flex justify-center gap-2 flex-wrap">
         {[...Array(totalFormPages)].map((_, i) => (
           <button
             key={i}

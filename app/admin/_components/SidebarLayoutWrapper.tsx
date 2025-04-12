@@ -7,6 +7,7 @@ import { PropsWithChildren, useMemo } from 'react';
 
 import { SidebarLayout } from '@/components/layout/sidebar/sidebar-layout';
 import { useMe } from '@/hooks/user';
+import { FormInputIcon, ListOrderedIcon } from 'lucide-react';
 
 export function SidebarLayoutWrapper({ children }: PropsWithChildren) {
   const me = useMe();
@@ -18,6 +19,9 @@ export function SidebarLayoutWrapper({ children }: PropsWithChildren) {
         name: '',
         options: [
           { name: 'Users', icon: UserIcon, href: '/admin/users' },
+          { name: 'Orders', icon: ListOrderedIcon, href: '/admin/orders' },
+          { name: 'Forms', icon: FormInputIcon, href: '/admin/forms' },
+
         ],
       },
 

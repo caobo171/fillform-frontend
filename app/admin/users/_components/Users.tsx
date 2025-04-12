@@ -185,6 +185,17 @@ export default function Users() {
       },
 
       {
+        title: 'Ngày đăng ký',
+        key: 'created_at',
+        className: 'text-right',
+        render: (data: RawUser) => (
+          <div className="w-full flex items-center justify-end gap-4">
+            {new Date(data.createdAt).toLocaleDateString()}
+          </div>
+        ),
+      },
+
+      {
         title: 'Số dư',
         key: 'credit',
         className: 'text-right',
