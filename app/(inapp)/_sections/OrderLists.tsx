@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAdminOrders, useMyOrders, useUserOrders } from '@/hooks/order';
 import { ORDER_STATUS, OPTIONS_DELAY, Code } from '@/core/Constants';
 import Fetch from '@/lib/core/fetch/Fetch';
@@ -21,9 +21,12 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
     const [currentOrderPage, setCurrentOrderPage] = useState(1);
     let dataOrder = null;
     const params = useParams();
-    const [search, setSearch] = useState('');   
+    const searchParams = useSearchParams();
+    const [search, setSearch] = useState(searchParams.get('q') || '');
+
+
     const userId = params.id as string;
-    if (admin){
+    if (admin) {
         if (!userId) {
             dataOrder = useAdminOrders(currentOrderPage, ITEMS_PER_PAGE, {
                 q: search
@@ -39,7 +42,13 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
         })
     }
 
-    
+
+    useEffect(() => {
+        setSearch(searchParams.get('q') || '');
+        setCurrentOrderPage(1);
+        dataOrder.mutate();
+    }, [searchParams.get('q')]);
+
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const me = useMe();
@@ -110,6 +119,23 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
     };
 
 
+
+    if (dataOrder.isLoading) {
+        return <div className="flex flex-col gap-4">
+            <div className="w-[150px] h-[28px] rounded-lg bg-gray-200 animate-pulse" />
+
+            <div className="flex flex-wrap gap-4">
+                {[1, 2, 3, 4].map((item) => (
+                    <div
+                        key={`recent_podcast_${item}`}
+                        className="h-[32px] w-full rounded-lg bg-gray-200 animate-pulse"
+                    />
+                ))}
+            </div>
+        </div>
+    }
+
+
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
@@ -127,11 +153,17 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                             type="text"
                             placeholder="Nhấn enter để tìm kiếm order"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                            }}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    setCurrentOrderPage(1);
-                                    dataOrder.mutate();
+                                    if (admin && !userId) {
+                                        router.push(`/admin/orders?q=${search}`);
+                                    } else {
+                                        setCurrentOrderPage(1);
+                                        dataOrder.mutate();
+                                    }
                                 }
                             }}
                             className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pl-10 pr-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6"
@@ -148,20 +180,6 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
             ) : (<> </>)}
 
 
-            {dataOrder.isLoading ? (
-                <div className="flex flex-col gap-4">
-                    <div className="w-[150px] h-[28px] rounded-lg bg-gray-200 animate-pulse" />
-
-                    <div className="flex flex-wrap gap-4">
-                        {[1, 2, 3, 4].map((item) => (
-                            <div
-                                key={`recent_podcast_${item}`}
-                                className="h-[32px] w-full rounded-lg bg-gray-200 animate-pulse"
-                            />
-                        ))}
-                    </div>
-                </div>
-            ) : <></>}
 
             <div className="mt-4 flow-root">
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -204,7 +222,8 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                         {order.type}
                                                         &nbsp;-&nbsp;
                                                         {OPTIONS_DELAY[order.delay as keyof typeof OPTIONS_DELAY]?.name || 'Unknown'}
-                                                        &nbsp; {me.data?.is_super_admin ? `- v${order.version}` : ''}
+                                                        &nbsp; {me.data?.is_super_admin ? `- v${order.version} - ${order.owner}` : ''}
+
                                                     </div>
                                                 </div>
                                             </div>

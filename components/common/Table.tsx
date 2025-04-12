@@ -121,14 +121,14 @@ export function Table<RecordType extends AnyObject>(
   return (
     <div
       className={twMerge(
-        'relative ring-1 ring-black ring-opacity-5 sm:rounded-lg bg-white',
+        'relative ring-1 ring-black ring-opacity-5 sm:rounded-lg bg-white overflow-x-auto',
         clsx({
           'overflow-hidden min-h-[180px]': data.length === 0,
         }),
         className
       )}
     >
-      <table className="min-w-full divide-y divide-gray-100">
+      <table className="min-w-full divide-y divide-gray-100 ">
         <thead>
           <tr>
             {columns.map((col) => (

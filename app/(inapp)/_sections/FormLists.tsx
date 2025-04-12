@@ -1,18 +1,19 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMyForms, useUserForms } from '@/hooks/form';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { SearchIcon } from 'lucide-react';
-import { OPTIONS_DELAY } from '@/core/Constants';
 const ITEMS_PER_PAGE = 10;
 
 
 export default function FormLists({ admin }: { admin?: boolean }) {
   const [currentFormPage, setCurrentFormPage] = useState(1);
-  const [search, setSearch] = useState('');
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('q') || '');
   const router = useRouter();
+
+
 
   let dataForm = null;
   const params = useParams();
@@ -26,6 +27,12 @@ export default function FormLists({ admin }: { admin?: boolean }) {
       q: search
     });
   }
+
+  useEffect(() => {
+    setSearch(searchParams.get('q') || '');
+    setCurrentFormPage(1);
+    dataForm.mutate();
+  }, [searchParams.get('q')]);
 
   const totalFormPages = Math.ceil((dataForm?.data?.form_num || 0) / ITEMS_PER_PAGE)
 
@@ -67,7 +74,11 @@ export default function FormLists({ admin }: { admin?: boolean }) {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   setCurrentFormPage(1);
-                  dataForm.mutate();
+                  if (admin && !userId) {
+                    router.push(`/admin/forms?q=${search}`);
+                  } else {
+                    dataForm.mutate();
+                  }
                 }
               }}
               onChange={(e) => setSearch(e.target.value)}
