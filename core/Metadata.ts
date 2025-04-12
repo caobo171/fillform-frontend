@@ -4,12 +4,12 @@ class MetaData {
   static appDomain = 'https://appv2.fillform.info';
 
   static defaultKeywords =
-    'Điền đơn tự động, tự học tiếng anh, học tiếng anh miễn phí';
+    'Điền đơn tự động, ứng dụng điền đơn tự động, ứng dụng điền đơn, google form';
 
   static defaultTitle = 'Fillform - Điền đơn tự động';
 
   static defaultDescription =
-    'Fillform là chương trình luyện nghe Tiếng Anh miễn phí và sử dụng phương pháp nghe chép chính tả.';
+    'Fillform là ứng dụng để điền đơn tự động.';
 
   static defaultCanonical = '/';
 

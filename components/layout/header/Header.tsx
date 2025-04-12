@@ -75,7 +75,7 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
         )}
       >
         <nav
-          className={clsx('mx-auto flex items-center justify-between px-6', {
+          className={clsx('mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8', {
             'container': !isAdminPage,
           })}
         >
@@ -99,7 +99,7 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
         })}
       >
         <nav
-          className={clsx('mx-auto flex items-center justify-between px-6', {
+          className={clsx('mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8', {
             'container': !isAdminPage,
           })}
         >

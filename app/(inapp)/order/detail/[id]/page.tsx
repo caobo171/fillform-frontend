@@ -207,7 +207,11 @@ const OrderPage = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Điền rải:</span>
-                                    <span className="font-semibold">{OPTIONS_DELAY[(order.data?.order.delay || 0) as keyof typeof OPTIONS_DELAY].name}</span>
+                                    <span className="font-semibold">{OPTIONS_DELAY[(order.data?.order.delay) as keyof typeof OPTIONS_DELAY]?.name || 'Unknown' }</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Ngày tạo:</span>
+                                    <span className="font-semibold">{new Date(order.data?.order?.createdAt || '').toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-600">Tình trạng:</span>
