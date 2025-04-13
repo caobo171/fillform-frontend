@@ -57,7 +57,7 @@ const UserInfo = (props: { user: RawUser }) => {
         <div className="rounded-lg bg-white shadow-md pt-5 pb-10 px-6">
             <div className="flex items-center justify-center">
                 <div className="rounded-full p-0.5 border border-black border-opacity-10">
-                    {props.user.avatar ? (<>
+                    {props.user?.avatar ? (<>
                         <div style={{ backgroundImage: `url(${Constants.IMAGE_URL + props.user.avatar})` }}
                             className="w-20 h-20 rounded-full bg-cover bg-center">
                         </div>

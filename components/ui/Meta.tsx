@@ -21,6 +21,7 @@ function Meta({
       <link rel="canonical" href={url} />
       <meta name="author" content="Wele" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="google" content="notranslate" />
       <meta
         name="robots"
         content="max-snippet:-1, max-image-preview:large, max-video-preview:-1"
