@@ -27,7 +27,7 @@ export async function generateMetadata(
       languages: MetaData.defaultLanguages,
     },
     openGraph: {
-      images: ['https://appv2.fillform.info/static/logo.webp', ...previousImages],
+      images: ['https://app.fillform.info/static/img/background.jpg', ...previousImages],
     },
   };
 }

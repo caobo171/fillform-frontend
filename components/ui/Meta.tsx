@@ -36,16 +36,16 @@ function Meta({
       <meta property="og:image:height" content="630" />
       <meta
         property="og:image"
-        content={image || 'https://appv2.fillform.info/static/logo.webp'}
+        content={image || 'https://app.fillform.info/static/img/background.jpg'}
       />
       <meta
         property="og:image:secure_url"
-        content={image || 'https://appv2.fillform.info/static/logo.webp'}
+        content={image || 'https://app.fillform.info/static/img/background.jpg'}
       />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:title" content={title} />
-      <meta name="twitter:image" content={image || 'https://appv2.fillform.info/static/logo.webp'} />
+      <meta name="twitter:image" content={image || 'https://app.fillform.info/static/img/background.jpg'} />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="keywords" content={keywords || 'e-learning, english, free'} />
       <meta name="description" content={description} />

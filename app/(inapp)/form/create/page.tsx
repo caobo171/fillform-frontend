@@ -1,224 +1,35 @@
-'use client'
+import { MetaData } from '@/core/Metadata';
+import { Metadata, ResolvingMetadata } from 'next';
+import React, { Suspense, lazy } from 'react';
+import FormCreate from './_components/FormCreate';
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Controller, useForm } from 'react-hook-form'
-import { XCircle } from 'lucide-react'
-import { z } from 'zod'
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-import Fetch from '@/lib/core/fetch/Fetch'
-import { Toast } from '@/services/Toast'
-import LoadingAbsolute from '@/components/loading'
-import { Container } from '@/components/layout/container/container'
-import { Button, Input } from '@/components/common'
-import { FormItem, InlineFormItem } from '@/components/form/FormItem'
+export async function generateMetadata(
+  _: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // optionally access and extend (rather than replace) parent metadata
+  const previousImages = (await parent).openGraph?.images || [];
 
-const formCreateSchema = z.object({
-    form_link: z.string().min(1, 'Vui lòng nhập đường dẫn edit form!'),
-});
-
-type CreateFormValues = z.infer<typeof formCreateSchema>;
-
-export default function FormCreate() {
-    const router = useRouter();
-    const [loading, setLoading] = useState<boolean>(false);
-    const [msg, setMsg] = useState<string>('');
-
-    const {
-        control,
-        handleSubmit,
-        formState: { isSubmitting, errors },
-    } = useForm<CreateFormValues>();
-
-    const onSubmit = async (formData: CreateFormValues) => {
-        if (!formData.form_link) {
-            setMsg('Vui lòng nhập đường dẫn edit form!');
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            const res: any = await Fetch.postWithAccessToken('/api/form/create', {
-                form_link: formData.form_link,
-            });
-
-            if (res.data?.form){
-                Toast.success('Tạo form thành công!');
-                router.push(`/form/${res.data?.form?.id}`);
-            }
-        } catch (e) {
-            setMsg(`Đã xảy ra lỗi, bạn hãy kiểm tra xem form đã được mở quyền truy cập cho tất có mọi người có link và tắt thu thập email, tắt cho phép chỉnh sửa câu trả lời và phải tắt mỗi mail chỉ điền 1 lần hay chưa nha ! 
-                Một số câu hỏi bọn mình cũng chưa hỗ trợ ví dụ như file nè !`);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <Container>
-            <div className="relative isolate overflow-hidden py-12">
-                {loading && <LoadingAbsolute />}
-
-                <div className="container mx-auto">
-                    {/* Header */}
-                    <div className="mb-8 text-center">
-                        <h2 className="text-3xl font-bold mb-3">Tạo Form mới</h2>
-                        <p className="text-gray-600">
-                            Nhập link edit form của bạn vào ô dưới đây. Hãy đọc kĩ hướng dẫn để tránh sai sót.
-                        </p>
-                    </div>
-
-                    {/* Form Section */}
-                    <div className="bg-white shadow-sm rounded-lg pb-6 mb-10">
-                        <form onSubmit={handleSubmit(onSubmit)} className="mb-4">
-                            <InlineFormItem 
-                                label="Điền Edit Link Form" 
-                                className="mb-6"
-                                error={errors.form_link?.message}
-                            >
-                                <Controller
-                                    render={({ field }) => (
-                                        <Input
-                                            placeholder="Ví dụ: https://docs.google.com/forms/d/xxx/edit"
-                                            className="w-full"
-                                            {...field}
-                                            size="large"
-                                            state={errors.form_link ? 'error' : 'normal'}
-                                        />
-                                    )}
-                                    name="form_link"
-                                    control={control}
-                                />
-                            </InlineFormItem>
-
-                            <Button 
-                                htmlType="submit" 
-                                className="w-full" 
-                                size="large" 
-                                loading={isSubmitting || loading}
-                            >
-                                Tạo ngay
-                            </Button>
-                        </form>
-
-                        {/* Alert Message */}
-                        {msg && (
-                            <div className="mt-4">
-                                <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
-                                    <XCircle className="w-5 h-5 flex-shrink-0" /> 
-                                    <span>{msg}</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Guide Sections */}
-                    <div className="space-y-12">
-                        {/* Warning Note */}
-                        <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-4 text-yellow-800">
-                            <p className="font-medium">
-                                <strong className="text-yellow-600">Lưu ý quan trọng: </strong>
-                                Nếu bạn <strong>thao tác lần đầu</strong>, hãy tạo bản sao cho form của mình và thực hiện trên bản sao trước nhé!
-                            </p>
-                        </div>
-
-                        <div className="border border-gray-100 rounded-lg overflow-hidden">
-                            <h3 className="text-xl font-bold p-4 bg-gray-50 border-b border-gray-100">Hướng Dẫn Chi Tiết</h3>
-                            
-                            {/* Step 1 */}
-                            <div className="p-6 border-b border-gray-100">
-                                <div className="grid md:grid-cols-2 gap-8 items-center">
-                                    <div className="text-left">
-                                        <p className="font-bold mb-2 text-gray-900">Bước 1: Copy đường dẫn edit</p>
-                                        <p className="mb-2 text-gray-700">
-                                            Copy đường dẫn edit của form vào ô phía trên. Đường dẫn edit lấy từ trang chỉnh sửa form của bạn,
-                                            <strong> phải có đuôi /edit</strong>. Ví dụ:
-                                        </p>
-                                        <p className="text-xs bg-gray-50 p-2 rounded overflow-auto">
-                                            https://docs.google.com/forms/d/1IkrTNv9VlSHbDbFx_tnRXXarN1BaNkzHr9VHtBamkRw/edit
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <Image
-                                            src="/static/img/guide-s1.png"
-                                            alt="Fillform Step 1"
-                                            width={600}
-                                            height={400}
-                                            className="w-full rounded-lg shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Step 2 */}
-                            <div className="p-6 border-b border-gray-100">
-                                <div className="grid md:grid-cols-2 gap-8 items-center">
-                                    <div className="text-left">
-                                        <p className="font-bold mb-2 text-gray-900">Bước 2: Mở quyền truy cập form và xuất bản form</p>
-                                        <p className="text-gray-700">
-                                            Xuất bản form và mở quyền edit cho tất cả các đối tượng.
-                                            <strong> Bạn chỉ cần mở quyền tại bước này</strong>,
-                                            sau khi bạn nhấn "Tạo ngay" và hệ thống lưu dữ liệu thành công, bạn có thể tắt quyền truy cập.
-                                        </p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Image
-                                            src="/static/img/guide-s21.png"
-                                            alt="Fillform Step 2.1"
-                                            width={300}
-                                            height={200}
-                                            className="w-full rounded-lg shadow-sm"
-                                        />
-                                        <Image
-                                            src="/static/img/guide-s22.png"
-                                            alt="Fillform Step 2.2"
-                                            width={300}
-                                            height={200}
-                                            className="w-full rounded-lg shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Step 3 */}
-                            <div className="p-6">
-                                <div className="grid md:grid-cols-2 gap-8 items-center">
-                                    <div className="text-left">
-                                        <p className="font-bold mb-2 text-gray-900">Bước 3: Cấu hình form</p>
-                                        <p className="mb-4 text-gray-700">
-                                            Bạn lưu ý Form <strong>phải tắt thu thập email</strong>,
-                                            &nbsp;<strong>tắt cho phép chỉnh sửa câu trả lời</strong> và
-                                            &nbsp;<strong>phải tắt mỗi mail chỉ điền 1 lần</strong>.
-                                            Hãy cấu hình form như hình bên nhé!
-                                        </p>
-                                        <p className="text-gray-700">
-                                            Cần hỗ trợ? Liên hệ{' '}
-                                            <a
-                                                href="https://www.facebook.com/fillformvn"
-                                                className="text-blue-600 hover:underline font-medium"
-                                            >
-                                                FillForm - Điền form tự động
-                                            </a>
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <Image
-                                            src="/static/img/guide-s3.png"
-                                            alt="Fillform Step 3"
-                                            width={600}
-                                            height={400}
-                                            className="w-full rounded-lg shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </Container>
-    )
+  return {
+    metadataBase: new URL(MetaData.landingPageDomain),
+    title: 'Tạo form mới',
+    description: MetaData.defaultDescription,
+    alternates: {
+      canonical: MetaData.defaultCanonical,
+      languages: MetaData.defaultLanguages,
+    },
+    openGraph: {
+      images: ['https://app.fillform.info/static/img/background.jpg', ...previousImages],
+    },
+  };
+}
+export default function _FormCreate() {
+  return (
+    <FormCreate />
+  );
 }
