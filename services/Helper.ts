@@ -449,7 +449,7 @@ export class Helper {
       for (var index in array[i]) {
         if (line != '') line += ','
 
-        line += array[i][index];
+        line += `"${array[i][index]}"`;
       }
 
       str += line + '\r\n';
