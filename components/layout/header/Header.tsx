@@ -81,8 +81,10 @@ export function Header({ menu, searchUrl, children }: HeaderProps) {
         >
           <div className="flex items-center gap-x-20">
             <Logo />
-            <Menu subs={menu?.subs} main={menu?.main} />
           </div>
+
+          <Menu subs={menu?.subs} main={menu?.main} />
+
 
           <div className="flex items-center gap-4">
             {children}

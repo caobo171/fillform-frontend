@@ -198,7 +198,7 @@ export default function FormRate() {
                     addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
                     continue;
                 }
-
+                
                 for (let j = 0; j < latest_answers.length; j++) {
                     const latest_answer = latest_answers[j];
                     const answer = answers[j];
