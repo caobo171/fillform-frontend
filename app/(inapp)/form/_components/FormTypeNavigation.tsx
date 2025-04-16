@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 interface FormTypeNavigationProps {
   formId?: string | number;
-  type: 'rate' | 'prefill';
+  type: 'rate' | 'prefill' | 'ai';
 }
 
 export const FormTypeNavigation = ({ formId, type }: FormTypeNavigationProps) => {
@@ -27,6 +27,12 @@ export const FormTypeNavigation = ({ formId, type }: FormTypeNavigationProps) =>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z M8 4.5V7 M12 4.5V7 M16 4.5V7 M8 12h8" />
         </svg>
         Điền theo data có trước
+      </Link>
+      <Link href={`/form/ai/${formId}`} className={buttonStyles(type === 'ai')}>
+        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Điền form bằng AI agent
       </Link>
     </div>
   )
