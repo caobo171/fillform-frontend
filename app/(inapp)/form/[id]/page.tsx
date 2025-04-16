@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation';
 import Fetch from '@/lib/core/fetch/Fetch';
 import LoadingAbsolute from '@/components/loading';
 import { RawForm } from '@/store/types';
+import { Helper } from '@/services/Helper';
 
 interface ChatError {
     id: string;
@@ -173,7 +174,7 @@ export default function FormRate() {
 
         const latest_form_questions = dataForm?.latest_form_questions || [];
         if (latest_form_questions.length !== dataForm?.form.loaddata?.length) {
-             addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu form hiện tại và dữ liệu form mới nhất. Hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+            addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu form hiện tại và dữ liệu form mới nhất. Hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
         }
 
         let min_length = Math.min(latest_form_questions.length, dataForm?.form.loaddata?.length || 0);
@@ -189,23 +190,26 @@ export default function FormRate() {
                 continue;
             }
 
-            let latest_answers = latest_question.answer || [];
-            let answers = question.answer || [];
+            if (Helper.isSelectType(question?.type)) {
+                let latest_answers = latest_question.answer || [];
+                let answers = question.answer || [];
 
-            if (latest_answers.length !== answers.length) {
-                addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
-                continue;
-            }
-
-            for (let j = 0; j < latest_answers.length; j++) {
-                const latest_answer = latest_answers[j];
-                const answer = answers[j];
-
-                if (latest_answer.data != answer.data) {
+                if (latest_answers.length !== answers.length) {
                     addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
-                    break;
+                    continue;
+                }
+
+                for (let j = 0; j < latest_answers.length; j++) {
+                    const latest_answer = latest_answers[j];
+                    const answer = answers[j];
+
+                    if (latest_answer.data != answer.data) {
+                        addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
+                        break;
+                    }
                 }
             }
+
         }
 
 
@@ -335,7 +339,7 @@ export default function FormRate() {
             <section className="bg-gradient-to-b from-primary-50 to-white">
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
 
-                    {(isLoading) &&  <LoadingAbsolute />}
+                    {(isLoading) && <LoadingAbsolute />}
 
                     {isSaved && (
                         <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md shadow-sm" role="alert">

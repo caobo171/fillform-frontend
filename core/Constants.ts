@@ -49,6 +49,27 @@ const Constants = {
 
 
 
+export enum QUESTION_TYPE {
+  SHORT_ANSWER = 0,
+  PARAGRAPH = 1,
+  MULTIPLE_CHOICE = 2,
+  DROPDOWN = 3,
+  CHECKBOX = 4,
+  LINEAR_SCALE = 5,
+  TITLE_BLOCK = 6,
+  MULTIPLE_CHOICE_GRID = 7,
+  CHECKBOX_GRID = 7,
+  SECTION_BLOCK = 8,
+  DATE = 9,
+  TIME = 10,
+  IMAGE_BLOCK = 11,
+  VIDEO_BLOCK = 12,
+  RATING = 18,
+}
+
+
+
+
 export const ORDER_STATUS = {
   RUNNING: 'Đang chạy',
   PAUSE: 'Tạm dừng',

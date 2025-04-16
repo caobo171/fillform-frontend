@@ -7,6 +7,7 @@ import {
   RawUser,
   UploadImage,
 } from '@/store/types';
+import { QUESTION_TYPE } from '@/core/Constants';
 
 // import { AppRouterContext } from "";
 
@@ -282,6 +283,35 @@ export class Helper {
 
     return input;
   }
+
+
+  static isSelectType(type: number) {
+    return type == QUESTION_TYPE.MULTIPLE_CHOICE
+      || type == QUESTION_TYPE.CHECKBOX
+      || type == QUESTION_TYPE.MULTIPLE_CHOICE_GRID
+      || type == QUESTION_TYPE.CHECKBOX_GRID
+      || type == QUESTION_TYPE.RATING
+      || type == QUESTION_TYPE.DROPDOWN
+      || type == QUESTION_TYPE.LINEAR_SCALE
+  }
+
+
+  static isNoneFormType(type: number) {
+    return type == QUESTION_TYPE.IMAGE_BLOCK
+      || type == QUESTION_TYPE.VIDEO_BLOCK
+      || type == QUESTION_TYPE.SECTION_BLOCK
+      || type == QUESTION_TYPE.TITLE_BLOCK
+  }
+
+
+  static isTypingType(type: number) {
+    return type == QUESTION_TYPE.SHORT_ANSWER
+      || type == QUESTION_TYPE.PARAGRAPH
+      || type == QUESTION_TYPE.DATE
+      || type == QUESTION_TYPE.TIME
+  }
+
+
 
   static readDataUrl = function (file: File): Promise<UploadImage> {
     return new Promise((resolve, reject) => {
