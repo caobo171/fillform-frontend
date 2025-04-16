@@ -29,7 +29,7 @@ const OrderPage = () => {
 
     const [owner, setOwner] = useState(order.data?.order.owner)
     const [delay, setDelay] = useState(order.data?.order.delay);
-    
+
     useEffect(() => {
         setOwner(order.data?.order.owner)
         setDelay(order.data?.order.delay)
@@ -207,7 +207,7 @@ const OrderPage = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Điền rải:</span>
-                                    <span className="font-semibold">{OPTIONS_DELAY[(order.data?.order.delay) as keyof typeof OPTIONS_DELAY]?.name || 'Unknown' }</span>
+                                    <span className="font-semibold">{OPTIONS_DELAY[(order.data?.order.delay) as keyof typeof OPTIONS_DELAY]?.name || 'Unknown'}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Ngày tạo:</span>
@@ -303,46 +303,57 @@ const OrderPage = () => {
                 {isAdmin && (
                     <div className="text-left mb-8 bg-white rounded shadow-sm p-4">
                         <h2 className="text-2xl font-bold mb-4">Quản lý Order</h2>
-                        <div className="p-3 bg-yellow-50 text-yellow-800 rounded mb-4 text-sm">
-                            <p>⚠️ Hãy chắc chắn đã ấn <b>Tạm dừng</b> trước khi thực hiện <b>bất cứ thao tác nào</b> với order</p>
-                        </div>
 
-                        {/* Admin Controls */}
-                        <div className="flex flex-wrap gap-2 mb-6">
-                            {order.data?.order.status === ORDER_STATUS.SUCCESS ? (
-                                <button disabled className="px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed opacity-50">Tiếp tục</button>
-                            ) : order.data?.order.status === ORDER_STATUS.RUNNING ? (
-                                <button
-                                    onClick={() => orderPause()}
-                                    className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded transition-colors"
-                                >
-                                    Tạm dừng
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => orderContinue()}
-                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-                                >
-                                    Tiếp tục
-                                </button>
-                            )}
-                            <button
-                                onClick={() => orderStop()}
-                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
-                            >
-                                Huỷ
-                            </button>
-                            <button
-                                onClick={() => orderClone()}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-                            >
-                                Clone
-                            </button>
-                        </div>
+                        {
+                            order.data?.order.status == ORDER_STATUS.CANCELED ? <>
+                                <div className="p-3 bg-red-50 text-red-800 rounded mb-4 text-sm">
+                                    <p>⚠️ Order đã bị hủy</p>
+                                </div>
+                            </> : (<>
+                                <div className="p-3 bg-yellow-50 text-yellow-800 rounded mb-4 text-sm">
+                                    <p>⚠️ Hãy chắc chắn đã ấn <b>Tạm dừng</b> trước khi thực hiện <b>bất cứ thao tác nào</b> với order</p>
+                                </div>
+
+                                {/* Admin Controls */}
+                                <div className="flex flex-wrap gap-2 mb-6">
+                                    {order.data?.order.status === ORDER_STATUS.SUCCESS ? (
+                                        <button disabled className="px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed opacity-50">Tiếp tục</button>
+                                    ) : order.data?.order.status === ORDER_STATUS.RUNNING ? (
+                                        <button
+                                            onClick={() => orderPause()}
+                                            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded transition-colors"
+                                        >
+                                            Tạm dừng
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => orderContinue()}
+                                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+                                        >
+                                            Tiếp tục
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => orderStop()}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                                    >
+                                        Huỷ
+                                    </button>
+                                    <button
+                                        onClick={() => orderClone()}
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                                    >
+                                        Clone
+                                    </button>
+                                </div>
+
+                            </>)
+                        }
+
 
 
                         {
-                            order.data?.order.status === ORDER_STATUS.PAUSE || order.data?.order.status === ORDER_STATUS.CANCELED ? (
+                            order.data?.order.status === ORDER_STATUS.PAUSE ? (
 
                                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 mb-8">
 
