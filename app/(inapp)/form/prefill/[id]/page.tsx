@@ -61,7 +61,7 @@ export default function FormPrefill() {
     const { data: user } = useMe();
     const bankInfo = useMyBankInfo();
 
-    const { register, handleSubmit, control, watch, setValue } = useForm();
+    const { register, handleSubmit, control, watch, setValue, reset } = useForm();
 
 
     const onCheckData = async (event: any) => {
@@ -69,8 +69,6 @@ export default function FormPrefill() {
         event.preventDefault();
         // This would be your API call to check the data
         try {
-
-
             const res = await Fetch.postWithAccessToken<{ code: number, message: string, fields: any, prefillData: any, form: any }>('/api/form/get.prefill', {
                 data_url: urlData,
                 id: formData?.form?.id
@@ -81,8 +79,21 @@ export default function FormPrefill() {
             setPrefillForm(res.data?.form);
             setError('');
 
-
-            // And update formData with loaddata
+            // Set form values for each question in the form data
+            if (res.data?.form?.loaddata) {
+                // Reset any previous form values first
+                reset();
+                
+                // Set default values for each question based on the form data
+                res.data.form.loaddata.forEach((item: any) => {
+                    if (item.id && item.field) {
+                        setValue(`question_${item.id}`, item.field);
+                    }
+                });
+                
+            }
+            
+            Toast.success('Dữ liệu đã được tải thành công!');
         } catch (err) {
             setError("Lỗi khi kiểm tra dữ liệu, vui lòng kiểm tra lại quyền truy cập Google Sheet của bạn!");
         } finally {
