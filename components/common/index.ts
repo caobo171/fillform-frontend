@@ -1,6 +1,6 @@
 export { Table } from './Table';
 export { Button } from './Button';
-export { Pagination } from './Pagination';
+export { LocalPagination } from './LocalPagination';
 export { Loading } from './Loading';
 export { Badge } from './Badge';
 export { Modal } from './Modal';

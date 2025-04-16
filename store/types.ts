@@ -65,6 +65,7 @@ export type RawUser = {
   email: string;
   credit: number;
   is_super_admin: number;
+  createdAt: string;
 };
 
 

@@ -10,7 +10,6 @@ import useSWRMutation from 'swr/mutation';
 import {
   Input,
   Modal,
-  Pagination,
   Table,
   TableProps,
   TextArea,
@@ -22,6 +21,7 @@ import Fetch from '@/lib/core/fetch/Fetch';
 import { AnyObject } from '@/store/interface';
 import { RawUser } from '@/store/types';
 import Link from 'next/link';
+import { LocalPagination } from '@/components/common/LocalPagination';
 export default function Users() {
   const pageSize = 20;
 
@@ -287,7 +287,7 @@ export default function Users() {
       />
 
       {users && users.user_num > pageSize && (
-        <Pagination
+        <LocalPagination
           total={users?.user_num ?? 0}
           pageSize={pageSize}
           current={currentPage}

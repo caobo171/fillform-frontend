@@ -16,7 +16,7 @@ type PaginationProps = {
   className?: string;
 };
 
-export function Pagination(props: PaginationProps) {
+export function LocalPagination(props: PaginationProps) {
   const { onChange, total, sibling = 1, current, pageSize, className } = props;
 
   const paginationRange = usePagination({
@@ -120,5 +120,3 @@ export function Pagination(props: PaginationProps) {
     </nav>
   );
 }
-
-export default Pagination;
