@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import Image from 'next/image';
+import { FormTypeNavigation } from "../_components/FormTypeNavigation"
 import WarningChatBox from '../_components/WarningChatBox';
 import { useFormById } from '@/hooks/form';
 import { useParams } from 'next/navigation';
@@ -348,20 +349,7 @@ export default function FormRate() {
                     <div className="container mx-auto mb-8">
                         <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo tỉ lệ mong muốn</h1>
 
-                        <div className="flex flex-wrap justify-center gap-2 my-6">
-                            <Link href="" className="flex items-center px-5 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition shadow-sm">
-                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                Điền theo tỉ lệ mong muốn
-                            </Link>
-                            <Link href={`/form/prefill/${dataForm?.form?.id}`} className="flex items-center px-5 py-2.5 border border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-50 transition">
-                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z M8 4.5V7 M12 4.5V7 M16 4.5V7 M8 12h8" />
-                                </svg>
-                                Điền theo data có trước
-                            </Link>
-                        </div>
+                        <FormTypeNavigation formId={dataForm?.form?.id} type={'rate'} />
 
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                             <div className="space-y-4 text-xs text-gray-700">

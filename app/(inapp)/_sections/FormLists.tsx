@@ -24,7 +24,7 @@ export default function FormLists({ admin }: { admin?: boolean }) {
   const params = useParams();
   const userId = params.id as string;
 
-  const inAdminList = admin && userId;
+  const inAdminList = admin && !userId;
   if (admin) {
     dataForm = useUserForms(currentFormPage, ITEMS_PER_PAGE, userId, {
       q: search
