@@ -580,7 +580,7 @@ export default function FormRate() {
                                                 </svg>
                                             </button>
                                             {isShowErrorMessage && chatErrors.some(error => error.type === 'error') && (
-                                                <div className="flex flex-col space-y-2 text-red-700 bg-red-50 px-4 py-2 rounded-md border border-red-200 align-center justify-center" role="alert">
+                                                <div className="flex flex-col space-y-4 text-red-700 bg-red-50 px-4 py-2 rounded-md border border-red-200 align-center justify-center" role="alert">
                                                     <div className="flex items-center justify-center">
                                                         <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -592,6 +592,17 @@ export default function FormRate() {
                                                             <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
                                                         ))}
                                                     </ul>
+                                                    <div className="flex justify-center">
+                                                        <button 
+                                                            onClick={() => router.push(`/form/run/${dataForm?.form.id}`)}
+                                                            className="inline-flex items-center px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
+                                                        >
+                                                            Vẫn tiếp tục điền đơn
+                                                            <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

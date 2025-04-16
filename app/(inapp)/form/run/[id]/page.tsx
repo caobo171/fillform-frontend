@@ -3,12 +3,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useFormById } from '@/hooks/form';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { RawForm } from '@/store/types';
 import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
 import { Toast } from '@/services/Toast';
-import { useMe } from '@/hooks/user';
+import { useMe, useMyBankInfo } from '@/hooks/user';
 import LoadingAbsolute from '@/components/loading';
 import { usePostHog } from 'posthog-js/react';
 
@@ -17,6 +18,7 @@ export default function FormRateOrder() {
     const { data: formData, isLoading: isLoadingForm } = useFormById(params.id as string);
     const [isLoading, setIsLoading] = useState(false);
     const me = useMe();
+    const bankInfo = useMyBankInfo();
 
     const posthog = usePostHog();
 
@@ -214,8 +216,49 @@ export default function FormRateOrder() {
 
                             <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 my-6">
                                 <h3 className="text-xl font-bold">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
-                                <p className="text-sm">{message}</p>
                                 <p className="text-sm text-left w-full" dangerouslySetInnerHTML={{ __html: delayMessage }}></p>
+                                
+                                {total > (me.data?.credit || 0) && (
+                                    <div className="mt-4 p-4 bg-white rounded-lg">
+                                        <div className="p-3 bg-red-100 text-red-700 rounded-lg mb-4 text-center font-medium">
+                                            ❌ KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ!
+                                        </div>
+                                        <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm {(total - (me.data?.credit || 0)).toLocaleString()} VND để tiếp tục</h4>
+                                        
+                                        <div className="space-y-3">
+                                            <div className="flex items-center">
+                                                <span className="w-1/3 font-medium text-right pr-3">Tên NH:</span>
+                                                <span>{bankInfo.data?.name}</span>
+                                            </div>
+
+                                            <div className="flex items-center">
+                                                <span className="w-1/3 font-medium text-right pr-3">STK:</span>
+                                                <span>{bankInfo.data?.number}</span>
+                                            </div>
+
+                                            <div className="flex items-center">
+                                                <span className="w-1/3 font-medium text-right pr-3">Tên TK:</span>
+                                                <span>VUONG TIEN DAT</span>
+                                            </div>
+
+                                            <div className="flex items-center">
+                                                <span className="w-1/3 font-medium text-right pr-3">Nội dung CK:</span>
+                                                <span>{bankInfo.data?.message_credit}</span>
+                                            </div>
+
+                                            <div className="flex items-start">
+                                                <span className="w-1/3 font-medium text-right pr-3">Mã QR:</span>
+                                                <Image
+                                                    src={bankInfo.data?.qr_link || ""}
+                                                    alt="QRCode"
+                                                    width={200}
+                                                    height={200}
+                                                    className="w-[200px] h-auto"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div className="grid gap-4">
                                 <button

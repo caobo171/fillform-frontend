@@ -8,10 +8,10 @@ import Link from "next/link";
 import { useFormById } from "@/hooks/form";
 import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from "@/core/Constants";
 import { MeHook } from "@/store/me/hooks";
-import { useMe } from "@/hooks/user";
-import Fetch from "@/lib/core/fetch/Fetch";
-import { Toast } from "@/services/Toast";
-import LoadingAbsolute from "@/components/loading";
+import { useMe, useMyBankInfo } from '@/hooks/user';
+import Fetch from '@/lib/core/fetch/Fetch';
+import { Toast } from '@/services/Toast';
+import LoadingAbsolute from '@/components/loading';
 
 interface FormData {
     slug: string;
@@ -57,7 +57,8 @@ export default function FormPrefill() {
     const [prefillData, setPrefillData] = useState<any>({});
     const [urlData, setUrlData] = useState('');
     const [submitDisabled, setSubmitDisabled] = useState(false);
-    const { data: user } = useMe()
+    const { data: user } = useMe();
+    const bankInfo = useMyBankInfo();
 
     const { register, handleSubmit, control, watch, setValue } = useForm();
 
@@ -426,21 +427,51 @@ export default function FormPrefill() {
                                         </div>
                                     </div>
 
-                                    <div className="mt-6 bg-primary-50 border-l-4 border-primary-500 p-4 rounded-md">
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <svg className="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <h3 className="text-xl font-bold text-primary-800">TỔNG CỘNG: {total.toLocaleString()} VND</h3>
-                                        </div>
+                                    <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 my-6">
+                                        <h3 className="text-xl font-bold">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
+                                        <p className="text-sm text-left w-full" dangerouslySetInnerHTML={{ __html: delayNote }}></p>
                                         
-                                        <p className="mb-3 text-primary-700 font-medium">
-                                            {insufficientFunds 
-                                                ? <span className="text-red-600 font-bold">KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ</span> 
-                                                : `Bạn xác nhận sẽ buff ${numRequest} câu trả lời cho form này.`}
-                                        </p>
-                                        
-                                        <div className="bg-white p-3 rounded-md text-sm" dangerouslySetInnerHTML={{ __html: delayNote }}></div>
+                                        {insufficientFunds && (
+                                            <div className="mt-4 p-4 bg-white rounded-lg">
+                                                <div className="p-3 bg-red-100 text-red-700 rounded-lg mb-4 text-center font-medium">
+                                                    ❌ KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ!
+                                                </div>
+                                                <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm {(total - (user?.credit || 0)).toLocaleString()} VND để tiếp tục</h4>
+                                                
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center">
+                                                        <span className="w-1/3 font-medium text-right pr-3">Tên NH:</span>
+                                                        <span>{bankInfo?.data?.name}</span>
+                                                    </div>
+
+                                                    <div className="flex items-center">
+                                                        <span className="w-1/3 font-medium text-right pr-3">STK:</span>
+                                                        <span>{bankInfo?.data?.number}</span>
+                                                    </div>
+
+                                                    <div className="flex items-center">
+                                                        <span className="w-1/3 font-medium text-right pr-3">Tên TK:</span>
+                                                        <span>VUONG TIEN DAT</span>
+                                                    </div>
+
+                                                    <div className="flex items-center">
+                                                        <span className="w-1/3 font-medium text-right pr-3">Nội dung CK:</span>
+                                                        <span>{bankInfo?.data?.message_credit}</span>
+                                                    </div>
+
+                                                    <div className="flex items-start">
+                                                        <span className="w-1/3 font-medium text-right pr-3">Mã QR:</span>
+                                                        <Image
+                                                            src={bankInfo?.data?.qr_link || ""}
+                                                            alt="QRCode"
+                                                            width={200}
+                                                            height={200}
+                                                            className="w-[200px] h-auto"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
