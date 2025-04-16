@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import Image from 'next/image';
+import WarningChatBox from '../_components/WarningChatBox';
 import { useFormById } from '@/hooks/form';
 import { useParams } from 'next/navigation';
 import Fetch from '@/lib/core/fetch/Fetch';
 import LoadingAbsolute from '@/components/loading';
 import { RawForm } from '@/store/types';
 import { Helper } from '@/services/Helper';
+import { useRouter } from 'next/navigation';
 
 interface ChatError {
     id: string;
@@ -25,10 +27,12 @@ export default function FormRate() {
     const { register, handleSubmit, watch, setValue } = useForm();
     const [isLoading, setIsLoading] = useState(false);
     const [reloadEvent, setReloadEvent] = useState(false);
+    const router = useRouter();
 
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const [chatOpen, setChatOpen] = useState<boolean>(true);
     const [chatErrors, setChatErrors] = useState<ChatError[]>([]);
+    const [isShowErrorMessage, setIsShowErrorMessage] = useState<boolean>(false);
 
     const onSubmit = async (data: any) => {
         // Handle form submission
@@ -195,7 +199,7 @@ export default function FormRate() {
                 let answers = question.answer || [];
 
                 if (latest_answers.length !== answers.length) {
-                    addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
+                    addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
                     continue;
                 }
                 
@@ -204,7 +208,7 @@ export default function FormRate() {
                     const answer = answers[j];
 
                     if (latest_answer.data != answer.data) {
-                        addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description}</b> với config mới nhất`, `00000`, "error");
+                        addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
                         break;
                     }
                 }
@@ -278,6 +282,7 @@ export default function FormRate() {
                     return 0;
                 });
                 setChatErrors(chatErrors);
+                setIsShowErrorMessage(false);
             }
 
             // Add event listeners for form validation
@@ -340,26 +345,6 @@ export default function FormRate() {
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
 
                     {(isLoading) && <LoadingAbsolute />}
-
-                    {isSaved && (
-                        <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md shadow-sm" role="alert">
-                            <div className="flex items-center text-center justify-center">
-                                <svg className="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                <p className="text-green-700 font-medium">Đã lưu dữ liệu thành công</p>
-                            </div>
-                            <div className="mt-3 text-center">
-                                <Link href={`/form/run/${dataForm?.form.id}`} className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
-                                    <span>Tạo yêu cầu điền đơn ngay!</span>
-                                    <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </Link>
-                            </div>
-                        </div>
-                    )}
-
                     <div className="container mx-auto mb-8">
                         <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo tỉ lệ mong muốn</h1>
 
@@ -578,12 +563,38 @@ export default function FormRate() {
                                         <div className='mb-4 text-green-700 font-medium'>
                                             Đã lưu dữ liệu thành công
                                         </div>
-                                        <Link href={`/form/run/${dataForm?.form.id}`} className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
-                                            <span>Tạo yêu cầu điền đơn ngay!</span>
-                                            <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                            </svg>
-                                        </Link>
+                                        <div className="space-y-4">
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setIsShowErrorMessage(true);
+                                                    if (!chatErrors.some(error => error.type === 'error')) {
+                                                        router.push(`/form/run/${dataForm?.form.id}`);
+                                                    }
+                                                }}
+                                                className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                                            >
+                                                <span>Tạo yêu cầu điền đơn ngay!</span>
+                                                <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                </svg>
+                                            </button>
+                                            {isShowErrorMessage && chatErrors.some(error => error.type === 'error') && (
+                                                <div className="flex flex-col space-y-2 text-red-700 bg-red-50 px-4 py-2 rounded-md border border-red-200 align-center justify-center" role="alert">
+                                                    <div className="flex items-center justify-center">
+                                                        <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                        </svg>
+                                                        <span className="text-sm font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
+                                                    </div>
+                                                    <ul className="list-disc list-inside text-sm pl-5">
+                                                        {chatErrors.filter(error => error.type === 'error').map((error, index) => (
+                                                            <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 )
                             }
@@ -592,110 +603,12 @@ export default function FormRate() {
                 </div>
             </section>
 
-            {/* Chat Container */}
-            <div className={`fixed bottom-4 right-4 w-80 bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 z-[9999] ${chatOpen ? 'h-96' : 'h-14'} border border-gray-200`}>
-                <div
-                    className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-3 flex items-center justify-between cursor-pointer"
-                    onClick={toggleChat}
-                >
-                    <div className="flex items-center">
-                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white bg-opacity-20 mr-2">
-                            <Image src="/static/img/logo-white-short.png" alt="Logo" width={20} height={20} className="h-5 w-auto" />
-                        </div>
-                        <span className="font-medium">Bé Fill Điền Form</span>
-                    </div>
-                    <div className="flex items-center">
-                        <div className="relative mr-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white text-opacity-90" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                            </svg>
-                            {chatErrors.length > 0 && (
-                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white">
-                                    {chatErrors.length}
-                                </span>
-                            )}
-                        </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transform transition-transform duration-300 ${chatOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                    </div>
-                </div>
-
-                {chatOpen && (
-                    <div className="p-4 h-[calc(100%-3.5rem)] overflow-y-auto">
-                        <div className="flex items-center space-x-2 mb-4 pb-2 border-b border-gray-100">
-                            <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
-                                <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <p className="text-xs font-medium text-gray-800">Bé Fill kiểm tra cấu hình</p>
-                        </div>
-
-                        <div className="text-xs space-y-3">
-                            <p className="bg-primary-50 p-2 rounded-lg rounded-tl-none text-gray-700">
-                                💡 Chào bạn! Bé Fill ở đây để giúp bạn check những rủi ro Config nha.
-                            </p>
-
-                            {chatErrors.length === 0 && (
-                                <div className="flex justify-center my-8">
-                                    <div className="text-center text-gray-500 text-xs">
-                                        <svg className="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <p>Chưa có lỗi nào</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {chatErrors.map((error) => (
-                                <div key={error.id} className="mt-2 relative">
-                                    <div className={`p-3 rounded-lg rounded-tl-none text-xs relative
-                                        ${error.type === "error" ? "bg-red-50 text-red-800" :
-                                            error.type === "warning" ? "bg-yellow-50 text-yellow-800" :
-                                                "bg-primary-50 text-blue-800"
-                                        }`}>
-                                        <button
-                                            className="absolute top-1 right-1 text-xs opacity-70 hover:opacity-100 transition-opacity"
-                                            onClick={() => removeChatError(error.id)}
-                                            aria-label="Close"
-                                        >
-                                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                        {error.type === "error" && (
-                                            <div className="flex items-center gap-1 mb-1 font-semibold">
-                                                <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                                <span>Lỗi!</span>
-                                            </div>
-                                        )}
-                                        {error.type === "warning" && (
-                                            <div className="flex items-center gap-1 mb-1 font-semibold">
-                                                <svg className="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                                <span>Cẩn thận!</span>
-                                            </div>
-                                        )}
-                                        {error.type === "note" && (
-                                            <div className="flex items-center gap-1 mb-1 font-semibold">
-                                                <svg className="h-4 w-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <span>Thông báo</span>
-                                            </div>
-                                        )}
-                                        <span className="text-xs" dangerouslySetInnerHTML={{ __html: error.message }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
+            <WarningChatBox
+                chatOpen={chatOpen}
+                chatErrors={chatErrors}
+                toggleChat={toggleChat}
+                removeChatError={removeChatError}
+            />
         </>
     );
 }
