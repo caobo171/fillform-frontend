@@ -197,7 +197,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
 
                         {
-                            (dataOrder.isLoading || dataOrder.isValidating) ? (
+                            (dataOrder.isLoading) ? (
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="w-[150px] h-[28px] rounded-lg bg-gray-200 animate-pulse" />
 

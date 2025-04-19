@@ -322,7 +322,7 @@ export default function FormPrefill() {
                                         {prefillForm?.loaddata && prefillForm?.loaddata?.map((data: any, index: any) => (
                                             <div key={index} className="p-2 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
                                                 <div className="md:flex md:items-start gap-8">
-                                                    <div className="md:w-2/5 mb-3 md:mb-0">
+                                                    <div className="md:w-2/5 mb-3 md:mb-0 flex-shrink-0">
                                                         <div className="bg-white p-3 rounded-md shadow-sm">
                                                             {data.description ? (
                                                                 <>
