@@ -56,7 +56,8 @@ export type RawForm = {
   slug: string,
   updatedAt: string,
   urlMain: string,
-  version: string
+  version: string,
+  sections: any,
 };
 
 export type RawUser = {

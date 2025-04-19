@@ -143,7 +143,7 @@ export default function FormRateOrder() {
                 //@ts-ignore
                 window.Frill?.('survey', { key: "fae72769-c0ae-4300-bf53-c7f787f9555d" })
             } else {
-                Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+                Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
                 console.error('Form submission failed');
             }
         } catch (error) {

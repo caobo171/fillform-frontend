@@ -13,6 +13,7 @@ import LoadingAbsolute from '@/components/loading';
 import { RawForm } from '@/store/types';
 import { Helper } from '@/services/Helper';
 import { useRouter } from 'next/navigation';
+import { QUESTION_TYPE } from '@/core/Constants';
 
 interface ChatError {
     id: string;
@@ -33,7 +34,6 @@ export default function FormRate() {
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const [chatOpen, setChatOpen] = useState<boolean>(true);
     const [chatErrors, setChatErrors] = useState<ChatError[]>([]);
-    const [isShowErrorMessage, setIsShowErrorMessage] = useState<boolean>(false);
 
     const onSubmit = async (data: any) => {
         // Handle form submission
@@ -164,8 +164,12 @@ export default function FormRate() {
         // "Other" option validation
         document.querySelectorAll(".js-answer-select").forEach((select: Element) => {
             if (select instanceof HTMLSelectElement) {
+                const questionDom = select.closest(".js-question");
+                const questionId = questionDom?.id?.replace("question-", "");
+
+                let question = dataForm?.latest_form_questions?.find(q => q.id == questionId);
                 if (select.value.toLowerCase().includes("other")) {
-                    addChatError(chatErrors, `Bạn chọn "other - bỏ qua không điền". Hãy kiểm tra lại đã tắt bắt buộc điền trên Google Form chưa?`, `select-error-${select.id}`, "warning");
+                    addChatError(chatErrors, `Bạn chọn "other - bỏ qua không điền". Hãy kiểm tra lại đã tắt bắt buộc điền câu hỏi <b>${question?.question} - ${question?.description || ''}</b> trên Google Form chưa?`, `select-error-${select.id}`, question?.required ? "error" : "warning");
                 }
             }
         });
@@ -183,15 +187,19 @@ export default function FormRate() {
         }
 
         let min_length = Math.min(latest_form_questions.length, dataForm?.form.loaddata?.length || 0);
-
-
         for (let i = 0; i < min_length; i++) {
             const latest_question = latest_form_questions[i];
             const question = dataForm?.form.loaddata[i];
+            
 
             if (question?.type != latest_question?.type) {
                 console.log(question, latest_question);
-                addChatError(chatErrors, `Có sự khác nhau giữa câu hỏi ${question.question} - ${question.description} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+                addChatError(chatErrors, `Có sự khác nhau giữa câu hỏi ${question.question} - ${question.description || ''} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+                continue;
+            }
+
+            if (question.type == QUESTION_TYPE.FILE) {
+                addChatError(chatErrors, `Chưa hỗ trợ câu hỏi loại file ${question.question} - ${question.description || ''}`, `00000`, "error");
                 continue;
             }
 
@@ -203,20 +211,39 @@ export default function FormRate() {
                     addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
                     continue;
                 }
-                
+
                 for (let j = 0; j < latest_answers.length; j++) {
                     const latest_answer = latest_answers[j];
                     const answer = answers[j];
 
                     if (latest_answer.data != answer.data) {
-                        addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
+                        addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời <b>${latest_answer.data}</b> trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
+                        break;
+                    }
+
+                    if (latest_answer.go_to_section != answer.go_to_section) {
+                        addChatError(chatErrors, `Có sự khác nhau về hướng đi theo câu trả lời <b>${latest_answer.data}</b> trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
                         break;
                     }
                 }
             }
-
         }
 
+        const latest_form_sections = dataForm?.latest_form_sections || [];
+        if (latest_form_sections.length !== dataForm?.form.sections?.length) {
+            addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu section hiện tại và dữ liệu section mới nhất. Hãy kiểm tra lại dữ liệu section mới nhất nhé!`, `00000`, "error");
+        }
+
+        const min_sections_length = Math.min(latest_form_sections.length, dataForm?.form.sections?.length || 0);
+
+        for (let i = 0; i < min_sections_length; i++) {
+            const latest_section = latest_form_sections[i];
+            const section = dataForm?.form.sections[i];
+            if (latest_section.next_section != section.next_section) {
+                addChatError(chatErrors, `Có sự khác nhau về điều hướng section với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
+                break;
+            }
+        }
 
 
         // Config validation logic
@@ -283,7 +310,6 @@ export default function FormRate() {
                     return 0;
                 });
                 setChatErrors(chatErrors);
-                setIsShowErrorMessage(false);
             }
 
             // Add event listeners for form validation
@@ -448,8 +474,8 @@ export default function FormRate() {
 
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-1 rounded-lg container mx-auto">
                         <div className="space-y-2">
-                            {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionId) => (
-                                <div key={questionId} className="p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionIndex) => (
+                                <div key={questionIndex} id={`question-${question.id}`} className="js-question p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
                                         <div className="md:w-1/4 md:max-w-1/4 md:min-w-1/4 mb-1 md:mb-0 flex-shrink-0">
                                             <div className="w-full">
@@ -545,58 +571,59 @@ export default function FormRate() {
                                 Lưu lại và tiếp tục
                             </button>
 
-                            {
-                                isSaved && (
-                                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4 text-center" role="alert">
-                                        <div className='mb-4 text-green-700 font-medium'>
-                                            Đã lưu dữ liệu thành công
-                                        </div>
-                                        <div className="space-y-4">
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    setIsShowErrorMessage(true);
-                                                    if (!chatErrors.some(error => error.type === 'error')) {
-                                                        router.push(`/form/run/${dataForm?.form.id}`);
-                                                    }
-                                                }}
-                                                className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-                                            >
-                                                <span>Tạo yêu cầu điền đơn ngay!</span>
-                                                <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                </svg>
-                                            </button>
-                                            {isShowErrorMessage && chatErrors.some(error => error.type === 'error') && (
-                                                <div className="flex flex-col space-y-4 text-red-700 bg-red-50 px-4 py-2 rounded-md border border-red-200 align-center justify-center" role="alert">
-                                                    <div className="flex items-center justify-center">
-                                                        <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                        </svg>
-                                                        <span className="text-sm font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
-                                                    </div>
-                                                    <ul className="list-disc list-inside text-sm pl-5">
-                                                        {chatErrors.filter(error => error.type === 'error').map((error, index) => (
-                                                            <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
-                                                        ))}
-                                                    </ul>
-                                                    <div className="flex justify-center">
-                                                        <button 
-                                                            onClick={() => router.push(`/form/run/${dataForm?.form.id}`)}
-                                                            className="inline-flex items-center px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-                                                        >
-                                                            Vẫn tiếp tục điền đơn
-                                                            <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
+                            {isSaved && !chatErrors.some(error => error.type === 'error') && (
+                                <div
+                                    className="animate-fade-in bg-green-50 border-l-4 border-green-600 p-6 mb-6 rounded-lg shadow-sm flex flex-col items-center text-center"
+                                    role="alert"
+                                >
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span className="text-green-800 font-semibold text-lg">Đã lưu dữ liệu thành công</span>
                                     </div>
-                                )
-                            }
+                                    <button
+                                        onClick={e => {
+                                            e.preventDefault();
+                                            router.push(`/form/run/${dataForm?.form.id}`);
+                                        }}
+                                        className="mt-2 mb-2 inline-flex items-center justify-center px-5 py-2 bg-primary-600 text-white font-medium rounded-md shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-all"
+                                    >
+                                        <span>Tạo yêu cầu điền đơn ngay!</span>
+                                        <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </button>
+
+                                </div>
+                            )}
+                            <div className="w-full mt-4 flex justify-center items-center">
+
+                                {isSaved && chatErrors.some(error => error.type === 'error') && (
+                                    <div className="w-full max-w-md mt-4 text-red-800 bg-red-50 px-5 py-4 rounded-lg border border-red-200 shadow flex flex-col items-center animate-shake" role="alert">
+                                        <div className="flex items-center mb-2">
+                                            <svg className="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <span className="text-base font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
+                                        </div>
+                                        <ul className="list-disc list-inside text-sm text-left pl-5 mb-3">
+                                            {chatErrors.filter(error => error.type === 'error').map((error, index) => (
+                                                <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
+                                            ))}
+                                        </ul>
+                                        <button
+                                            onClick={() => router.push(`/form/run/${dataForm?.form.id}`)}
+                                            className="inline-flex items-center px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all"
+                                        >
+                                            Vẫn chạy điền form
+                                            <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </form>
                 </div>

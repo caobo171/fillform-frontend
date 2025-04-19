@@ -64,6 +64,7 @@ export enum QUESTION_TYPE {
   TIME = 10,
   IMAGE_BLOCK = 11,
   VIDEO_BLOCK = 12,
+  FILE = 13,
   RATING = 18,
 }
 
