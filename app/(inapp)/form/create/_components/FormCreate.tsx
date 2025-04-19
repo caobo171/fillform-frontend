@@ -73,7 +73,7 @@ export default function FormCreate() {
                     </div>
 
                     {/* Form Section */}
-                    <div className="bg-white shadow-sm rounded-lg pb-6 mb-10">
+                    <div className="bg-white shadow-sm rounded-lg pb-6">
                         <form onSubmit={handleSubmit(onSubmit)} className="mb-4">
                             <InlineFormItem 
                                 label="Điền Edit Link Form" 
@@ -114,6 +114,21 @@ export default function FormCreate() {
                                 </div>
                             </div>
                         )}
+                    </div>
+
+                    {/* Storylane Demo Section - After Input Form */}
+                    <div className="border border-primary-100 rounded-lg overflow-hidden bg-primary-50 mb-4">
+                        <h3 className="text-lg font-bold px-4 py-2 bg-primary-100 border-b border-primary-200 text-primary-800">Xem Demo Trực Quan</h3>
+                        <div className="p-4">
+                            <iframe
+                                src="https://app.storylane.io/demo/3ad9zgkguwpw?embed=inline"
+                                title="Storylane Demo"
+                                width="100%"
+                                height="600"
+                                style={{ border: 'none', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+                                allowFullScreen
+                            ></iframe>
+                        </div>
                     </div>
 
                     {/* Guide Sections */}
@@ -199,7 +214,7 @@ export default function FormCreate() {
                                             Cần hỗ trợ? Liên hệ{' '}
                                             <a
                                                 href="https://www.facebook.com/fillformvn"
-                                                className="text-blue-600 hover:underline font-medium"
+                                                className="text-primary-600 hover:underline font-medium"
                                             >
                                                 FillForm - Điền form tự động
                                             </a>
@@ -217,6 +232,7 @@ export default function FormCreate() {
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

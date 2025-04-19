@@ -60,7 +60,8 @@ export const useFormById = (id: string) => {
 		const rest = await Fetch.postWithAccessToken<{
 			form: RawForm,
 			config: any,
-			latest_form_questions: any[]
+			latest_form_questions: any[],
+			latest_form_sections: any[],
 		}>(url, {
 			id: id
 		});
@@ -68,6 +69,7 @@ export const useFormById = (id: string) => {
 		return {
 			form: rest.data.form as RawForm,
 			config: rest.data.config as any,
+			latest_form_sections: rest.data.latest_form_sections as any[],
 			latest_form_questions: rest.data.latest_form_questions as any[]
 		};
 	});

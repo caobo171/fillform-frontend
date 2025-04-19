@@ -13,8 +13,10 @@ import Fetch from '@/lib/core/fetch/Fetch';
 import { Toast } from '@/services/Toast';
 import LoadingAbsolute from '@/components/loading';
 import { FormTypeNavigation } from "../../_components/FormTypeNavigation";
+import WarningChatBox from "../../_components/WarningChatBox";
+import { Helper } from "@/services/Helper";
 
-interface FormData {
+interface dataForm {
     slug: string;
     urlMain: string;
     name: string;
@@ -46,12 +48,19 @@ interface PrefillPageProps {
     };
 }
 
+interface ChatError {
+    id: string;
+    message: string;
+    type: 'error' | 'warning' | 'note';
+}
+
 export default function FormPrefill() {
     const router = useRouter();
     const { id } = useParams();
 
-    const { data: formData, isLoading: isLoadingForm } = useFormById(id as string);
+    const { data: dataForm, isLoading: isLoadingForm, mutate: mutateForm } = useFormById(id as string);
     const [isLoading, setIsLoading] = useState(false);
+    const [reloadEvent, setReloadEvent] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [fields, setFields] = useState<Field[] | null>(null);
     const [prefillForm, setPrefillForm] = useState<any>(null);
@@ -61,8 +70,14 @@ export default function FormPrefill() {
     const { data: user } = useMe();
     const bankInfo = useMyBankInfo();
 
-    const { register, handleSubmit, control, watch, setValue, reset } = useForm();
+    const [chatOpen, setChatOpen] = useState<boolean>(true);
+    const [chatErrors, setChatErrors] = useState<ChatError[]>([]);
+    const [isShowErrorMessage, setIsShowErrorMessage] = useState<boolean>(false);
 
+    const { register, handleSubmit, control, watch, setValue, reset } = useForm();
+    // Watch for delay value changes
+    const delayValue = watch("delay", 0);
+    const numRequest = prefillData.length;
 
     const onCheckData = async (event: any) => {
         setIsLoading(true);
@@ -71,7 +86,7 @@ export default function FormPrefill() {
         try {
             const res = await Fetch.postWithAccessToken<{ code: number, message: string, fields: any, prefillData: any, form: any }>('/api/form/get.prefill', {
                 data_url: urlData,
-                id: formData?.form?.id
+                id: dataForm?.form?.id
             });
 
             setFields(res.data?.fields);
@@ -83,16 +98,15 @@ export default function FormPrefill() {
             if (res.data?.form?.loaddata) {
                 // Reset any previous form values first
                 reset();
-                
                 // Set default values for each question based on the form data
                 res.data.form.loaddata.forEach((item: any) => {
                     if (item.id && item.field) {
                         setValue(`question_${item.id}`, item.field);
                     }
                 });
-                
+
             }
-            
+
             Toast.success('Dữ liệu đã được tải thành công!');
         } catch (err) {
             setError("Lỗi khi kiểm tra dữ liệu, vui lòng kiểm tra lại quyền truy cập Google Sheet của bạn!");
@@ -104,11 +118,17 @@ export default function FormPrefill() {
     const onSubmitPrefill = async (data: any) => {
         // This would be your API call to run the prefill
         console.log("Running prefill with data:", data);
+
+        if (chatErrors.some(error => error.type === 'error') && !isShowErrorMessage) {
+            setIsShowErrorMessage(true);
+            return;
+        }
+
         setIsLoading(true);
         setSubmitDisabled(true);
         try {
             const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.prefill.run', {
-                form_id: formData?.form?.id,
+                form_id: dataForm?.form?.id,
                 ...data,
                 delay_type: data.delay,
                 num_request: data.num_request,
@@ -120,7 +140,7 @@ export default function FormPrefill() {
                 Toast.success('Đã tạo yêu cầu điền form thành công!');
                 router.push(`/`);
             } else {
-                Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+                Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
                 console.error('Form submission failed');
             }
 
@@ -137,9 +157,127 @@ export default function FormPrefill() {
     };
 
 
-    // Watch for delay value changes
-    const delayValue = watch("delay", 0);
-    const numRequest = prefillData.length;
+
+    const toggleChat = (): void => {
+        setChatOpen(!chatOpen);
+    };
+
+    const removeChatError = (errorId: string): void => {
+        setChatErrors(chatErrors.filter(error => error.id !== errorId));
+    };
+
+    const addChatError = (chatErrors: ChatError[], message: string, errorId: string, type: 'error' | 'warning' | 'note'): void => {
+        // Check if error already exists
+        if (chatErrors.some(error => error.id === errorId)) return;
+        chatErrors.push({ id: errorId, message, type });
+    };
+
+
+    const validateConfig = (chatErrors: ChatError[]): void => {
+
+
+        if (!dataForm?.latest_form_questions) {
+            return addChatError(chatErrors, `Hiện tại hệ thống không thể kiểm tra config, hãy nhớ bật quyền chia sẻ nhé cho bất kì ai có link nhé`, `00000`, "error");
+        }
+
+        const latest_form_questions = dataForm?.latest_form_questions || [];
+        if (latest_form_questions.length !== dataForm?.form.loaddata?.length) {
+            addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu form hiện tại và dữ liệu form mới nhất. Hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+        }
+
+        let min_length = Math.min(latest_form_questions.length, dataForm?.form.loaddata?.length || 0);
+        for (let i = 0; i < min_length; i++) {
+            const latest_question = latest_form_questions[i];
+            const question = dataForm?.form.loaddata[i];
+
+            if (question?.type != latest_question?.type) {
+                console.log(question, latest_question);
+                addChatError(chatErrors, `Có sự khác nhau giữa câu hỏi ${question.question} - ${question.description} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+                continue;
+            }
+
+            if (Helper.isSelectType(question?.type)) {
+                let latest_answers = latest_question.answer || [];
+                let answers = question.answer || [];
+
+                if (latest_answers.length !== answers.length) {
+                    addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
+                    continue;
+                }
+
+                for (let j = 0; j < latest_answers.length; j++) {
+                    const latest_answer = latest_answers[j];
+                    const answer = answers[j];
+
+                    // if (latest_answer.data != answer.data) {
+                    //     addChatError(chatErrors, `Có sự khác nhau về cấu hình câu trả lời <b>${latest_answer.data}</b> trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
+                    //     break;
+                    // }
+
+                    if (latest_answer.go_to_section != answer.go_to_section) {
+                        addChatError(chatErrors, `Có sự khác nhau về hướng đi theo câu trả lời <b>${latest_answer.data}</b> trong câu hỏi <b>${question.question} - ${question.description || ''}</b> với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
+                        break;
+                    }
+                }
+            }
+        }
+
+        const latest_form_sections = dataForm?.latest_form_sections || [];
+        if (latest_form_sections.length !== dataForm?.form.sections?.length) {
+            addChatError(chatErrors, `Có sự khác nhau giữa dữ liệu section hiện tại và dữ liệu section mới nhất. Hãy kiểm tra lại dữ liệu section mới nhất nhé!`, `00000`, "error");
+        }
+
+        const min_sections_length = Math.min(latest_form_sections.length, dataForm?.form.sections?.length || 0);
+
+        for (let i = 0; i < min_sections_length; i++) {
+            const latest_section = latest_form_sections[i];
+            const section = dataForm?.form.sections[i];
+            if (latest_section.next_section != section.next_section) {
+                addChatError(chatErrors, `Có sự khác nhau về điều hướng section với config mới nhất của Google Form, hãy đồng bộ lại`, `00000`, "error");
+                break;
+            }
+        }
+
+
+        // Config validation logic
+        if (dataForm?.config?.lang === null) {
+            addChatError(chatErrors, `Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt thu thập email và tắt giới hạn trả lời nhé`, `00000`, "warning");
+        } else {
+            if (dataForm?.config?.isValidPublished === "false") {
+                addChatError(chatErrors, `<b>Google Form!</b> Form chưa Xuất bản/Publish. Nếu là Form cũ (trước 2025) có thể bỏ qua lỗi này.`, `00004`, "error");
+            } else if (dataForm?.config?.isValidPublished === "null") {
+                addChatError(chatErrors, `<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ Xuất bản/Publish Form nhé!`, `00004`, "warning");
+            }
+
+            if (dataForm?.config?.isValidCollectEmail === "false") {
+                addChatError(chatErrors, `<b>Google Form!</b> Phải chọn "Không thu thập email/ Do not Collect" trong setting.`, `00001`, "error");
+            } else if (dataForm?.config?.isValidCollectEmail === "null") {
+                addChatError(chatErrors, `Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt thu thập email. Phải chọn "Không thu thập email/ Do not Collect" trong setting nhé!`, `00001`, "warning");
+            }
+
+            if (dataForm?.config?.isValidEditAnswer === "false") {
+                addChatError(chatErrors, `<b>Google Form!</b> Phải tắt cho phép chỉnh sửa câu trả lời trong setting.`, `00002`, "error");
+            } else if (dataForm?.config?.isValidEditAnswer === "null") {
+                addChatError(chatErrors, `<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt "cho phép chỉnh sửa câu trả lời" trong setting nhé!`, `00001`, "warning");
+            }
+
+            if (dataForm?.config?.isValidLimitRes === "false") {
+                addChatError(chatErrors, `<b>Google Form!</b> Phải tắt mọi giới hạn trả lời trong setting.`, `00003`, "error");
+            } else if (dataForm?.config?.isValidLimitRes === "null") {
+                addChatError(chatErrors, `<b>Google Form!</b> Hiện tại hệ thống không thể kiểm tra config, hãy nhớ tắt mọi giới hạn trả lời trong setting nhé!`, `00001`, "warning");
+            }
+
+            if (dataForm?.config?.isValidCollectEmail === "true" &&
+                dataForm?.config?.isValidEditAnswer === "true" &&
+                dataForm?.config?.isValidLimitRes === "true" &&
+                dataForm?.config?.isValidPublished === "true") {
+                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy config tỉ lệ nhé.`, `00005`, "note");
+            }
+        }
+    };
+
+
+
 
     // Calculate total and delay message
     const calculatePriceAndDelay = () => {
@@ -180,9 +318,52 @@ export default function FormPrefill() {
         };
     };
 
+    const syncFormHandle = async (): Promise<void> => {
+        setIsLoading(true);
+        try {
+            await Fetch.postWithAccessToken('/api/form/sync.config', {
+                id: dataForm?.form.id,
+            });
+
+            await mutateForm();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+            setReloadEvent(!reloadEvent);
+        }
+    };
+
+
     const { pricePerAnswer, total, insufficientFunds, delayNote, message } = calculatePriceAndDelay();
 
-    if (isLoadingForm || !formData) {
+    useEffect(() => {
+        if (dataForm?.form && dataForm?.form.loaddata) {
+            const validateAll = () => {
+                let chatErrors: ChatError[] = [];
+                validateConfig(chatErrors);
+                chatErrors.sort((a, b) => {
+                    if (a.type === "error" && b.type !== "error") {
+                        return -1;
+                    } else if (a.type !== "error" && b.type === "error") {
+                        return 1;
+                    }
+                    return 0;
+                });
+                setChatErrors(chatErrors);
+            }
+
+
+            validateAll();
+
+            // Cleanup event listeners
+            return () => {
+            };
+        }
+    }, [dataForm, reloadEvent]);
+
+
+    if (isLoadingForm || !dataForm) {
         return (
             <LoadingAbsolute />
         );
@@ -195,8 +376,8 @@ export default function FormPrefill() {
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
                     <div className="container mx-auto mb-8">
                         <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo data có trước</h1>
-                        
-                        <FormTypeNavigation formId={formData?.form?.id} type={'prefill'} />
+
+                        <FormTypeNavigation formId={dataForm?.form?.id} type={'prefill'} />
 
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                             <div className="space-y-4 text-xs text-gray-700">
@@ -210,13 +391,22 @@ export default function FormPrefill() {
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
-                                    <p>Vui lòng xem kỹ hướng dẫn bên dưới trước khi thực hiện</p>
+                                    <p>Vui lòng xem kỹ hướng dẫn bên dưới trước khi thực hiện. Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=5UM5Q2-jsBI" className="text-primary-600 font-medium hover:underline">Xem tại đây</a></p>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                <div className="flex items-start gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                     </svg>
-                                    <p>Video hướng dẫn chi tiết: <a href="https://www.youtube.com/watch?v=5UM5Q2-jsBI" className="text-primary-600 font-medium hover:underline">Xem tại đây</a></p>
+                                    <p>
+                                        Nếu bạn có thay đổi ở Google Form, hãy
+                                        <button onClick={syncFormHandle} className="mx-1 px-3 py-0.5 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 transition inline-flex items-center">
+                                            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                            </svg>
+                                            đồng bộ lại cấu hình
+                                        </button>
+                                        để cập nhật lại nhé
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -236,16 +426,16 @@ export default function FormPrefill() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                             </svg>
                                         </span>
-                                        <input 
-                                            type="text" 
-                                            id="urlMain" 
+                                        <input
+                                            type="text"
+                                            id="urlMain"
                                             readOnly
-                                            value={formData?.form?.urlMain}
-                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-gray-50 text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" 
+                                            value={dataForm?.form?.urlMain}
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-gray-50 text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
-                                
+
                                 <div className="relative">
                                     <label htmlFor="formName" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
                                         Tên Form
@@ -256,16 +446,16 @@ export default function FormPrefill() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                             </svg>
                                         </span>
-                                        <input 
-                                            type="text" 
-                                            id="formName" 
+                                        <input
+                                            type="text"
+                                            id="formName"
                                             readOnly
-                                            value={formData?.form?.name}
-                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-gray-50 text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" 
+                                            value={dataForm?.form?.name}
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-gray-50 text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
-                                
+
                                 <div className="relative">
                                     <label htmlFor="dataUrl" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
                                         Link Data của bạn
@@ -276,18 +466,18 @@ export default function FormPrefill() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </span>
-                                        <input 
-                                            type="text" 
-                                            id="dataUrl" 
+                                        <input
+                                            type="text"
+                                            id="dataUrl"
                                             value={urlData}
                                             onChange={(e) => setUrlData(e.target.value)}
-                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" 
+                                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                                             placeholder="Nhập đường dẫn Google Sheet có đuôi /edit của bạn..."
                                         />
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <button
                                 type="submit"
                                 className="w-full mt-6 inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -312,7 +502,7 @@ export default function FormPrefill() {
                             </div>
                         </div>
                     )}
-                    
+
                     {fields ? (
                         <form onSubmit={handleSubmit(onSubmitPrefill)} className="container mx-auto">
                             <div className="space-y-6">
@@ -322,7 +512,7 @@ export default function FormPrefill() {
                                         {prefillForm?.loaddata && prefillForm?.loaddata?.map((data: any, index: any) => (
                                             <div key={index} className="p-2 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
                                                 <div className="md:flex md:items-start gap-8">
-                                                    <div className="md:w-2/5 mb-3 md:mb-0">
+                                                    <div className="md:w-2/5 mb-3 md:mb-0 flex-shrink-0">
                                                         <div className="bg-white p-3 rounded-md shadow-sm">
                                                             {data.description ? (
                                                                 <>
@@ -429,14 +619,14 @@ export default function FormPrefill() {
                                     <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 my-6">
                                         <h3 className="text-xl font-bold">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
                                         <p className="text-sm text-left w-full" dangerouslySetInnerHTML={{ __html: delayNote }}></p>
-                                        
+
                                         {insufficientFunds && (
                                             <div className="mt-4 p-4 bg-white rounded-lg">
                                                 <div className="p-3 bg-red-100 text-red-700 rounded-lg mb-4 text-center font-medium">
                                                     ❌ KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ!
                                                 </div>
                                                 <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm {(total - (user?.credit || 0)).toLocaleString()} VND để tiếp tục</h4>
-                                                
+
                                                 <div className="space-y-3">
                                                     <div className="flex items-center">
                                                         <span className="w-1/3 font-medium text-right pr-3">Tên NH:</span>
@@ -484,8 +674,26 @@ export default function FormPrefill() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    Bắt đầu điền form
+                                    {isShowErrorMessage ? 'Vẫn tiếp tục điền form' : 'Bắt đầu điền form'}
                                 </button>
+
+                                <div className="w-full mt-4 flex items-center justify-center">
+                                    {isShowErrorMessage && chatErrors.some(error => error.type === 'error') && (
+                                        <div className="w-full max-w-md text-red-800 bg-red-50 px-5 py-4 rounded-lg border border-red-200 shadow flex flex-col items-center animate-shake text-center" role="alert">
+                                            <div className="flex items-center mb-2">
+                                                <svg className="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span className="text-base font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
+                                            </div>
+                                            <ul className="list-disc list-inside text-sm text-left pl-5 mb-3">
+                                                {chatErrors.filter(error => error.type === 'error').map((error, index) => (
+                                                    <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </form>
                     ) : (
@@ -528,23 +736,23 @@ export default function FormPrefill() {
                                             <span className="text-primary-600 font-bold">•</span>
                                             <span><strong>Tự luận:</strong> Nhập trực tiếp đáp án, cố hạn chế dấu , ; và xuống dòng</span>
                                         </p>
-                                        
+
                                         <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 text-blue-800">
                                             <p className="font-semibold mb-1">Data mẫu (thông tin cá nhân đều là thông tin ảo):</p>
-                                            <a href="https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit" 
-                                               className="text-blue-600 hover:underline" 
-                                               target="_blank" 
-                                               rel="noopener noreferrer">
+                                            <a href="https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit"
+                                                className="text-blue-600 hover:underline"
+                                                target="_blank"
+                                                rel="noopener noreferrer">
                                                 https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit
                                             </a>
                                         </div>
-                                        
+
                                         <div className="mt-3 p-3 bg-yellow-50 rounded-md border border-yellow-100 text-yellow-800">
                                             <p>Bạn có thể sử dụng tính năng <strong>mã hóa data</strong> để có data chuẩn hóa nhanh chóng (Hướng dẫn tại link video đầu trang).</p>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div className="flex justify-center items-center">
                                     <div className="relative rounded-md overflow-hidden shadow-md border border-gray-200">
                                         <Image
@@ -578,7 +786,7 @@ export default function FormPrefill() {
                                         </p>
                                     </div>
                                 </div>
-                                
+
                                 <div className="flex justify-center items-center">
                                     <div className="relative rounded-md overflow-hidden shadow-md border border-gray-200">
                                         <Image
@@ -620,7 +828,7 @@ export default function FormPrefill() {
                                         </p>
                                     </div>
                                 </div>
-                                
+
                                 <div className="flex justify-center items-center">
                                     <div className="relative rounded-md overflow-hidden shadow-md border border-gray-200">
                                         <Image
@@ -640,6 +848,14 @@ export default function FormPrefill() {
                     )}
                 </div>
             </section>
+
+
+            <WarningChatBox
+                chatOpen={chatOpen}
+                chatErrors={chatErrors}
+                toggleChat={toggleChat}
+                removeChatError={removeChatError}
+            />
         </>
     );
 }
