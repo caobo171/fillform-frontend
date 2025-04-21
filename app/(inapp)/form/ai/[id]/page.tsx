@@ -268,14 +268,12 @@ export default function FormAIOrder() {
     setIsLoading(true);
 
     try {
-      const response = await Fetch.post<ApiResponse>('/api/orders', {
-        formId: dataForm.form.id,
-        type: 'ai',
-        numRequest: parseInt(numRequest),
-        expectedOutcome,
-        delayType: parseInt(delayType),
+      const response = await Fetch.postWithAccessToken<ApiResponse>('/api/order/create.agent.run', {
+        form_id: dataForm.form.id,
+        num_request: parseInt(numRequest),
+        expected_outcome: expectedOutcome,
+        delay_type: parseInt(delayType),
         email,
-        total
       });
 
       if (response.data.code === Code.SUCCESS) {
@@ -284,7 +282,6 @@ export default function FormAIOrder() {
           numRequest: parseInt(numRequest),
           expectedOutcome,
           delayType: parseInt(delayType),
-          total
         });
 
         Toast.success('Đặt đơn thành công');
