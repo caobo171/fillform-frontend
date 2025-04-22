@@ -3,7 +3,6 @@
 import 'driver.js/dist/driver.css';
 import { Inter } from 'next/font/google';
 import { ReactElement } from 'react';
-import 'react-quill/dist/quill.snow.css';
 import { Provider } from 'react-redux';
 import 'react-responsive-modal/styles.css';
 import 'react-toastify/dist/ReactToastify.css';

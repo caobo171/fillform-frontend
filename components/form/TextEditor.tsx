@@ -1,11 +1,8 @@
 'use client'
 import React from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import clsx from 'clsx';
 
 import './TextEditor.css';
-import { ReactQuillNoSSR } from './NoSSR';
 
 type TextEditorProps = {
   className?: string;
@@ -41,12 +38,6 @@ export function TextEditor(props: TextEditorProps) {
   const { className, ...rest } = props;
 
   return (
-    <ReactQuillNoSSR
-      className={clsx('text-editor pb-[42px]', className)}
-      modules={modules}
-      formats={formats}
-      theme="snow"
-      {...rest}
-    />
+    <></>
   );
 }
