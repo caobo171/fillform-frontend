@@ -140,8 +140,16 @@ export default function FormRateOrder() {
                 Toast.success('Đã tạo yêu cầu điền form thành công!');
                 router.push(`/`);
 
+                const win = window as any;
                 //@ts-ignore
-                window.Frill?.('survey', { key: "fae72769-c0ae-4300-bf53-c7f787f9555d" })
+                if (win.PulseSurvey.surveyIgnored('My5wdWxzZXN1cnZleXM')) {
+                    console.log('User has ignored the survey');
+                } else if (win.PulseSurvey.surveyResponded('My5wdWxzZXN1cnZleXM')) {
+                    console.log('User has answered the survey');
+                } else {
+                    // You can call to show survey directly
+                    win.PulseSurvey.showSurvey('My5wdWxzZXN1cnZleXM');
+                }
             } else {
                 Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
                 console.error('Form submission failed');
