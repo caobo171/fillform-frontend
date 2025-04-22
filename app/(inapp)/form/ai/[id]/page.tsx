@@ -285,6 +285,7 @@ export default function FormAIOrder() {
         });
 
         Toast.success('Đặt đơn thành công');
+        router.push(`/`);
       } else {
         Toast.error(response.data.message || 'Có lỗi xảy ra');
       }
