@@ -102,7 +102,11 @@ export default function FormPrefill() {
                 // Set default values for each question based on the form data
                 res.data.form.loaddata.forEach((item: any) => {
                     if (item.id && item.field) {
-                        setValue(`question_${item.id}`, item.field);
+                        let foundField = res.data.fields.find((field: any) => Helper.purify(field.label) == Helper.purify(item.field));
+                        if (foundField) {
+                            setValue(`question_${item.id}`, foundField.id);
+                        }
+
                     }
                 });
 
@@ -285,7 +289,7 @@ export default function FormPrefill() {
                 dataForm?.config?.isValidEditAnswer === "true" &&
                 dataForm?.config?.isValidLimitRes === "true" &&
                 dataForm?.config?.isValidPublished === "true") {
-                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy config tỉ lệ nhé.`, `00005`, "note");
+                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy chuẩn bị data và nhập link data để bắt đầu.`, `00005`, "note");
             }
         }
     };
@@ -553,8 +557,8 @@ export default function FormPrefill() {
                                                                 defaultValue={data.field}
                                                             >
                                                                 {fields && fields.map((field: any) => (
-                                                                    <option key={field.value} value={field.value}>
-                                                                        {field.value}
+                                                                    <option key={field.id} value={field.id}>
+                                                                        {field.label}
                                                                     </option>
                                                                 ))}
                                                             </select>
