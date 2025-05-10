@@ -67,6 +67,9 @@ export type RawUser = {
   credit: number;
   is_super_admin: number;
   createdAt: string;
+  isAffiliate: boolean;
+  idcredit: string;
+  referCredit: number;
 };
 
 

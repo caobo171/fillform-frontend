@@ -1,0 +1,254 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Loader2, Copy, CheckCircle } from 'lucide-react'
+import Fetch from '@/lib/core/fetch/Fetch'
+import { Toast } from '@/services/Toast'
+import { AFFILIATE_URL, Code, REFER_PERCENT } from '@/core/Constants'
+import { useMe } from '@/hooks/user'
+import Constants from '@/utils/transcriber/Constants'
+import { useAsync } from 'react-use'
+import { RawUser } from '@/store/types'
+
+interface ReferralUser {
+  username: string
+  registrationDate: string
+}
+
+export default function AffiliateDashboard() {
+  const { data: user } = useMe()
+
+  const [copySuccess, setCopySuccess] = useState(false)
+  const [withdrawalLoading, setWithdrawalLoading] = useState(false)
+  const referrals = useAsync(async () => {
+    if (user) {
+      const res = await Fetch.postWithAccessToken<any>(`/api/affiliate/list.user`, {})
+      if (res.data.code === Code.SUCCESS) {
+        return res.data.users
+      }
+    }
+    return []
+  })
+  const [withdrawalForm, setWithdrawalForm] = useState({
+    bankName: '',
+    accountNumber: '',
+    accountName: ''
+  })
+
+  // Referral link
+  const referralLink = `${AFFILIATE_URL}/authentication/register?ref=${user?.idcredit}`
+
+  // Handle copy to clipboard
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(referralLink)
+      setCopySuccess(true)
+      setTimeout(() => setCopySuccess(false), 2000)
+    } catch (err) {
+      Toast.error('Không thể sao chép liên kết')
+    }
+  }
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setWithdrawalForm(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  // Handle withdrawal request
+  const handleWithdrawalRequest = async () => {
+    if (!withdrawalForm.bankName || !withdrawalForm.accountNumber || !withdrawalForm.accountName) {
+      Toast.error('Vui lòng điền đầy đủ thông tin')
+      return
+    }
+
+    setWithdrawalLoading(true)
+    try {
+      const res = await Fetch.postWithAccessToken<any>('/api/affiliate/withdraw', withdrawalForm)
+      
+      if (res.data.code === Code.SUCCESS) {
+        Toast.success('Yêu cầu rút tiền đã được gửi')
+        // Reset form
+        setWithdrawalForm({
+          bankName: '',
+          accountNumber: '',
+          accountName: ''
+        })
+      } else {
+        Toast.error(res.data.message || 'Có lỗi xảy ra')
+      }
+    } catch (error) {
+      Toast.error('Có lỗi xảy ra khi gửi yêu cầu')
+    } finally {
+      setWithdrawalLoading(false)
+    }
+  }
+
+
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f9fafb] py-6 px-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left Column */}
+        <div className="space-y-6">
+          {/* Affiliate Account Information */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Tài khoản Affiliate</h2>
+            <div className="space-y-2">
+              <p><span className="font-medium">Email:</span> {user.email}</p>
+              <p><span className="font-medium">Số hoa hồng tích lũy:</span> {user?.referCredit || 0} VND</p>
+              <p><span className="font-medium">Số hoa hồng đã nhận:</span> {user?.referCreditDone || 0} VND</p>
+            </div>
+          </div>
+
+          {/* Withdrawal Request Form */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Yêu cầu rút tiền</h2>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="bankName" className="block text-sm font-medium text-gray-700 mb-1">Ngân hàng</label>
+                <input
+                  type="text"
+                  id="bankName"
+                  name="bankName"
+                  value={withdrawalForm.bankName}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Tên ngân hàng"
+                />
+              </div>
+              <div>
+                <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 mb-1">Số tài khoản</label>
+                <input
+                  type="text"
+                  id="accountNumber"
+                  name="accountNumber"
+                  value={withdrawalForm.accountNumber}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Số tài khoản"
+                />
+              </div>
+              <div>
+                <label htmlFor="accountName" className="block text-sm font-medium text-gray-700 mb-1">Tên tài khoản</label>
+                <input
+                  type="text"
+                  id="accountName"
+                  name="accountName"
+                  value={withdrawalForm.accountName}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Tên tài khoản"
+                />
+              </div>
+              <button
+                onClick={handleWithdrawalRequest}
+                disabled={withdrawalLoading || (user?.referCredit || 0) < 100000}
+                className={`w-full py-2 px-4 rounded-md text-white font-medium flex items-center justify-center ${(user?.referCredit || 0) < 100000 ? 'bg-gray-400 cursor-not-allowed' : withdrawalLoading ? 'bg-blue-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+              >
+                {withdrawalLoading ? (
+                  <>
+                    <span>Đang xử lý...</span>
+                    <Loader2 className="ml-2 w-4 h-4 animate-spin" />
+                  </>
+                ) : 'Yêu cầu rút tiền'}
+              </button>
+              {(user?.referCredit || 0) < 100000 && (
+                <p className="text-sm text-red-500">Hoa hồng phải đạt tối thiểu 100.000 VND để rút tiền</p>
+              )}
+            </div>
+          </div>
+
+          {/* Affiliate Benefits */}
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Quyền lợi của bạn:</h3>
+            <ul className="space-y-2 text-sm text-blue-700">
+              <li>- Chỉ được tính affiliate với tài khoản giới thiệu đăng kí mới.</li>
+              <li>- FillForm sẽ tặng bạn {REFER_PERCENT}% trên mỗi giao dịch nạp tiền thành công của người được giới thiệu.</li>
+              <li>- Hoa hồng phải đạt 100.000 VND mới được yêu cầu rút tiền.</li>
+              <li>- Tài khoản đang bị lỗi hoặc lạm dụng, spam sẽ bị từ chối tính affiliate.</li>
+            </ul>
+            
+            <h3 className="text-lg font-medium text-blue-800 mt-4 mb-2">Quyền lợi của bạn bè được giới thiệu:</h3>
+            <p className="text-sm text-blue-700">- Được tặng ngay 5000 credit vào tài khoản đăng kí mới.</p>
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          {/* Program Info */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Chương trình affiliate</h2>
+            <p className="mb-3">Giới thiệu ngay để nhận {REFER_PERCENT}% mỗi giao dịch tự động</p>
+            <p className="mb-4">Copy link dưới đây và chia sẻ với bạn bè để đăng ký dùng FillForm nhé!</p>
+            
+            {/* Referral Link */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Link giới thiệu của bạn</label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={referralLink}
+                  readOnly
+                  className="flex-1 p-2 border border-gray-300 rounded-md bg-gray-50"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                  title="Sao chép liên kết"
+                >
+                  {copySuccess ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Referral List */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Danh sách giới thiệu</h2>
+            {referrals.loading ? (
+              <div className="flex justify-center items-center h-32">
+                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+              </div>
+            ) : referrals.value?.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày đăng kí</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {referrals.value?.map((referral: RawUser, index: number) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{referral.username}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{new Date(referral.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>Bạn chưa có người dùng giới thiệu nào</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

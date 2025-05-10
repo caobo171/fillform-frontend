@@ -5,9 +5,11 @@ const FAKE_DATA = {
 
 const IMAGE_URL = 'https://d2inr1ykkgbz5g.cloudfront.net/';
 
-export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://appv2.fillform.info';
+export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.fillform.info';
 
-export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://appv2.fillform.info';
+export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.fillform.info';
+
+export const AFFILIATE_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000' : 'https://app.fillform.info';
 
 export const POSTHOG_KEY = process.env.NODE_ENV !== 'production' ? 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD' : 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD';
 export const POSTHOG_HOST = process.env.NODE_ENV !== 'production' ? 'https://us.i.posthog.com' : 'https://us.i.posthog.com';
@@ -162,3 +164,6 @@ export const BANK_INFO = {
     }
   }
 }
+
+
+export const REFER_PERCENT = 15;

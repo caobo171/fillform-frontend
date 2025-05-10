@@ -1,8 +1,6 @@
 import {
   ArrowRightStartOnRectangleIcon,
-  ChatBubbleOvalLeftEllipsisIcon,
-  Cog6ToothIcon,
-  FolderIcon,
+  CurrencyDollarIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 import React, { useMemo } from 'react';
@@ -50,6 +48,18 @@ export function UserMenu({ data }: UserMenuProps) {
         href: '/admin',
       });
     }
+
+
+
+    options.push({
+      label: (
+        <div className={dropdownItemCls}>
+          <CurrencyDollarIcon className="w-5 h-5" /> Affiliate
+        </div>
+      ),
+      value: 'affiliate',
+      href: '/affiliate',
+    });
 
 
 

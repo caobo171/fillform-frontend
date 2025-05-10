@@ -3,8 +3,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { XCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -52,18 +52,29 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function Register() {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get('ref');
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setValue,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
 
+  useEffect(() => {
+    if (refCode) {
+      setValue('referCode', refCode);
+    }
+  }, [refCode]);
+
   const onSubmit: SubmitHandler<RegisterFormValues> = async (formData) => {
     const { username, password, email, confirmPassword, referCode } = formData;
+
+    console.log(formData);
 
     try {
       const res: AnyObject = await Fetch.post('/api/auth/signup', {
@@ -178,6 +189,7 @@ export default function Register() {
 
               <FormItem label="Mã giới thiệu (nếu có)" className="mb-8">
                 <Controller
+                  
                   render={({ field }) => <Input size="large" {...field} />}
                   name="referCode"
                   control={control}
@@ -213,3 +225,7 @@ export default function Register() {
     </>
   );
 }
+function setValue(arg0: string, refCode: string) {
+  throw new Error('Function not implemented.');
+}
+

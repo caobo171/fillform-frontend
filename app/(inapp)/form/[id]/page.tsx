@@ -510,7 +510,7 @@ export default function FormRate() {
                                                                     <input
                                                                         type="number"
                                                                         min="0"
-                                                                        step="1"
+                                                                        step="any"
                                                                         id={`answer_${answer.id}`}
                                                                         {...register(`answer_${answer.id}`)}
                                                                         defaultValue={answer.count}

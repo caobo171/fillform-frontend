@@ -30,7 +30,7 @@ function Meta({
       <meta property="og:type" content="website" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:url" content={url || 'https://appv2.fillform.info/'} />
+      <meta property="og:url" content={url || 'https://app.fillform.info/'} />
       <meta property="og:site_name" content="Fillform" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
