@@ -70,6 +70,8 @@ export type RawUser = {
   isAffiliate: boolean;
   idcredit: string;
   referCredit: number;
+  referId: number;
+  referCreditDone: number;
 };
 
 
