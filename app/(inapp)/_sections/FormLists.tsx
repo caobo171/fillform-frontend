@@ -64,15 +64,17 @@ export default function FormLists({ admin }: { admin?: boolean }) {
   );
 
   useEffect(() => {
-    setSearch(searchParams.get('q') || '');
-    setCurrentFormPage(1);
-    dataForm.mutate();
-  }, [searchParams.get('q')]);
-
-  useEffect(() => {
+    const searchQuery = searchParams.get('q') || '';
+    setSearch(searchQuery);
     setCurrentFormPage(page);
-    dataForm.mutate();
-  }, [page]);
+    
+    // Only mutate once after state updates are complete
+    const timeoutId = setTimeout(() => {
+      dataForm.mutate();
+    }, 0);
+    
+    return () => clearTimeout(timeoutId);
+  }, [searchParams, page]);
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">

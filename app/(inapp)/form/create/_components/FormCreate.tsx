@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { XCircle } from 'lucide-react'
@@ -26,16 +26,34 @@ export default function FormCreate() {
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const [msg, setMsg] = useState<string>('');
+    const [isViewFormLink, setIsViewFormLink] = useState<boolean>(false);
 
     const {
         control,
         handleSubmit,
+        watch,
         formState: { isSubmitting, errors },
     } = useForm<CreateFormValues>();
+    
+    const formLink = watch('form_link');
+    
+    useEffect(() => {
+        if (formLink && formLink.includes('/viewform')) {
+            setIsViewFormLink(true);
+        } else {
+            setIsViewFormLink(false);
+            setMsg('');
+        }
+    }, [formLink]);
 
     const onSubmit = async (formData: CreateFormValues) => {
         if (!formData.form_link) {
             setMsg('Vui lòng nhập đường dẫn edit form!');
+            return;
+        }
+        
+        if (formData.form_link.includes('/viewform')) {
+            setMsg('Bạn đang sử dụng link xem form (/viewform). Vui lòng sử dụng link edit form (/edit) thay thế!');
             return;
         }
 
@@ -111,6 +129,42 @@ export default function FormCreate() {
                                 <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
                                     <XCircle className="w-5 h-5 flex-shrink-0" /> 
                                     <span>{msg}</span>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* ViewForm Link Warning */}
+                        {isViewFormLink && (
+                            <div className="mt-4">
+                                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                                    <h4 className="text-red-700 font-bold mb-2 flex items-center gap-2">
+                                        <XCircle className="w-5 h-5" />
+                                        Bạn đang sử dụng link xem form (/viewform)
+                                    </h4>
+                                    <p className="text-red-700 mb-4">
+                                        Vui lòng sử dụng link <strong>edit form</strong> có đuôi <strong>/edit</strong> thay vì link xem form có đuôi <strong>/viewform</strong>.
+                                    </p>
+                                    <div className="bg-white p-3 rounded border border-red-100 mb-3">
+                                        <p className="text-sm font-medium text-gray-700 mb-2">Link xem form (không đúng):</p>
+                                        <p className="text-xs bg-red-50 p-2 rounded overflow-auto text-red-700 font-mono">
+                                            https://docs.google.com/forms/d/xxx/viewform
+                                        </p>
+                                    </div>
+                                    <div className="bg-white p-3 rounded border border-green-100">
+                                        <p className="text-sm font-medium text-gray-700 mb-2">Link edit form (đúng):</p>
+                                        <p className="text-xs bg-green-50 p-2 rounded overflow-auto text-green-700 font-mono">
+                                            https://docs.google.com/forms/d/xxx/edit
+                                        </p>
+                                    </div>
+                                    <div className="mt-4">
+                                        <Image
+                                            src="/static/img/guide-s1.png"
+                                            alt="Edit Link Guide"
+                                            width={600}
+                                            height={400}
+                                            className="w-full rounded-lg shadow-sm border border-gray-200"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
