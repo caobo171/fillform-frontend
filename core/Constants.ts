@@ -167,3 +167,4 @@ export const BANK_INFO = {
 
 
 export const REFER_PERCENT = 15;
+export const MIN_DRAW_CREDIT = 100000;

@@ -154,9 +154,9 @@ export default function Users() {
   const columns: TableProps<RawUser>['columns'] = useMemo(
     () => [
       {
-        title: 'Id',
-        key: 'id',
-        dataIndex: 'id',
+        title: 'Id Credit',
+        key: 'idcredit',
+        dataIndex: 'idcredit',
         className: '',
       },
 

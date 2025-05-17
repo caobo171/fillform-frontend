@@ -4,22 +4,29 @@ import { useState, useEffect } from 'react'
 import { Loader2, Copy, CheckCircle } from 'lucide-react'
 import Fetch from '@/lib/core/fetch/Fetch'
 import { Toast } from '@/services/Toast'
-import { AFFILIATE_URL, Code, REFER_PERCENT } from '@/core/Constants'
+import { AFFILIATE_URL, Code, MIN_DRAW_CREDIT, REFER_PERCENT } from '@/core/Constants'
 import { useMe } from '@/hooks/user'
 import Constants from '@/utils/transcriber/Constants'
 import { useAsync } from 'react-use'
 import { RawUser } from '@/store/types'
-
-interface ReferralUser {
-  username: string
-  registrationDate: string
-}
+import useSWR, { mutate } from 'swr'
 
 export default function AffiliateDashboard() {
   const { data: user } = useMe()
 
   const [copySuccess, setCopySuccess] = useState(false)
-  const [withdrawalLoading, setWithdrawalLoading] = useState(false)
+  const [withdrawalLoading, setWithdrawalLoading] = useState(false);
+
+  const withdrawRequests = useSWR('/api/affiliate/list.withdraw', async () => {
+    if (user) {
+      const res = await Fetch.postWithAccessToken<any>(`/api/affiliate/list.withdraw`, {})
+      if (res.data.code === Code.SUCCESS) {
+        return res.data.requests
+      }
+    }
+    return []
+  })
+
   const referrals = useAsync(async () => {
     if (user) {
       const res = await Fetch.postWithAccessToken<any>(`/api/affiliate/list.user`, {})
@@ -67,7 +74,7 @@ export default function AffiliateDashboard() {
 
     setWithdrawalLoading(true)
     try {
-      const res = await Fetch.postWithAccessToken<any>('/api/affiliate/withdraw', withdrawalForm)
+      const res = await Fetch.postWithAccessToken<any>('/api/affiliate/request.withdraw', withdrawalForm)
       
       if (res.data.code === Code.SUCCESS) {
         Toast.success('Yêu cầu rút tiền đã được gửi')
@@ -77,6 +84,9 @@ export default function AffiliateDashboard() {
           accountNumber: '',
           accountName: ''
         })
+
+        withdrawRequests.mutate();
+        mutate('/api/me/profile');
       } else {
         Toast.error(res.data.message || 'Có lỗi xảy ra')
       }
@@ -106,8 +116,8 @@ export default function AffiliateDashboard() {
             <h2 className="text-xl font-bold mb-4">Tài khoản Affiliate</h2>
             <div className="space-y-2">
               <p><span className="font-medium">Email:</span> {user.email}</p>
-              <p><span className="font-medium">Số hoa hồng tích lũy:</span> {user?.referCredit || 0} VND</p>
-              <p><span className="font-medium">Số hoa hồng đã nhận:</span> {user?.referCreditDone || 0} VND</p>
+              <p><span className="font-medium">Số hoa hồng tích lũy:</span> {user?.referCredit?.toLocaleString() || 0} VND</p>
+              <p><span className="font-medium">Số hoa hồng đã nhận:</span> {user?.referCreditDone?.toLocaleString() || 0} VND</p>
             </div>
           </div>
 
@@ -153,8 +163,8 @@ export default function AffiliateDashboard() {
               </div>
               <button
                 onClick={handleWithdrawalRequest}
-                disabled={withdrawalLoading || (user?.referCredit || 0) < 100000}
-                className={`w-full py-2 px-4 rounded-md text-white font-medium flex items-center justify-center ${(user?.referCredit || 0) < 100000 ? 'bg-gray-400 cursor-not-allowed' : withdrawalLoading ? 'bg-blue-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                disabled={withdrawalLoading || (user?.referCredit || 0) < MIN_DRAW_CREDIT}
+                className={`w-full py-2 px-4 rounded-md text-white font-medium flex items-center justify-center ${(user?.referCredit || 0) < MIN_DRAW_CREDIT ? 'bg-gray-400 cursor-not-allowed' : withdrawalLoading ? 'bg-blue-400' : 'bg-blue-500 hover:bg-blue-600'}`}
               >
                 {withdrawalLoading ? (
                   <>
@@ -163,8 +173,8 @@ export default function AffiliateDashboard() {
                   </>
                 ) : 'Yêu cầu rút tiền'}
               </button>
-              {(user?.referCredit || 0) < 100000 && (
-                <p className="text-sm text-red-500">Hoa hồng phải đạt tối thiểu 100.000 VND để rút tiền</p>
+              {(user?.referCredit || 0) < MIN_DRAW_CREDIT && (
+                <p className="text-sm text-red-500">Hoa hồng phải đạt tối thiểu {MIN_DRAW_CREDIT.toLocaleString()} VND để rút tiền</p>
               )}
             </div>
           </div>
@@ -244,6 +254,49 @@ export default function AffiliateDashboard() {
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <p>Bạn chưa có người dùng giới thiệu nào</p>
+              </div>
+            )}
+          </div>
+          
+          {/* Withdrawal Requests List */}
+          <div className="bg-white rounded-lg p-6 shadow-sm mt-6">
+            <h2 className="text-xl font-bold mb-4">Danh sách yêu cầu rút tiền</h2>
+            {!withdrawRequests.data ? (
+              <div className="flex justify-center items-center h-32">
+                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+              </div>
+            ) : withdrawRequests.data?.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số tiền</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngân hàng</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày yêu cầu</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {withdrawRequests.data?.map((request: any, index: number) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{request.amount?.toLocaleString()} VND</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{request.bankName} - {request.accountNumber}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${request.status === 'done' ? 'bg-green-100 text-green-800' : request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
+                            {request.status === 'done' ? 'Đã thanh toán' : request.status === 'pending' ? 'Đang xử lý' : request.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{new Date(request.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>Bạn chưa có yêu cầu rút tiền nào</p>
               </div>
             )}
           </div>

@@ -4,7 +4,7 @@ import Fetch from '@/lib/core/fetch/Fetch'
 import { mutate } from 'swr'
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react';
-import { Code, REFER_PERCENT } from '@/core/Constants';
+import { Code, MIN_DRAW_CREDIT, REFER_PERCENT } from '@/core/Constants';
 import { Toast } from '@/services/Toast';
 
 export default function AffiliateComponent() {
@@ -45,7 +45,7 @@ export default function AffiliateComponent() {
               <ul className="list-disc pl-6 space-y-2 text-gray-700">
                 <li>Chỉ được tính affiliate với tài khoản giới thiệu đăng kí mới.</li>
                 <li>FillForm sẽ tặng bạn <span className="font-semibold text-blue-600">{REFER_PERCENT}%</span> trên mỗi giao dịch nạp tiền/thanh công của người được giới thiệu.</li>
-                <li>Hoa hồng phải đạt <span className="font-semibold text-blue-600">100.000 VND</span> mới được yêu cầu rút tiền.</li>
+                <li>Hoa hồng phải đạt <span className="font-semibold text-blue-600">{MIN_DRAW_CREDIT.toLocaleString()} VND</span> mới được yêu cầu rút tiền.</li>
                 <li>Tài khoản đăng kí lại hoặc lạm dụng, spam sẽ bị từ chối tính affiliate.</li>
               </ul>
             </div>
