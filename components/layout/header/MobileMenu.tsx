@@ -1,4 +1,4 @@
-import { Dialog } from '@headlessui/react';
+import { Dialog, DialogPanel } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import React, { useMemo } from 'react';
@@ -53,6 +53,7 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
 
   const moreItems = useMemo(() => {
     const items = [
+      {name: 'Affiliate', href: '/affiliate'}
     ];
 
     if (ACL.isAdmin(user)) {
@@ -77,7 +78,7 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
   return (
     <Dialog as="div" className="semi-lg:hidden" open={open} onClose={onClose}>
       <div className="fixed inset-0 z-200" />
-      <Dialog.Panel className="fixed inset-y-0 right-0 z-30 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+      <DialogPanel className="fixed inset-y-0 right-0 z-30 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
         <div className="flex flex-col gap-4 items-center">
           <div className="w-full flex items-center justify-between">
             {user ? (
@@ -172,7 +173,7 @@ export function MobileMenu({ open, onClose, user, menu }: MobilePanelProps) {
             </>
           )}
         </div>
-      </Dialog.Panel>
+      </DialogPanel>
     </Dialog>
   );
 }
