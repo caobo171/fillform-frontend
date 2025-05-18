@@ -29,7 +29,7 @@ export default function AffiliateDashboard() {
 
   const referrals = useAsync(async () => {
     if (user) {
-      const res = await Fetch.postWithAccessToken<any>(`/api/affiliate/list.user`, {})
+      const res = await Fetch.postWithAccessToken<any>(`/api/affiliate/list.referals`, {})
       if (res.data.code === Code.SUCCESS) {
         return res.data.users
       }

@@ -69,6 +69,18 @@ export type RawUser = {
 };
 
 
+export type RawSystemAnnoucement = {
+  id: number;
+  image: string;
+  content: string;
+  type: string;
+  createdAt: string;
+  status: string;
+  link: string;
+  owner: string
+};
+
+
 export type RawImage = {
   id: number;
   link: string;

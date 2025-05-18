@@ -2,8 +2,7 @@ const FAKE_DATA = {
   IMAGE_URL:
     'https://cungdecor.vn/wp-content/uploads/2019/04/kien-truc-noi-that-la-gi-xu-huong-thiet-ke-kien-truc-noi-that-hien-nay-02.jpg',
 };
-
-const IMAGE_URL = 'https://d2inr1ykkgbz5g.cloudfront.net/';
+const IMAGE_URL = "https://fillformposts.s3.ap-southeast-1.amazonaws.com/";
 
 export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.fillform.info';
 
