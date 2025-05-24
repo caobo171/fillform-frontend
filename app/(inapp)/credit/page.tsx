@@ -5,6 +5,7 @@ import { Toast } from '@/services/Toast'
 import { useMe, useMyBankInfo } from '@/hooks/user';
 import { Container } from '@/components/layout/container/container'
 import { OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants'
+import { PaymentInformation } from '@/components/common'
 
 const CreditPage: FC<{}> = () => {
 
@@ -78,52 +79,12 @@ const CreditPage: FC<{}> = () => {
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-                                    <div className="flex items-center">
-                                        <span className="w-1/3 font-medium text-gray-700">Tên Ngân Hàng</span>
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={() => copyText(bankInfo.data?.name || "")} className="hover:opacity-70 bg-gray-100 p-1 rounded">📋</button>
-                                            <span>{bankInfo.data?.name}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center">
-                                        <span className="w-1/3 font-medium text-gray-700">Số Tài Khoản</span>
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={() => copyText(bankInfo.data?.number || "")} className="hover:opacity-70 bg-gray-100 p-1 rounded">📋</button>
-                                            <span>{bankInfo.data?.number}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center">
-                                        <span className="w-1/3 font-medium text-gray-700">Tên Tài Khoản</span>
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={() => copyText("VUONG TIEN DAT")} className="hover:opacity-70 bg-gray-100 p-1 rounded">📋</button>
-                                            <span>VUONG TIEN DAT</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center">
-                                        <span className="w-1/3 font-medium text-gray-700">Nội dung chuyển tiền</span>
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={() => copyText(bankInfo.data?.message_credit || "")} className="hover:opacity-70 bg-gray-100 p-1 rounded">📋</button>
-                                            <span>{bankInfo.data?.message_credit}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start mt-4">
-                                        <span className="w-1/3 font-medium text-gray-700">Mã QR</span>
-                                        <div className="flex items-center gap-2">
-                                            <Image
-                                                src={bankInfo.data?.qr_link || ""}
-                                                alt="QRCode"
-                                                width={200}
-                                                height={200}
-                                                className="w-[200px] h-auto"
-                                            />
-                                        </div>
-
-                                    </div>
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <PaymentInformation 
+                                        bankInfo={bankInfo} 
+                                        showCopyButtons={true} 
+                                        className="space-y-3"
+                                    />
                                 </div>
 
                                 <div className="flex justify-center items-center bg-gray-50 p-4 rounded-lg">

@@ -26,3 +26,4 @@ export type { AccordionProps } from './Accordion';
 export type { TabsProps } from './Tabs';
 export { PremiumIcon } from './PremiumIcon';
 export { Tabs } from './Tabs';
+export { default as PaymentInformation } from './PaymentInformation';
