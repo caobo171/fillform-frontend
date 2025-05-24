@@ -13,6 +13,7 @@ import { useMe, useMyBankInfo } from '@/hooks/user';
 import LoadingAbsolute from '@/components/loading';
 import { usePostHog } from 'posthog-js/react';
 import { PaymentInformation } from '@/components/common';
+import { CreateOrderForm } from '@/components/form';
 
 export default function FormRateOrder() {
     const params = useParams();
@@ -170,93 +171,29 @@ export default function FormRateOrder() {
     return (
         <section id="about" className="py-10">
             <div className="container mx-auto text-center min-h-screen">
-                <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 mt-12">
+                <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 sm:mt-12">
                     <div className="p-4">
                         {(isLoading || isLoadingForm) ? <LoadingAbsolute /> : <></>}
-                        <h3 className="text-2xl font-bold mb-2">TẠO YÊU CẦU ĐIỀN FORM</h3>
-                        <h6 className="text-sm text-gray-500 mb-4">{formData?.form.name}</h6>
                         <form onSubmit={handleSubmit}>
-                            <div className="text-left">
-                                <div className="mb-4 grid grid-cols-12 items-center">
-                                    <label htmlFor="credit" className="col-span-8 lg:col-span-6">Số dư tài khoản</label>
-                                    <div className="col-span-4 lg:col-span-6">
-                                        <input type="text" readOnly className="bg-transparent w-full" id="credit" value={me.data?.credit.toLocaleString() + ' VND'} />
-                                    </div>
-                                </div>
-                                <div className="mb-4 grid grid-cols-12 items-center">
-                                    <label htmlFor="price" className="col-span-8 lg:col-span-6">Đơn giá mỗi câu trả lời (VND)</label>
-                                    <div className="col-span-4 lg:col-span-6">
-                                        <p id="pricePerAnswer">{pricePerAnswer.toLocaleString()}</p>
-                                    </div>
-                                </div>
-                                <div className="mb-4 grid grid-cols-12 items-center">
-                                    <label htmlFor="num_request" className="col-span-8 lg:col-span-6">Số lượng câu trả lời cần tăng</label>
-                                    <div className="col-span-4 lg:col-span-6">
-                                        <input
-                                            type="number"
-                                            required
-                                            className="w-full border border-gray-300 rounded px-3 py-2"
-                                            id="num_request"
-                                            name="num_request"
-                                            value={numRequest}
-                                            onChange={(e) => setNumRequest(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="mb-4 grid grid-cols-12 items-center">
-                                    <label htmlFor="delay" className="col-span-8 lg:col-span-6">Điền rải random như người thật</label>
-                                    <div className="col-span-4 lg:col-span-6">
-                                        <select
-                                            className="w-full border border-gray-300 rounded px-3 py-2"
-                                            name="delay"
-                                            id="delay"
-                                            value={delayType}
-                                            onChange={(e) => setDelayType(e.target.value)}
-                                        >
-                                            {Object.keys(OPTIONS_DELAY).map(e => parseInt(e)).map((key: number) => (
-                                                <option key={key} value={key}>
-                                                    {OPTIONS_DELAY[key].name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 my-6">
-                                <h3 className="text-xl font-bold">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
-                                <p className="text-sm text-left w-full" dangerouslySetInnerHTML={{ __html: delayMessage }}></p>
-                                
-                                {total > (me.data?.credit || 0) && (
-                                    <div className="mt-4 p-4 bg-white rounded-lg">
-                                        <div className="p-3 bg-red-100 text-red-700 rounded-lg mb-4 text-center font-medium">
-                                            ❌ KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ!
-                                        </div>
-                                        <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm {(total - (me.data?.credit || 0)).toLocaleString()} VND để tiếp tục</h4>
-                                        
-                                        <PaymentInformation 
-                                            bankInfo={bankInfo} 
-                                            className="space-y-3"
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="grid gap-4">
+                            <CreateOrderForm
+                                userCredit={me.data?.credit || 0}
+                                numRequest={parseInt(numRequest) || 0}
+                                delayType={parseInt(delayType) || 0}
+                                formId={formData?.form.id}
+                                formName={formData?.form.name}
+                                bankInfo={bankInfo}
+                                onNumRequestChange={(value) => setNumRequest(value.toString())}
+                                onDelayTypeChange={(value) => setDelayType(value.toString())}
+                                className="max-w-full"
+                            />
+                            <div className="mt-6">
                                 <button
-                                    className={`bg-blue-600 hover:bg-blue-700 text-white w-full py-2 px-4 rounded ${submitDisabled ? 'hidden' : ''}`}
+                                    className={`bg-blue-600 hover:bg-blue-700 text-white w-full py-2 px-4 rounded ${submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     type="submit"
-                                    id="button-addon1"
                                     disabled={submitDisabled}
                                 >
                                     Bắt đầu điền form
                                 </button>
-                                <Link
-                                    href={`/form/${formData?.form.id}`}
-                                    className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded text-center w-full"
-                                >
-                                    Quay lại
-                                </Link>
-
                             </div>
                         </form>
                     </div>
