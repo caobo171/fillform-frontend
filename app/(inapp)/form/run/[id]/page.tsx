@@ -236,7 +236,6 @@ export default function FormRateOrder() {
                                         
                                         <PaymentInformation 
                                             bankInfo={bankInfo} 
-                                            showCopyButtons={false} 
                                             className="space-y-3"
                                         />
                                     </div>

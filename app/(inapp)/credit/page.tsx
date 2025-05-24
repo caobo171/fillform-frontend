@@ -82,7 +82,6 @@ const CreditPage: FC<{}> = () => {
                                 <div className="bg-gray-50 p-4 rounded-lg">
                                     <PaymentInformation 
                                         bankInfo={bankInfo} 
-                                        showCopyButtons={true} 
                                         className="space-y-3"
                                     />
                                 </div>

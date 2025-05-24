@@ -12,6 +12,7 @@ import { useMe, useMyBankInfo } from '@/hooks/user';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { Toast } from '@/services/Toast';
 import LoadingAbsolute from '@/components/loading';
+import { PaymentInformation } from '@/components/common';
 import { FormTypeNavigation } from "../../_components/FormTypeNavigation";
 import WarningChatBox from "../../_components/WarningChatBox";
 import { Helper } from "@/services/Helper";
@@ -645,38 +646,10 @@ export default function FormPrefill() {
                                                 </div>
                                                 <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm {(total - (user?.credit || 0)).toLocaleString()} VND để tiếp tục</h4>
 
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Tên NH:</span>
-                                                        <span>{bankInfo?.data?.name}</span>
-                                                    </div>
-
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">STK:</span>
-                                                        <span>{bankInfo?.data?.number}</span>
-                                                    </div>
-
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Tên TK:</span>
-                                                        <span>VUONG TIEN DAT</span>
-                                                    </div>
-
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Nội dung CK:</span>
-                                                        <span>{bankInfo?.data?.message_credit}</span>
-                                                    </div>
-
-                                                    <div className="flex items-start">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Mã QR:</span>
-                                                        <Image
-                                                            src={bankInfo?.data?.qr_link || ""}
-                                                            alt="QRCode"
-                                                            width={200}
-                                                            height={200}
-                                                            className="w-[200px] h-auto"
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <PaymentInformation 
+                                                    bankInfo={bankInfo} 
+                                                    className="space-y-3"
+                                                />
                                             </div>
                                         )}
                                     </div>
