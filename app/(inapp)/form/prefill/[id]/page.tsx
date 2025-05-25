@@ -51,6 +51,10 @@ export default function FormPrefill() {
     const { register, handleSubmit, control, watch, setValue, reset } = useForm();
     // Watch for delay value changes
     const delayValue = watch("delay", 0);
+    const scheduleEnabled = watch("scheduleEnabled", false);
+    const startTime = watch("startTime", "08:00");
+    const endTime = watch("endTime", "20:00");
+    const disabledDays = watch("disabledDays", []);
     const numRequest = prefillData.length;
 
     const onCheckData = async (event: any) => {
@@ -112,6 +116,10 @@ export default function FormPrefill() {
                 delay_type: parseInt(data.delay),
                 num_request: parseInt(numRequest),
                 data_url: urlData,
+                schedule_enabled: scheduleEnabled ? 1 : 0,
+                start_time: startTime,
+                end_time: endTime,
+                disabled_days: disabledDays.join(','),
 
             });
 
@@ -511,6 +519,10 @@ export default function FormPrefill() {
                                 </div>
 
                                 <CreateOrderForm
+                                    disabledDays={disabledDays}
+                                    scheduleEnabled={scheduleEnabled}
+                                    startTime={startTime}
+                                    endTime={endTime}
                                     userCredit={user?.credit || 0}
                                     numRequest={numRequest}
                                     delayType={parseInt(delayValue)}

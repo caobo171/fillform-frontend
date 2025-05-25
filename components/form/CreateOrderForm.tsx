@@ -17,6 +17,14 @@ interface CreateOrderFormProps {
   className?: string;
   showTitle?: boolean;
   showBackButton?: boolean;
+  scheduleEnabled?: boolean;
+  startTime?: string;
+  endTime?: string;
+  disabledDays?: number[];
+  onScheduleEnabledChange?: (value: boolean) => void;
+  onStartTimeChange?: (value: string) => void;
+  onEndTimeChange?: (value: string) => void;
+  onDisabledDaysChange?: (value: number[]) => void;
 }
 
 // Custom hook for handling clicks outside an element (for dropdown)
@@ -51,16 +59,33 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   onDelayTypeChange,
   className = '',
   showTitle = true,
-  showBackButton = true
+  showBackButton = true,
+  scheduleEnabled = true,
+  startTime = '08:00',
+  endTime = '20:00',
+  disabledDays = [],
+  onScheduleEnabledChange = () => {},
+  onStartTimeChange = () => {},
+  onEndTimeChange = () => {},
+  onDisabledDaysChange = () => {}
 }) => {
   const [pricePerUnit, setPricePerUnit] = useState<number>(OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price);
   const [total, setTotal] = useState<number>(0);
   const [delayInfo, setDelayInfo] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [schedulePriceAdjustment, setSchedulePriceAdjustment] = useState<number>(0);
+  const [daysDropdownOpen, setDaysDropdownOpen] = useState<boolean>(false);
+  const [localScheduleEnabled, setLocalScheduleEnabled] = useState<boolean>(scheduleEnabled);
+  const [localStartTime, setLocalStartTime] = useState<string>(startTime);
+  const [localEndTime, setLocalEndTime] = useState<string>(endTime);
+  const [localDisabledDays, setLocalDisabledDays] = useState<number[]>(disabledDays);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useOnClickOutside(dropdownRef, () => setIsDropdownOpen(false));
+  
+  const daysDropdownRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(daysDropdownRef, () => setDaysDropdownOpen(false));
 
   // Calculate price based on delay type
   useEffect(() => {
@@ -70,15 +95,15 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
     switch (delayType) {
       case OPTIONS_DELAY_ENUM.SHORT_DELAY:
         currentPricePerUnit = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.SHORT_DELAY].price;
-        delayMessage = `Bill điền rải ngắn có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.SHORT_DELAY].price} VND / 1 mẫu trả lời. Rải giãn cách từ <b>1 đến 5 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và cần bạn bật lại tiếp tục chạy vào vào ngày hôm sau.</b>. Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 2 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
+        delayMessage = `Bill điền rải ngắn có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.SHORT_DELAY].price} VND / 1 mẫu trả lời. Rải giãn cách từ <b>1 đến 5 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. ${!localScheduleEnabled ? 'Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và bật lại vào 7h hôm sau.</b>' : ''} Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 2 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
         break;
       case OPTIONS_DELAY_ENUM.STANDARD_DELAY:
         currentPricePerUnit = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.STANDARD_DELAY].price;
-        delayMessage = `Bill điền rải tiêu chuẩn có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.STANDARD_DELAY].price} VND / 1 mẫu trả lời. Rải giãn cách từ <b>1 đến 10 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và cần bạn bật lại tiếp tục chạy vào vào ngày hôm sau.</b>. Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 12 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
+        delayMessage = `Bill điền rải tiêu chuẩn có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.STANDARD_DELAY].price} VND / 1 mẫu trả lời. Rải giãn cách từ <b>1 đến 10 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. ${!localScheduleEnabled ? 'Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và bật lại vào 7h hôm sau.</b>' : ''} Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 12 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
         break;
       case OPTIONS_DELAY_ENUM.LONG_DELAY:
         currentPricePerUnit = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.LONG_DELAY].price;
-        delayMessage = `Bill điền rải dài có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.LONG_DELAY].price} VND / 1 mẫu trả lời. Rải giãn cách từ <b>1 đến 20 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và cần bạn bật lại tiếp tục chạy vào vào ngày hôm sau.</b>. Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 24 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
+        delayMessage = `Bill điền rải dài có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.LONG_DELAY].price} VND / 1 mẫu trả lời. Rải giãn cách từ <b>1 đến 20 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. ${!localScheduleEnabled ? 'Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và bật lại vào 7h hôm sau.</b>' : ''} Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 24 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
         break;
       default:
         currentPricePerUnit = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price;
@@ -88,13 +113,82 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
     setPricePerUnit(currentPricePerUnit);
     setDelayInfo(delayMessage);
-  }, [delayType]);
+  }, [delayType, localScheduleEnabled]);
+
+  // Sync local state with props
+  useEffect(() => {
+    setLocalScheduleEnabled(scheduleEnabled);
+    setLocalStartTime(startTime);
+    setLocalEndTime(endTime);
+    setLocalDisabledDays(disabledDays);
+  }, [scheduleEnabled, startTime, endTime, disabledDays.join(',')]);
+
+  // Update schedule price adjustment
+  useEffect(() => {
+    if (localScheduleEnabled) {
+      setSchedulePriceAdjustment(50); // +50 VND per request when scheduling is enabled
+    } else {
+      setSchedulePriceAdjustment(0);
+    }
+  }, [localScheduleEnabled]);
+  
+  // Handle schedule changes with error handling to prevent issues
+  const handleScheduleEnabledChange = (value: boolean) => {
+    try {
+      setLocalScheduleEnabled(value);
+      // Only call the parent handler if it's a function
+      if (typeof onScheduleEnabledChange === 'function') {
+        onScheduleEnabledChange(value);
+      }
+    } catch (error) {
+      console.error('Error toggling schedule:', error);
+      // Ensure the local state is updated even if parent handler fails
+      setLocalScheduleEnabled(value);
+    }
+  };
+  
+  const handleStartTimeChange = (value: string) => {
+    try {
+      setLocalStartTime(value);
+      if (typeof onStartTimeChange === 'function') {
+        onStartTimeChange(value);
+      }
+    } catch (error) {
+      console.error('Error changing start time:', error);
+      setLocalStartTime(value);
+    }
+  };
+  
+  const handleEndTimeChange = (value: string) => {
+    try {
+      setLocalEndTime(value);
+      if (typeof onEndTimeChange === 'function') {
+        onEndTimeChange(value);
+      }
+    } catch (error) {
+      console.error('Error changing end time:', error);
+      setLocalEndTime(value);
+    }
+  };
+  
+  const handleDisabledDaysChange = (value: number[]) => {
+    try {
+      setLocalDisabledDays(value);
+      if (typeof onDisabledDaysChange === 'function') {
+        onDisabledDaysChange(value);
+      }
+    } catch (error) {
+      console.error('Error changing disabled days:', error);
+      setLocalDisabledDays(value);
+    }
+  };
 
   // Calculate total cost
   useEffect(() => {
-    const calculatedTotal = numRequest * pricePerUnit;
+    const adjustedPricePerUnit = pricePerUnit + schedulePriceAdjustment;
+    const calculatedTotal = numRequest * adjustedPricePerUnit;
     setTotal(calculatedTotal);
-  }, [numRequest, pricePerUnit]);
+  }, [numRequest, pricePerUnit, schedulePriceAdjustment]);
 
 
 
@@ -102,7 +196,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   const submitDisabled = insufficientFunds || numRequest <= 0;
 
   return (
-    <div className={`${className} relative px-3 sm:px-0`}>      
+    <div className={`${className} relative px-3`}>      
       {formId && showBackButton && (
         <Link
           href={`/form/${formId}`}
@@ -127,8 +221,13 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         </div>
         <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
           <label htmlFor="price" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi câu trả lời:</label>
-          <div className="w-full sm:w-1/2  p-2 rounded">
-            <p id="pricePerAnswer" className="sm:text-right font-bold text-blue-600">{pricePerUnit.toLocaleString()} VND</p>
+          <div className="w-full sm:w-1/2 p-2 rounded">
+            <p id="pricePerAnswer" className="sm:text-right font-bold text-blue-600">
+              {pricePerUnit.toLocaleString()} VND
+              {schedulePriceAdjustment > 0 && (
+                <span className="ml-1 text-sm text-green-600">(+{schedulePriceAdjustment} VND lịch trình)</span>
+              )}
+            </p>
           </div>
         </div>
         <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
@@ -147,7 +246,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             />
           </div>
         </div>
-        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center">
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
           <label htmlFor="delay" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Điền rải random như người thật:</label>
           <div className="w-full sm:w-1/2">
             {/* Custom dropdown with descriptions */}
@@ -193,6 +292,127 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             </div>
           </div>
         </div>
+        
+        {/* Schedule Options */}
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
+          <label htmlFor="schedule" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Lịch trình chạy:</label>
+          <div className="w-full sm:w-1/2">
+            <div 
+              className="flex items-center"
+              onClick={(e) => {
+                e.preventDefault();
+                handleScheduleEnabledChange(!localScheduleEnabled);
+              }}
+            >
+              <input
+                type="checkbox"
+                id="schedule-enabled"
+                checked={localScheduleEnabled}
+                onChange={(e) => {
+                  e.stopPropagation(); // Prevent event bubbling
+                  handleScheduleEnabledChange(!localScheduleEnabled); // Toggle directly instead of using e.target.checked
+                }}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+              />
+              <label 
+                htmlFor="schedule-enabled" 
+                className="ml-2 block text-sm text-gray-700 cursor-pointer"
+              >
+                Bật lịch trình (+50 VND/yêu cầu)
+                {!localScheduleEnabled && delayType !== OPTIONS_DELAY_ENUM.NO_DELAY && (
+                  <span className="block text-xs text-red-500 mt-1 font-medium">
+                    Lưu ý: Nếu không bật lịch trình, yêu cầu sẽ tự động dừng từ 22h đến 7h hôm sau
+                  </span>
+                )}
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        {scheduleEnabled && (
+          <>
+            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
+              <label className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Thời gian chạy trong ngày:</label>
+              <div className="w-full sm:w-1/2 flex space-x-2">
+                <div className="flex-1">
+                  <label htmlFor="start-time" className="block text-xs text-gray-500 mb-1">Từ</label>
+                  <input
+                    type="time"
+                    id="start-time"
+                    value={localStartTime}
+                    onChange={(e) => handleStartTimeChange(e.target.value)}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-blue-600"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="end-time" className="block text-xs text-gray-500 mb-1">Đến</label>
+                  <input
+                    type="time"
+                    id="end-time"
+                    value={localEndTime}
+                    onChange={(e) => handleEndTimeChange(e.target.value)}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-blue-600"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
+              <label className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Ngày <span className="font-bold text-red-600">KHÔNG</span> chạy trong tuần:</label>
+              <div className="w-full sm:w-1/2">
+                <div className="relative" ref={daysDropdownRef}>
+                  <div 
+                    className="w-full border border-gray-300 rounded px-3 py-2 bg-white cursor-pointer hover:border-blue-400 transition-colors"
+                    onClick={() => setDaysDropdownOpen(!daysDropdownOpen)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="truncate font-medium text-blue-600">
+                        {localDisabledDays.length === 0 
+                          ? 'Chạy tất cả các ngày' 
+                          : localDisabledDays
+                              .map(day => ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][day])
+                              .join(', ')}
+                      </span>
+                      <svg className="flex-shrink-0 fill-current h-4 w-4 ml-1 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {daysDropdownOpen && (
+                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow-lg">
+                      {[0, 1, 2, 3, 4, 5, 6].map(day => {
+                        const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+                        const isSelected = localDisabledDays.includes(day);
+                        
+                        return (
+                          <div 
+                            key={day} 
+                            className={`p-3 hover:bg-gray-100 cursor-pointer flex items-center ${isSelected ? 'bg-blue-50' : ''}`}
+                            onClick={() => {
+                              const newDisabledDays = isSelected
+                                ? localDisabledDays.filter(d => d !== day)
+                                : [...localDisabledDays, day];
+                              handleDisabledDaysChange(newDisabledDays);
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => {}}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-2"
+                            />
+                            <span>{dayNames[day]}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-6 my-6 shadow-sm">
@@ -203,6 +423,23 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         <div className="bg-white rounded-lg p-3 mb-3">
           <p className="text-sm text-gray-700 w-full" dangerouslySetInnerHTML={{ __html: delayInfo }}></p>
         </div>
+        
+        {localScheduleEnabled && (
+          <div className="bg-white rounded-lg p-3 mb-3 border border-green-100">
+            <h4 className="font-medium text-green-700 mb-2">Lịch trình đã bật:</h4>
+            <ul className="text-sm text-gray-700 space-y-1">
+              <li>• Thời gian chạy: <span className="font-medium">{localStartTime} - {localEndTime}</span> mỗi ngày</li>
+              {localDisabledDays.length > 0 && (
+                <li>• Không chạy vào: <span className="font-medium">
+                  {localDisabledDays
+                    .map(day => ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'][day])
+                    .join(', ')}
+                </span></li>
+              )}
+              <li>• Phụ phí: <span className="font-medium text-green-600">+{schedulePriceAdjustment} VND/yêu cầu</span></li>
+            </ul>
+          </div>
+        )}
         
         {insufficientFunds && (
           <div className="mt-4 p-4 bg-white rounded-lg border border-red-100">

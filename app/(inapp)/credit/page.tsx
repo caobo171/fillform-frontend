@@ -12,6 +12,10 @@ const CreditPage: FC<{}> = () => {
     const bankInfo = useMyBankInfo();
     const [numRequest, setNumRequest] = useState<number>(0);
     const [delayType, setDelayType] = useState<number>(OPTIONS_DELAY_ENUM.NO_DELAY);
+    const [disabledDays, setDisabledDays] = useState<number[]>([]);
+    const [scheduleEnabled, setScheduleEnabled] = useState(false);
+    const [startTime, setStartTime] = useState('08:00');
+    const [endTime, setEndTime] = useState('20:00');
 
     return (
         <Container>
@@ -51,8 +55,16 @@ const CreditPage: FC<{}> = () => {
                                     userCredit={me?.data?.credit || 0}
                                     numRequest={numRequest}
                                     delayType={delayType}
+                                    disabledDays={disabledDays}
+                                    scheduleEnabled={scheduleEnabled}
+                                    startTime={startTime}
+                                    endTime={endTime}
                                     onNumRequestChange={setNumRequest}
                                     onDelayTypeChange={setDelayType}
+                                    onScheduleEnabledChange={setScheduleEnabled}
+                                    onStartTimeChange={setStartTime}
+                                    onEndTimeChange={setEndTime}
+                                    onDisabledDaysChange={setDisabledDays}
                                     className="flex flex-col justify-center bg-gray-50 p-4 rounded-lg"
                                     showTitle={false}
                                     showBackButton={false}

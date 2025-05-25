@@ -209,6 +209,30 @@ const OrderPage = () => {
                                     <span className="text-gray-600">Điền rải:</span>
                                     <span className="font-semibold">{OPTIONS_DELAY[(order.data?.order.delay) as keyof typeof OPTIONS_DELAY]?.name || 'Unknown'}</span>
                                 </div>
+                                {Number(order.data?.order.schedule_setup?.enabled) ? (
+                                    <div className="flex justify-between items-start">
+                                        <span className="text-gray-600">Lịch điền:</span>
+                                        <div className="text-right">
+                                            <span className="font-semibold text-green-600">Đã kích hoạt</span>
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                {Object.entries(order.data?.order.schedule_setup?.config || {}).map(([day, slots]: [string, any]) => {
+                                                    if (!slots || slots.length === 0) return null;
+                                                    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+                                                    return (
+                                                        <div key={day} className="mb-1">
+                                                            <span className="font-medium">{dayNames[parseInt(day)]}: </span>
+                                                            {slots.map((slot: any, index: number) => (
+                                                                <span key={index}>
+                                                                    {slot[0]}-{slot[1]}{index < slots.length - 1 ? ', ' : ''}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : null}
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Ngày tạo:</span>
                                     <span className="font-semibold">{new Date(order.data?.order?.createdAt || '').toLocaleString()}</span>
@@ -383,12 +407,12 @@ const OrderPage = () => {
                                                 id="delay"
                                                 name="delay"
                                                 value={delay}
-                                                onChange={(e) => setDelay(e.target.value)}
+                                                onChange={(e) => setDelay(Number(e.target.value))}
                                                 className="block w-full rounded-md bg-white px-3 py-2.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                             >
                                                 {
                                                     Object.keys(OPTIONS_DELAY).map((delay, index) => (
-                                                        <option key={index} value={delay}>{OPTIONS_DELAY[delay as keyof typeof OPTIONS_DELAY].name}</option>
+                                                        <option key={index} value={delay}>{OPTIONS_DELAY[Number(delay)].name}</option>
                                                     ))
                                                 }
                                             </select>
