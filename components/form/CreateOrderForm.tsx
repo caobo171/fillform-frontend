@@ -329,7 +329,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
           </div>
         </div>
         
-        {scheduleEnabled && (
+        {localScheduleEnabled && (
           <>
             <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
               <label className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Thời gian chạy trong ngày:</label>

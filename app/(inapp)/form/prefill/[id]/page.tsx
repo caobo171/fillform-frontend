@@ -50,11 +50,12 @@ export default function FormPrefill() {
 
     const { register, handleSubmit, control, watch, setValue, reset } = useForm();
     // Watch for delay value changes
-    const delayValue = watch("delay", 0);
-    const scheduleEnabled = watch("scheduleEnabled", false);
-    const startTime = watch("startTime", "08:00");
-    const endTime = watch("endTime", "20:00");
-    const disabledDays = watch("disabledDays", []);
+
+    const [delayValue, setDelayValue] = useState<number>(OPTIONS_DELAY_ENUM.NO_DELAY);
+    const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
+    const [startTime, setStartTime] = useState<string>('08:00');
+    const [endTime, setEndTime] = useState<string>('20:00');
+    const [disabledDays, setDisabledDays] = useState<number[]>([]);
     const numRequest = prefillData.length;
 
     const onCheckData = async (event: any) => {
@@ -71,6 +72,11 @@ export default function FormPrefill() {
             setPrefillData(res.data?.prefillData);
             setPrefillForm(res.data?.form);
             setError('');
+            setValue('delay', OPTIONS_DELAY_ENUM.NO_DELAY);
+            setValue('scheduleEnabled', false);
+            setValue('startTime', '08:00');
+            setValue('endTime', '20:00');
+            setValue('disabledDays', []);
 
             // Set form values for each question in the form data
             if (res.data?.form?.loaddata) {
@@ -96,7 +102,7 @@ export default function FormPrefill() {
         } finally {
             setIsLoading(false);
         }
-    };
+    };  
 
     const onSubmitPrefill = async (data: any) => {
         // This would be your API call to run the prefill
@@ -109,12 +115,13 @@ export default function FormPrefill() {
 
         setIsLoading(true);
         setSubmitDisabled(true);
+        
         try {
             const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.prefill.run', {
                 form_id: dataForm?.form?.id,
                 ...data,
-                delay_type: parseInt(data.delay),
-                num_request: parseInt(numRequest),
+                delay_type: delayValue,
+                num_request: numRequest,
                 data_url: urlData,
                 schedule_enabled: scheduleEnabled ? 1 : 0,
                 start_time: startTime,
@@ -281,7 +288,7 @@ export default function FormPrefill() {
 
     // Calculate total and delay message
     const isInsufficientFunds = () => {
-        return numRequest * OPTIONS_DELAY[parseInt(delayValue)].price > (user?.credit || 0);
+        return numRequest * OPTIONS_DELAY[delayValue].price > (user?.credit || 0);
     };
 
     const syncFormHandle = async (): Promise<void> => {
@@ -525,7 +532,7 @@ export default function FormPrefill() {
                                     endTime={endTime}
                                     userCredit={user?.credit || 0}
                                     numRequest={numRequest}
-                                    delayType={parseInt(delayValue)}
+                                    delayType={delayValue}
                                     numRequestReadOnly={true}
                                     formId={dataForm?.form?.id}
                                     formName={dataForm?.form?.name}
@@ -536,15 +543,26 @@ export default function FormPrefill() {
                                         // No action needed
                                     }}
                                     onDelayTypeChange={(value) => {
-                                        // Update the form value when delay type changes
-                                        setValue('delay', value.toString());
+                                        setDelayValue(value);
                                     }}
-                                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-100"
+                                    onScheduleEnabledChange={(value) => {
+                                        setScheduleEnabled(value);
+                                    }}
+                                    onStartTimeChange={(value) => {
+                                        setStartTime(value);
+                                    }}
+                                    onEndTimeChange={(value) => {
+                                        setEndTime(value);
+                                    }}
+                                    onDisabledDaysChange={(value) => {
+                                        setDisabledDays(value);
+                                    }}
+                                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 max-w-[600px] mx-auto"
                                 />
 
                                 <button
                                     type="submit"
-                                    className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                    className={`w-full max-w-[600px] mx-auto mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
                                         ${insufficientFunds || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={insufficientFunds || submitDisabled}
                                 >
