@@ -257,12 +257,14 @@ const OrderPage = () => {
                                                 {estimatedEndTime ? new Date(estimatedEndTime).toLocaleString() : 'Chưa có dữ liệu'}
                                             </span>
                                         </div>
-                                        <div className="mt-2 text-yellow-600 text-xs italic">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                            </svg>
-                                            Order có thể được dừng bởi người dùng, hoặc dừng do không trong thời gian rải đơn (7-22h hằng ngày)
-                                        </div>
+                                        {!order.data?.order.schedule_setup?.enabled && (
+                                            <div className="mt-2 text-yellow-600 text-xs italic">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                </svg>
+                                                Order có thể được dừng bởi người dùng, hoặc dừng do không trong thời gian rải đơn (7-22h hằng ngày)
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -317,6 +319,28 @@ const OrderPage = () => {
                                             className="bg-primary-600 h-2.5 rounded-full"
                                             style={{ width: `${Math.round(((order.data?.order_detail_list?.filter(e => e.result === "completed")?.length || 0) / (order.data?.order.num || 1)) * 100)}%` }}
                                         ></div>
+                                    </div>
+                                </div>
+                                
+                                <div className="pt-2 border-t border-gray-100 mt-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-gray-600">Dữ liệu Form:</span>
+                                        {order.data?.order.data_url ? (
+                                            <a 
+                                                href={order.data.order.data_url}
+                                                className="text-primary-600 hover:text-primary-800 font-medium flex items-center"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                                                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                                                </svg>
+                                                Xem bảng dữ liệu
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-500 italic text-sm">Không có dữ liệu</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -472,74 +496,86 @@ const OrderPage = () => {
 
                 {/* Form Config */}
                 <div className="text-left">
-                    <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
 
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                        {order.data?.order.data.map((question, qIndex) => (
-                            <div key={qIndex} className="p-4 bg-white rounded shadow-sm text-xs mb-4">
-                                <div className="md:flex md:items-start gap-8">
-                                    <div className="md:w-1/4 mb-4 md:mb-0">
-                                        {question.description ? (
-                                            <>
-                                                <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
-                                                <label className="block truncate w-full text-gray-400">{question.description}</label>
-                                            </>
-                                        ) : (
-                                            <label className="block font-bold truncate w-full">{question.question}</label>
-                                        )}
-                                    </div>
 
-                                    <div className="md:w-3/4">
-                                        {question.type ? (
-                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                                                {question.answer.map((answer: any, aIndex: any) => (
-                                                    answer.data && (
-                                                        <div key={aIndex} className="relative">
-                                                            <label
-                                                                htmlFor="name"
-                                                                className="absolute left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
-                                                            >
-                                                                {answer.data}
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                name={answer.id}
-                                                                id={answer.id}
-                                                                defaultValue={answer.count}
-                                                                className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
-                                                                disabled
-                                                            />
+
+
+                    {
+                        order.data?.order.type !== 'Data có trước' ? (
+                            <>
+                                <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
+
+                                <div className="bg-gray-50 p-6 rounded-lg">
+                                    {order.data?.order.data.map((question, qIndex) => (
+                                        <div key={qIndex} className="p-4 bg-white rounded shadow-sm text-xs mb-4">
+                                            <div className="md:flex md:items-start gap-8">
+                                                <div className="md:w-1/4 mb-4 md:mb-0">
+                                                    {question.description ? (
+                                                        <>
+                                                            <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
+                                                            <label className="block truncate w-full text-gray-400">{question.description}</label>
+                                                        </>
+                                                    ) : (
+                                                        <label className="block font-bold truncate w-full">{question.question}</label>
+                                                    )}
+                                                </div>
+
+                                                <div className="md:w-3/4">
+                                                    {question.type ? (
+                                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                                                            {question.answer.map((answer: any, aIndex: any) => (
+                                                                answer.data && (
+                                                                    <div key={aIndex} className="relative">
+                                                                        <label
+                                                                            htmlFor="name"
+                                                                            className="absolute left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                                        >
+                                                                            {answer.data}
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            name={answer.id}
+                                                                            id={answer.id}
+                                                                            defaultValue={answer.count}
+                                                                            className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                                            disabled
+                                                                        />
+                                                                    </div>
+                                                                )
+                                                            ))}
                                                         </div>
-                                                    )
-                                                ))}
+                                                    ) : (
+                                                        <div className="grid gap-2">
+                                                            {question.answer.map((answer: any, aIndex: any) => (
+                                                                <div key={aIndex} className="relative w-full">
+                                                                    <label
+                                                                        className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                                    >
+                                                                        Loại câu hỏi tự luận
+                                                                    </label>
+                                                                    <select
+                                                                        name={answer.id}
+                                                                        id={answer.id}
+                                                                        defaultValue={answer.count}
+                                                                        className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6"
+                                                                        disabled
+                                                                    >
+                                                                        <option value={answer.count}>{answer.count}</option>
+                                                                    </select>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        ) : (
-                                            <div className="grid gap-2">
-                                                {question.answer.map((answer: any, aIndex: any) => (
-                                                    <div key={aIndex} className="relative w-full">
-                                                        <label
-                                                            className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
-                                                        >
-                                                            Loại câu hỏi tự luận
-                                                        </label>
-                                                        <select
-                                                            name={answer.id}
-                                                            id={answer.id}
-                                                            defaultValue={answer.count}
-                                                            className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6"
-                                                            disabled
-                                                        >
-                                                            <option value={answer.count}>{answer.count}</option>
-                                                        </select>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            </>
+                        ) : null
+                    }
+
+
                 </div>
             </div>
         </section>

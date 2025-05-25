@@ -112,6 +112,7 @@ export type RawOrder = {
   passed_num: number;
   failed_num: number;
   data: any[];
+  data_url?: string;
   schedule_setup?: {
     enabled: number;
     config: {
