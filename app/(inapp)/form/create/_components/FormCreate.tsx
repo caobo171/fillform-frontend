@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
@@ -38,7 +37,7 @@ export default function FormCreate() {
     const formLink = watch('form_link');
     
     useEffect(() => {
-        if (formLink && formLink.includes('/viewform')) {
+        if (formLink && formLink?.includes('/viewform')) {
             setIsViewFormLink(true);
         } else {
             setIsViewFormLink(false);
@@ -47,12 +46,12 @@ export default function FormCreate() {
     }, [formLink]);
 
     const onSubmit = async (formData: CreateFormValues) => {
-        if (!formData.form_link) {
+        if (!formData?.form_link) {
             setMsg('Vui lòng nhập đường dẫn edit form!');
             return;
         }
         
-        if (formData.form_link.includes('/viewform')) {
+        if (formData?.form_link.includes('/viewform')) {
             setMsg('Bạn đang sử dụng link xem form (/viewform). Vui lòng sử dụng link edit form (/edit) thay thế!');
             return;
         }
@@ -61,7 +60,7 @@ export default function FormCreate() {
 
         try {
             const res: any = await Fetch.postWithAccessToken('/api/form/create', {
-                form_link: formData.form_link,
+                form_link: formData?.form_link,
             });
 
             if (res.data?.form){
