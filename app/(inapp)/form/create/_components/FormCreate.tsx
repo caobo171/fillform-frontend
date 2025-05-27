@@ -10,7 +10,6 @@ import { z } from 'zod'
 import Fetch from '@/lib/core/fetch/Fetch'
 import { Toast } from '@/services/Toast'
 import LoadingAbsolute from '@/components/loading'
-import { Container } from '@/components/layout/container/container'
 import { Button, Input } from '@/components/common'
 import { FormItem, InlineFormItem } from '@/components/form/FormItem'
 import Meta from '@/components/ui/Meta'
@@ -76,11 +75,11 @@ export default function FormCreate() {
     };
 
     return (
-        <Container>
+        <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
             <div className="relative isolate overflow-hidden py-12">
                 {loading && <LoadingAbsolute />}
 
-                <div className="container mx-auto">
+                <div className="container mx-auto" data-aos="fade-up">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <h2 className="text-3xl font-bold mb-3">Tạo Form mới</h2>
@@ -90,8 +89,8 @@ export default function FormCreate() {
                     </div>
 
                     {/* Form Section */}
-                    <div className="bg-white shadow-sm rounded-lg pb-6">
-                        <form onSubmit={handleSubmit(onSubmit)} className="mb-4">
+                    <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
+                        <form onSubmit={handleSubmit(onSubmit)} className="p-6">
                             <InlineFormItem 
                                 label="Điền Edit Link Form" 
                                 className="mb-6"
@@ -114,11 +113,16 @@ export default function FormCreate() {
 
                             <Button 
                                 htmlType="submit" 
-                                className="w-full" 
+                                className="w-full font-bold" 
                                 size="large" 
                                 loading={isSubmitting || loading}
                             >
-                                Tạo ngay
+                                <div className="flex items-center justify-center">
+                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Tạo ngay
+                                </div>
                             </Button>
                         </form>
 
@@ -289,6 +293,6 @@ export default function FormCreate() {
                     </div>
                 </div>
             </div>
-        </Container>
+        </section>
     )
 }

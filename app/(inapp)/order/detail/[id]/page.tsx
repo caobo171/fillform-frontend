@@ -182,7 +182,7 @@ const OrderPage = () => {
 
 
     return (
-        <section className="py-12 bg-white">
+        <section className="bg-gradient-to-b from-primary-50 to-white py-12 mx-auto px-4 sm:px-6">
             {isFetching && <LoadingAbsolute />}
             <div className="container mx-auto text-center" data-aos="fade-up">
                 <div className="mb-10">
@@ -349,7 +349,7 @@ const OrderPage = () => {
                 </div>
 
                 {isAdmin && (
-                    <div className="text-left mb-8 bg-white rounded shadow-sm p-4">
+                    <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
                         <h2 className="text-2xl font-bold mb-4">Quản lý Order</h2>
 
                         {
@@ -496,18 +496,14 @@ const OrderPage = () => {
 
                 {/* Form Config */}
                 <div className="text-left">
-
-
-
-
                     {
                         order.data?.order.type !== 'Data có trước' ? (
                             <>
                                 <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
 
-                                <div className="bg-gray-50 p-6 rounded-lg">
+                                <div className="bg-white p-6 rounded-lg border border-gray-100">
                                     {order.data?.order.data.map((question, qIndex) => (
-                                        <div key={qIndex} className="p-4 bg-white rounded shadow-sm text-xs mb-4">
+                                        <div key={qIndex} className="p-4 bg-gray-50 rounded shadow-sm text-xs mb-4">
                                             <div className="md:flex md:items-start gap-8">
                                                 <div className="md:w-1/4 mb-4 md:mb-0">
                                                     {question.description ? (

@@ -213,16 +213,16 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         </>
       )}
       <div className="text-left">
-        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
-          <label htmlFor="credit" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Số dư tài khoản:</label>
+        <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+          <label htmlFor="credit" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Số dư tài khoản:</label>
           <div className="w-full sm:w-1/2 p-2 rounded">
-            <input type="text" readOnly className="bg-transparent w-full sm:text-right font-bold text-blue-600" id="credit" value={userCredit.toLocaleString() + ' VND'} />
+            <input type="text" readOnly className="bg-transparent w-full sm:text-right font-bold" id="credit" value={userCredit.toLocaleString() + ' VND'} />
           </div>
         </div>
-        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
-          <label htmlFor="price" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi câu trả lời:</label>
+        <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+          <label htmlFor="price" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi câu trả lời:</label>
           <div className="w-full sm:w-1/2 p-2 rounded">
-            <p id="pricePerAnswer" className="sm:text-right font-bold text-blue-600">
+            <p id="pricePerAnswer" className="sm:text-right font-bold">
               {pricePerUnit.toLocaleString()} VND
               {schedulePriceAdjustment > 0 && (
                 <span className="ml-1 text-sm text-green-600">(+{schedulePriceAdjustment} VND lịch trình)</span>
@@ -230,13 +230,13 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             </p>
           </div>
         </div>
-        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
-          <label htmlFor="num_request" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Số lượng câu trả lời cần tăng:</label>
+        <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+          <label htmlFor="num_request" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Số lượng câu trả lời cần tăng:</label>
           <div className="w-full sm:w-1/2">
             <input
               type="number"
               required
-              className="w-full border border-gray-300 rounded px-3 py-2 text-right font-bold text-blue-600"
+              className="w-full border border-primary-500 rounded px-3 py-2 text-right font-bold"
               id="num_request"
               name="num_request"
               value={numRequest}
@@ -246,18 +246,18 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             />
           </div>
         </div>
-        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
-          <label htmlFor="delay" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Điền rải random như người thật:</label>
+        <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+          <label htmlFor="delay" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Điền rải random như người thật:</label>
           <div className="w-full sm:w-1/2">
             {/* Custom dropdown with descriptions */}
             <div className="relative" ref={dropdownRef}>
               <div 
-                className="w-full border border-gray-300 rounded px-3 py-2 bg-white cursor-pointer hover:border-blue-400 transition-colors"
+                className="w-full border border-primary-500 rounded px-3 py-2 bg-white cursor-pointer hover:border-blue-400 transition-colors"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <div className="flex justify-between items-center">
-                  <span className="truncate font-bold text-blue-600">{OPTIONS_DELAY[delayType].name}</span>
-                  <svg className="flex-shrink-0 fill-current h-4 w-4 ml-1 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <span className="truncate font-bold">{OPTIONS_DELAY[delayType].name}</span>
+                  <svg className="flex-shrink-0 fill-current h-4 w-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                   </svg>
                 </div>
@@ -282,7 +282,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                           setIsDropdownOpen(false);
                         }}
                       >
-                        <div className="font-medium">{option.name}</div>
+                        <div className="font-sm">{option.name}</div>
                         <div className="text-sm text-gray-500">{description}</div>
                       </div>
                     );
@@ -294,8 +294,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         </div>
         
         {/* Schedule Options */}
-        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
-          <label htmlFor="schedule" className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Lịch trình chạy:</label>
+        <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+          <label htmlFor="schedule" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Lịch trình chạy:</label>
           <div className="w-full sm:w-1/2">
             <div 
               className="flex items-center"
@@ -312,7 +312,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                   e.stopPropagation(); // Prevent event bubbling
                   handleScheduleEnabledChange(!localScheduleEnabled); // Toggle directly instead of using e.target.checked
                 }}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
               />
               <label 
                 htmlFor="schedule-enabled" 
@@ -320,7 +320,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
               >
                 Bật lịch trình (+50 VND/yêu cầu)
                 {!localScheduleEnabled && delayType !== OPTIONS_DELAY_ENUM.NO_DELAY && (
-                  <span className="block text-xs text-red-500 mt-1 font-medium">
+                  <span className="block text-xs text-red-500 mt-1 font-sm">
                     Lưu ý: Nếu không bật lịch trình, yêu cầu sẽ tự động dừng từ 22h đến 7h hôm sau
                   </span>
                 )}
@@ -331,8 +331,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         
         {localScheduleEnabled && (
           <>
-            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
-              <label className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Thời gian chạy trong ngày:</label>
+            <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+              <label className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Thời gian chạy trong ngày:</label>
               <div className="w-full sm:w-1/2 flex space-x-2">
                 <div className="flex-1">
                   <label htmlFor="start-time" className="block text-xs text-gray-500 mb-1">Từ</label>
@@ -341,7 +341,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                     id="start-time"
                     value={localStartTime}
                     onChange={(e) => handleStartTimeChange(e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-blue-600"
+                    className="w-full border border-gray-300 rounded px-3 py-2"
                   />
                 </div>
                 <div className="flex-1">
@@ -351,14 +351,14 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                     id="end-time"
                     value={localEndTime}
                     onChange={(e) => handleEndTimeChange(e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-blue-600"
+                    className="w-full border border-gray-300 rounded px-3 py-2"
                   />
                 </div>
               </div>
             </div>
             
-            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center border-b pb-3">
-              <label className="w-full sm:w-1/2 font-medium mb-2 sm:mb-0 text-gray-700">Ngày <span className="font-bold text-red-600">KHÔNG</span> chạy trong tuần:</label>
+            <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+              <label className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Ngày <span className="font-bold text-red-600">KHÔNG</span> chạy trong tuần:</label>
               <div className="w-full sm:w-1/2">
                 <div className="relative" ref={daysDropdownRef}>
                   <div 
@@ -366,14 +366,14 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                     onClick={() => setDaysDropdownOpen(!daysDropdownOpen)}
                   >
                     <div className="flex justify-between items-center">
-                      <span className="truncate font-medium text-blue-600">
+                      <span className="truncate font-sm">
                         {localDisabledDays.length === 0 
                           ? 'Chạy tất cả các ngày' 
                           : localDisabledDays
                               .map(day => ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][day])
                               .join(', ')}
                       </span>
-                      <svg className="flex-shrink-0 fill-current h-4 w-4 ml-1 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <svg className="flex-shrink-0 fill-current h-4 w-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                       </svg>
                     </div>
@@ -400,7 +400,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => {}}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-2"
+                              className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded mr-2"
                             />
                             <span>{dayNames[day]}</span>
                           </div>
@@ -426,24 +426,24 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         
         {localScheduleEnabled && (
           <div className="bg-white rounded-lg p-3 mb-3 border border-green-100">
-            <h4 className="font-medium text-green-700 mb-2">Lịch trình đã bật:</h4>
+            <h4 className="font-sm text-green-700 mb-2">Lịch trình đã bật:</h4>
             <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Thời gian chạy: <span className="font-medium">{localStartTime} - {localEndTime}</span> mỗi ngày</li>
+              <li>• Thời gian chạy: <span className="font-sm">{localStartTime} - {localEndTime}</span> mỗi ngày</li>
               {localDisabledDays.length > 0 && (
-                <li>• Không chạy vào: <span className="font-medium">
+                <li>• Không chạy vào: <span className="font-sm">
                   {localDisabledDays
                     .map(day => ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'][day])
                     .join(', ')}
                 </span></li>
               )}
-              <li>• Phụ phí: <span className="font-medium text-green-600">+{schedulePriceAdjustment} VND/yêu cầu</span></li>
+              <li>• Phụ phí: <span className="font-sm text-green-600">+{schedulePriceAdjustment} VND/yêu cầu</span></li>
             </ul>
           </div>
         )}
         
         {insufficientFunds && (
           <div className="mt-4 p-4 bg-white rounded-lg border border-red-100">
-            <div className="p-3 bg-red-100 text-red-700 rounded-lg mb-4 text-center font-medium">
+            <div className="p-3 bg-red-100 text-red-700 rounded-lg mb-4 text-center font-sm">
               ❌ KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ!
             </div>
             <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm <span className="text-red-600">{(total - userCredit).toLocaleString()} VND</span> để tiếp tục</h4>

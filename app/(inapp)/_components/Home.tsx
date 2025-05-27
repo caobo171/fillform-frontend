@@ -25,10 +25,10 @@ export default function HomePage() {
     }
 
     return (
-        <section className="py-8 px-4">
-            <div className="container mx-auto space-y-8">
+        <section className="bg-gradient-to-b from-primary-50 to-white py-8 px-4">
+            <div className="container mx-auto space-y-8" data-aos="fade-up">
                 {/* User Info */}
-                <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
                     <h5 className="text-lg font-medium">Xin chào</h5>
                     <h1 className="text-4xl font-bold">{me?.data?.username}</h1>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
@@ -37,7 +37,7 @@ export default function HomePage() {
                     </div>
                     <button     
                         onClick={() => handleNavigate('/form/create')}
-                        className="mt-4 w-full block text-center py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                        className="mt-4 w-full block text-center py-3 px-4 bg-primary-600 text-white font-bold rounded-md hover:bg-primary-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                     >
                         <h5>BẮT ĐẦU NGAY</h5>
                     </button>

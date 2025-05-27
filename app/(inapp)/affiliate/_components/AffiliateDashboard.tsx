@@ -107,8 +107,8 @@ export default function AffiliateDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] py-6 px-4">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+    <section className="bg-gradient-to-b from-primary-50 to-white min-h-screen py-6 px-4 sm:px-6 mx-auto">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6" data-aos="fade-up">
         {/* Left Column */}
         <div className="space-y-6">
           {/* Affiliate Account Information */}
@@ -164,14 +164,21 @@ export default function AffiliateDashboard() {
               <button
                 onClick={handleWithdrawalRequest}
                 disabled={withdrawalLoading || (user?.referCredit || 0) < MIN_DRAW_CREDIT}
-                className={`w-full py-2 px-4 rounded-md text-white font-medium flex items-center justify-center ${(user?.referCredit || 0) < MIN_DRAW_CREDIT ? 'bg-gray-400 cursor-not-allowed' : withdrawalLoading ? 'bg-blue-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                className={`w-full py-3 px-4 rounded-md text-white font-bold flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${(user?.referCredit || 0) < MIN_DRAW_CREDIT ? 'bg-gray-400 cursor-not-allowed focus:ring-gray-300' : withdrawalLoading ? 'bg-primary-400 focus:ring-primary-300' : 'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500'}`}
               >
                 {withdrawalLoading ? (
-                  <>
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="mr-2 w-5 h-5 animate-spin" />
                     <span>Đang xử lý...</span>
-                    <Loader2 className="ml-2 w-4 h-4 animate-spin" />
-                  </>
-                ) : 'Yêu cầu rút tiền'}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Yêu cầu rút tiền</span>
+                  </div>
+                )}
               </button>
               {(user?.referCredit || 0) < MIN_DRAW_CREDIT && (
                 <p className="text-sm text-red-500">Hoa hồng phải đạt tối thiểu {MIN_DRAW_CREDIT.toLocaleString()} VND để rút tiền</p>
@@ -210,11 +217,11 @@ export default function AffiliateDashboard() {
                   type="text"
                   value={referralLink}
                   readOnly
-                  className="flex-1 p-2 border border-gray-300 rounded-md bg-gray-50"
+                  className="flex-1 p-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
                 <button
                   onClick={handleCopyLink}
-                  className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                  className="p-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                   title="Sao chép liên kết"
                 >
                   {copySuccess ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
@@ -259,7 +266,7 @@ export default function AffiliateDashboard() {
           </div>
           
           {/* Withdrawal Requests List */}
-          <div className="bg-white rounded-lg p-6 shadow-sm mt-6">
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mt-6">
             <h2 className="text-xl font-bold mb-4">Danh sách yêu cầu rút tiền</h2>
             {!withdrawRequests.data ? (
               <div className="flex justify-center items-center h-32">
@@ -302,6 +309,6 @@ export default function AffiliateDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

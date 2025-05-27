@@ -30,8 +30,8 @@ export default function AffiliateComponent() {
   }
 
   return (
-    <section className="py-12 px-4 bg-gray-50">
-      <div className="max-w-2xl mx-auto">
+    <section className="bg-gradient-to-b from-primary-50 to-white py-12 px-4 sm:px-6 mx-auto">
+      <div className="max-w-2xl mx-auto" data-aos="fade-up">
         {/* Affiliate Program Information */}
         <div className="bg-white rounded-xl p-8 shadow-md border border-gray-100">
           <div className="text-center mb-8">
@@ -40,12 +40,12 @@ export default function AffiliateComponent() {
           </div>
 
           <div className="space-y-8">
-            <div className="bg-blue-50 p-5 rounded-lg border-l-4 border-blue-500">
-              <h2 className="text-xl font-semibold mb-3 text-blue-700">Quyền lợi của bạn:</h2>
+            <div className="bg-primary-50 p-5 rounded-lg border-l-4 border-primary-500">
+              <h2 className="text-xl font-semibold mb-3 text-primary-700">Quyền lợi của bạn:</h2>
               <ul className="list-disc pl-6 space-y-2 text-gray-700">
                 <li>Chỉ được tính affiliate với tài khoản giới thiệu đăng kí mới.</li>
-                <li>FillForm sẽ tặng bạn <span className="font-semibold text-blue-600">{REFER_PERCENT}%</span> trên mỗi giao dịch nạp tiền/thanh công của người được giới thiệu.</li>
-                <li>Hoa hồng phải đạt <span className="font-semibold text-blue-600">{MIN_DRAW_CREDIT.toLocaleString()} VND</span> mới được yêu cầu rút tiền.</li>
+                <li>FillForm sẽ tặng bạn <span className="font-semibold text-primary-600">{REFER_PERCENT}%</span> trên mỗi giao dịch nạp tiền/thanh công của người được giới thiệu.</li>
+                <li>Hoa hồng phải đạt <span className="font-semibold text-primary-600">{MIN_DRAW_CREDIT.toLocaleString()} VND</span> mới được yêu cầu rút tiền.</li>
                 <li>Tài khoản đăng kí lại hoặc lạm dụng, spam sẽ bị từ chối tính affiliate.</li>
               </ul>
             </div>
@@ -62,15 +62,20 @@ export default function AffiliateComponent() {
             <button
               onClick={handleRegisterPartner}
               disabled={loading}
-              className="inline-flex flex-row gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium shadow-sm hover:shadow-md"
+              className="inline-flex items-center justify-center px-8 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-all font-bold shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
             >
               {loading ? (
-                <>
-                  <span className="mr-2">Đang đăng kí...</span>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                </>
+                <div className="flex items-center justify-center">
+                  <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                  <span>Đang đăng kí...</span>
+                </div>
               ) : (
-                'Đăng kí trở thành Partner'
+                <div className="flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Đăng kí trở thành Partner</span>
+                </div>
               )}
             </button>
           </div>

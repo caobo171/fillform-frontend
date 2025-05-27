@@ -1,7 +1,6 @@
 'use client'
 import { FC, useState } from 'react'
 import { useMe, useMyBankInfo } from '@/hooks/user';
-import { Container } from '@/components/layout/container/container'
 import { PaymentInformation } from '@/components/common'
 import { CreateOrderForm } from '@/components/form'
 import { OPTIONS_DELAY_ENUM } from '@/core/Constants'
@@ -18,9 +17,9 @@ const CreditPage: FC<{}> = () => {
     const [endTime, setEndTime] = useState('20:00');
 
     return (
-        <Container>
+        <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
             <div className="relative isolate overflow-hidden py-12">
-                <div className="container mx-auto">
+                <div className="container mx-auto" data-aos="fade-up">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <h2 className="text-3xl font-bold mb-3">Nạp tiền vào tài khoản</h2>
@@ -33,7 +32,7 @@ const CreditPage: FC<{}> = () => {
                     </div>
 
                     {/* Payment Information */}
-                    <div className="bg-white shadow-sm rounded-lg mb-10">
+                    <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
                         <div className="p-6">
                             <div className="mb-6">
                                 <p className="text-gray-700 mb-4">
@@ -74,7 +73,7 @@ const CreditPage: FC<{}> = () => {
                     </div>
 
                     {/* Important Notes */}
-                    <div className="border border-gray-100 rounded-lg overflow-hidden mb-10">
+                    <div className="border border-gray-100 rounded-lg overflow-hidden mb-6">
                         <h3 className="text-xl font-bold p-4 bg-gray-50 border-b border-gray-100">ĐẶC BIỆT CHÚ Ý</h3>
 
                         <div className="p-6">
@@ -90,7 +89,7 @@ const CreditPage: FC<{}> = () => {
                     </div>
                 </div>
             </div>
-        </Container>
+        </section>
     )
 }
 

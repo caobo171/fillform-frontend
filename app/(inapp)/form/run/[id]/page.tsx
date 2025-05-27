@@ -86,9 +86,9 @@ export default function FormRateOrder() {
     };
 
     return (
-        <section id="about" className="py-10">
-            <div className="container mx-auto text-center min-h-screen">
-                <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 sm:mt-12">
+        <section id="about" className="bg-gradient-to-b from-primary-50 to-white py-10 mx-auto px-4 sm:px-6">
+            <div className="container mx-auto text-center min-h-screen" data-aos="fade-up">
+                <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-6 sm:mt-12 border border-gray-100">
                     <div className="p-4">
                         {(isLoading || isLoadingForm) ? <LoadingAbsolute /> : <></>}
                         <form onSubmit={handleSubmit}>
@@ -113,11 +113,16 @@ export default function FormRateOrder() {
                             />
                             <div className="mt-6">
                                 <button
-                                    className={`bg-blue-600 hover:bg-blue-700 text-white w-full py-2 px-4 rounded ${submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`bg-primary-600 hover:bg-primary-700 text-white w-full py-3 px-4 rounded-md font-bold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all ${submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     type="submit"
                                     disabled={submitDisabled}
                                 >
-                                    Bắt đầu điền form
+                                    <div className="flex items-center justify-center">
+                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Bắt đầu điền form
+                                    </div>
                                 </button>
                             </div>
                         </form>
