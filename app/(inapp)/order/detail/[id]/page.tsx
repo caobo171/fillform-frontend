@@ -136,7 +136,7 @@ const OrderPage = () => {
                 id: params.id as string,
                 owner: owner,
                 delay: delay,
-                disabled_days: disabledDays,
+                disabled_days: disabledDays.join(','),
                 start_time: startTime,
                 end_time: endTime,
                 schedule_enabled: scheduleEnabled ? 1 : 0,
