@@ -127,26 +127,37 @@ export const OPTIONS_DELAY_ENUM = {
   NO_DELAY: 0,
   SHORT_DELAY: 1,
   STANDARD_DELAY: 2,
-  LONG_DELAY: 3
+  LONG_DELAY: 3,
+  SPECIFIC_DELAY: 4
 }
 
 export const OPTIONS_DELAY = {
   [OPTIONS_DELAY_ENUM.NO_DELAY]: {
     name: "Không cần điền rải",
-    price: 350
+    price: 350,
+    description: "Gửi liên tiếp không giãn cách"
   },
   [OPTIONS_DELAY_ENUM.SHORT_DELAY]: {
     name: "Điền giãn cách ngắn",
-    price: 400
+    price: 400,
+    description: "Gửi với giãn cách 1-5 phút"
   },
   [OPTIONS_DELAY_ENUM.STANDARD_DELAY]: {
     name: "Điền giãn cách tiêu chuẩn",
-    price: 450
+    price: 450,
+    description: "Gửi với giãn cách 1-10 phút"
   },
   [OPTIONS_DELAY_ENUM.LONG_DELAY]: {
     name: "Điền giãn cách dài",
-    price: 500
+    price: 500,
+    description: "Gửi với giãn cách 1-20 phút"
+  },
+  [OPTIONS_DELAY_ENUM.SPECIFIC_DELAY]: {
+    name: "Điền giãn cách xác định chính xác thời gian",
+    price: 600,
+    description: "Gửi với giãn cách phù hợp với thời gian đã chọn"
   }
+
 }
 
 

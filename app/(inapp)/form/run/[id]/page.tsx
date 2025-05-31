@@ -11,8 +11,6 @@ import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
 import { Toast } from '@/services/Toast';
 import { useMe, useMyBankInfo } from '@/hooks/user';
 import LoadingAbsolute from '@/components/loading';
-import { usePostHog } from 'posthog-js/react';
-import { PaymentInformation } from '@/components/common';
 import { CreateOrderForm } from '@/components/form';
 
 export default function FormRateOrder() {
@@ -29,6 +27,10 @@ export default function FormRateOrder() {
     const [startTime, setStartTime] = useState('08:00');
     const [endTime, setEndTime] = useState('20:00');
     const [delayType, setDelayType] = useState('0');
+
+    const [specificStartDate, setSpecificStartDate] = useState('');
+    const [specificEndDate, setSpecificEndDate] = useState('');
+    const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);
 
 
     const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -52,6 +54,9 @@ export default function FormRateOrder() {
                 schedule_enabled: scheduleEnabled ? 1 : 0,
                 start_time: startTime,
                 end_time: endTime,
+                specific_start_date: specificStartDate,
+                specific_end_date: specificEndDate,
+                specific_daily_schedules: specificDailySchedules.map((schedule) => `${schedule.date}_${schedule.startTime}_${schedule.endTime}_${schedule.enabled}`).join(',')
             })
 
 
@@ -109,6 +114,13 @@ export default function FormRateOrder() {
                                 onStartTimeChange={(value) => setStartTime(value)}
                                 onEndTimeChange={(value) => setEndTime(value)}
                                 onDisabledDaysChange={(value) => setDisabledDays(value)}
+
+                                specificStartDate={specificStartDate}
+                                specificEndDate={specificEndDate}
+                                specificDailySchedules={specificDailySchedules}
+                                onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
+                                onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
+                                onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
                                 className="max-w-full"
                             />
                             <div className="mt-6">

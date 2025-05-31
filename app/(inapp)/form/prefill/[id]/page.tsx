@@ -56,6 +56,13 @@ export default function FormPrefill() {
     const [startTime, setStartTime] = useState<string>('08:00');
     const [endTime, setEndTime] = useState<string>('20:00');
     const [disabledDays, setDisabledDays] = useState<number[]>([]);
+
+
+    // SPECIFIC_DELAY
+    const [specificStartDate, setSpecificStartDate] = useState('');
+    const [specificEndDate, setSpecificEndDate] = useState('');
+    const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);    
+
     const numRequest = prefillData.length;
 
     const onCheckData = async (event: any) => {
@@ -127,7 +134,9 @@ export default function FormPrefill() {
                 start_time: startTime,
                 end_time: endTime,
                 disabled_days: disabledDays.join(','),
-
+                specific_start_date: specificStartDate,
+                specific_end_date: specificEndDate,
+                specific_daily_schedules: specificDailySchedules.map(e => `${e.date}_${e.startTime}_${e.endTime}_${e.enabled}`).join(',')
             });
 
             if (response.data?.code == Code.SUCCESS) {
@@ -538,6 +547,12 @@ export default function FormPrefill() {
                                     formName={dataForm?.form?.name}
                                     bankInfo={bankInfo}
                                     showBackButton={false}
+                                    specificStartDate={specificStartDate}
+                                    specificEndDate={specificEndDate}
+                                    specificDailySchedules={specificDailySchedules}
+                                    onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
+                                    onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
+                                    onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
                                     onNumRequestChange={(value) => {
                                         // This is read-only in prefill mode, but we need to provide the handler
                                         // No action needed

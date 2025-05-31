@@ -119,6 +119,16 @@ export type RawOrder = {
       [key: string]: string[][];
     };
   };
+  specific_delay?: {
+    start_date: string;
+    end_date: string;
+    daily_schedules: {
+      date: string;
+      start_time: string;
+      end_time: string;
+      enabled: number;
+    }[];
+  }
 };
 
 
