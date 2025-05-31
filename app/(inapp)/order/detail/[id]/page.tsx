@@ -36,9 +36,9 @@ const OrderPage = () => {
     const daysDropdownRef = useRef<HTMLDivElement>(null);
 
     // SPECIFIC_DELAY state
-    const [specificStartDate, setSpecificStartDate] = useState('');
-    const [specificEndDate, setSpecificEndDate] = useState('');
-    const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);
+    const [specificStartDate, setSpecificStartDate] = useState(order.data?.order.specific_delay?.start_date || '');
+    const [specificEndDate, setSpecificEndDate] = useState(order.data?.order.specific_delay?.end_date || '');
+    const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>(order.data?.order.specific_delay?.daily_schedules || []);
     const [startDateWarning, setStartDateWarning] = useState('');
     const [endDateWarning, setEndDateWarning] = useState('');
     const [isGeneratingSchedules, setIsGeneratingSchedules] = useState(false);
@@ -48,7 +48,7 @@ const OrderPage = () => {
         setDelay(order.data?.order.delay)
         setScheduleEnabled(Boolean(order.data?.order.schedule_setup?.enabled))
 
-        if (order.data?.order.delay === OPTIONS_DELAY_ENUM.SPECIFIC_DELAY) { // SPECIFIC_DELAY
+        if (order.data?.order.delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY) { // SPECIFIC_DELAY
             // Load specific delay info from backend if available
             const spec = order.data?.order.specific_delay;
             setSpecificStartDate(spec?.start_date || '');
@@ -153,21 +153,21 @@ const OrderPage = () => {
                 delay: delay,
                 schedule_enabled: scheduleEnabled ? 1 : 0,
             };
-            if (delay === OPTIONS_DELAY_ENUM.SPECIFIC_DELAY) { // SPECIFIC_DELAY
-                postData.specific_delay = {
-                    start_date: specificStartDate,
-                    end_date: specificEndDate,
-                    daily_schedules: specificDailySchedules.map((s: any) => `${s.date}_${s.startTime}_${s.endTime}_${s.enabled}`).join(',')
-                };
+            if (delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY) { // SPECIFIC_DELAY
+                postData.specific_start_date = specificStartDate;
+                postData.specific_end_date = specificEndDate;
+                postData.specific_daily_schedules = specificDailySchedules.map((s: any) => `${s.date}_${s.startTime}_${s.endTime}_${s.enabled}`).join(',');
             } else {
                 postData.disabled_days = disabledDays.join(',');
                 postData.start_time = startTime;
                 postData.end_time = endTime;
             }
-            const res = await Fetch.postWithAccessToken<{ code: number }>('/api/order/update', postData);
+            const res = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/update', postData);
             if (res.data.code === Code.SUCCESS) {
                 order.mutate();
                 Toast.success('Thay đổi đã được lưu');
+            } else {
+                Toast.error(res.data.message);
             }
         } catch (error) {
             Toast.error('Lỗi khi lưu thay đổi');
@@ -561,7 +561,7 @@ const OrderPage = () => {
                                         <h3 className="text-lg font-semibold mb-4">Lịch trình chạy</h3>
 
                                         {/* SPECIFIC_DELAY schedule controls */}
-                                        {delay === 4 ? (
+                                        {delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY ? (
                                             <div className="border border-blue-200 rounded-lg p-4 mb-4 bg-blue-50">
                                                 <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                     <div>
