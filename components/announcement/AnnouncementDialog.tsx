@@ -86,7 +86,7 @@ export function AnnouncementDialog({ announcement, onClose, open }: Announcement
             
             {announcement.image && (
               <div 
-                className={`relative w-full min-h-96 sm:max-w-1/2 overflow-hidden rounded-t-lg ${announcement.link ? 'cursor-pointer' : ''}`}
+                className={`relative w-full min-h-32 sm:min-h-96 sm:max-w-1/2 overflow-hidden rounded-t-lg ${announcement.link ? 'cursor-pointer' : ''}`}
                 onClick={announcement.link ? handleLinkClick : undefined}
               >
                 {/* Loading skeleton */}
