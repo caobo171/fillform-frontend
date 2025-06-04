@@ -58,8 +58,20 @@ export default function InappLayout({ children }: PropsWithChildren) {
   useEffect(() => {
     if (login_annoucement) {
 
-      if (!localStorage.getItem('fillform_login_annoucement_' + me.data?.id + '_' + login_annoucement.id)) {
-        localStorage.setItem('fillform_login_annoucement_' + me.data?.id + '_' + login_annoucement.id, 'true');
+      const announcementKey = `fillform_login_annoucement_${me.data?.id}_${login_annoucement.id}`;
+      const storedTimestampStr = localStorage.getItem(announcementKey);
+      const startOfToday = new Date().setHours(0, 0, 0, 0);
+
+      let shouldShow = true;
+      if (storedTimestampStr) {
+        const storedTimestamp = parseInt(storedTimestampStr, 10);
+        if (!isNaN(storedTimestamp) && storedTimestamp >= startOfToday) {
+          shouldShow = false;
+        }
+      }
+
+      if (shouldShow) {
+        localStorage.setItem(announcementKey, Date.now().toString());
         setShowLoginAnnoucement(true);
       }
     }
