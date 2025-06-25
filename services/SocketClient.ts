@@ -4,9 +4,15 @@ import { RawUser } from '@/store/types';
 class SocketServiceClient {
     public socket: any;
 
+    public connected: boolean = false;
     connect(me: RawUser) {
 
         console.log('Connecting to WebSocket server, ', me.id, SOCKET_URL);
+
+        if (this.connected) {
+            return;
+        }
+
         this.socket = io(SOCKET_URL + '/', {
             path: '/api/socket.io',
             auth: {
@@ -18,14 +24,17 @@ class SocketServiceClient {
             console.log('Connected to WebSocket server');
 
             this.socket.emit('joinRoom', me.id);
+            this.connected = true;
         });
 
         this.socket.on('disconnect', () => {
             console.log('Disconnected from WebSocket server');
+            this.connected = false;
         });
 
         this.socket.on('connect_error', (error: any) => {
             console.error('Socket connection error:', error);
+            this.connected = false;
         });
     }
 

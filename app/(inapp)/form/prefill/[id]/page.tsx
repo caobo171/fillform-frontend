@@ -4,48 +4,22 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { useFormById } from "@/hooks/form";
 import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from "@/core/Constants";
-import { MeHook } from "@/store/me/hooks";
 import { useMe, useMyBankInfo } from '@/hooks/user';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { Toast } from '@/services/Toast';
 import LoadingAbsolute from '@/components/loading';
+import { CreateOrderForm } from "@/components/form";
 import { FormTypeNavigation } from "../../_components/FormTypeNavigation";
 import WarningChatBox from "../../_components/WarningChatBox";
 import { Helper } from "@/services/Helper";
 
-interface dataForm {
-    slug: string;
-    urlMain: string;
-    name: string;
-    urlData: string;
-    loaddata?: Array<{
-        id: string;
-        question: string;
-        description: string;
-        field: string;
-        fields: Array<{
-            id: string;
-            value: string;
-        }>;
-    }>;
-}
 
-interface User {
-    credit: number;
-}
 
 interface Field {
     id: string;
     value: string;
-}
-
-interface PrefillPageProps {
-    params: {
-        slug: string;
-    };
 }
 
 interface ChatError {
@@ -76,7 +50,19 @@ export default function FormPrefill() {
 
     const { register, handleSubmit, control, watch, setValue, reset } = useForm();
     // Watch for delay value changes
-    const delayValue = watch("delay", 0);
+
+    const [delayValue, setDelayValue] = useState<number>(OPTIONS_DELAY_ENUM.NO_DELAY);
+    const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
+    const [startTime, setStartTime] = useState<string>('08:00');
+    const [endTime, setEndTime] = useState<string>('20:00');
+    const [disabledDays, setDisabledDays] = useState<number[]>([]);
+
+
+    // SPECIFIC_DELAY
+    const [specificStartDate, setSpecificStartDate] = useState('');
+    const [specificEndDate, setSpecificEndDate] = useState('');
+    const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);    
+
     const numRequest = prefillData.length;
 
     const onCheckData = async (event: any) => {
@@ -93,6 +79,11 @@ export default function FormPrefill() {
             setPrefillData(res.data?.prefillData);
             setPrefillForm(res.data?.form);
             setError('');
+            setValue('delay', OPTIONS_DELAY_ENUM.NO_DELAY);
+            setValue('scheduleEnabled', false);
+            setValue('startTime', '08:00');
+            setValue('endTime', '20:00');
+            setValue('disabledDays', []);
 
             // Set form values for each question in the form data
             if (res.data?.form?.loaddata) {
@@ -101,7 +92,11 @@ export default function FormPrefill() {
                 // Set default values for each question based on the form data
                 res.data.form.loaddata.forEach((item: any) => {
                     if (item.id && item.field) {
-                        setValue(`question_${item.id}`, item.field);
+                        let foundField = res.data.fields.find((field: any) => Helper.purify(field.label) == Helper.purify(item.field));
+                        if (foundField) {
+                            setValue(`question_${item.id}`, foundField.id);
+                        }
+
                     }
                 });
 
@@ -113,7 +108,7 @@ export default function FormPrefill() {
         } finally {
             setIsLoading(false);
         }
-    };
+    };  
 
     const onSubmitPrefill = async (data: any) => {
         // This would be your API call to run the prefill
@@ -126,19 +121,39 @@ export default function FormPrefill() {
 
         setIsLoading(true);
         setSubmitDisabled(true);
+        
         try {
             const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.prefill.run', {
                 form_id: dataForm?.form?.id,
                 ...data,
-                delay_type: data.delay,
-                num_request: data.num_request,
+                delay_type: delayValue,
+                num_request: numRequest,
                 data_url: urlData,
-
+                schedule_enabled: scheduleEnabled ? 1 : 0,
+                start_time: startTime,
+                end_time: endTime,
+                disabled_days: disabledDays.join(','),
+                specific_start_date: specificStartDate,
+                specific_end_date: specificEndDate,
+                specific_daily_schedules: specificDailySchedules.map(e => `${e.date}_${e.startTime}_${e.endTime}_${e.enabled}`).join(',')
             });
 
             if (response.data?.code == Code.SUCCESS) {
                 Toast.success('Đã tạo yêu cầu điền form thành công!');
                 router.push(`/`);
+
+
+                const win = window as any;
+                //@ts-ignore
+                if (win.PulseSurvey.surveyIgnored('My5wdWxzZXN1cnZleXM')) {
+                    console.log('User has ignored the survey');
+                } else if (win.PulseSurvey.surveyResponded('My5wdWxzZXN1cnZleXM')) {
+                    console.log('User has answered the survey');
+                } else {
+                    // You can call to show survey directly
+                    win.PulseSurvey.showSurvey('My5wdWxzZXN1cnZleXM');
+                }
+
             } else {
                 Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
                 console.error('Form submission failed');
@@ -271,7 +286,7 @@ export default function FormPrefill() {
                 dataForm?.config?.isValidEditAnswer === "true" &&
                 dataForm?.config?.isValidLimitRes === "true" &&
                 dataForm?.config?.isValidPublished === "true") {
-                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy config tỉ lệ nhé.`, `00005`, "note");
+                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy chuẩn bị data và nhập link data để bắt đầu.`, `00005`, "note");
             }
         }
     };
@@ -280,42 +295,8 @@ export default function FormPrefill() {
 
 
     // Calculate total and delay message
-    const calculatePriceAndDelay = () => {
-        let pricePerAnswer = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price;
-        if (parseInt(delayValue) === OPTIONS_DELAY_ENUM.SHORT_DELAY) pricePerAnswer = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.SHORT_DELAY].price;
-        else if (parseInt(delayValue) === OPTIONS_DELAY_ENUM.STANDARD_DELAY) pricePerAnswer = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.STANDARD_DELAY].price;
-        else if (parseInt(delayValue) === OPTIONS_DELAY_ENUM.LONG_DELAY) pricePerAnswer = OPTIONS_DELAY[OPTIONS_DELAY_ENUM.LONG_DELAY].price;
-
-        const total = numRequest * pricePerAnswer;
-        const insufficientFunds = total > (user?.credit || 0);
-
-        let delayNote = "";
-        switch (parseInt(delayValue)) {
-            case OPTIONS_DELAY_ENUM.NO_DELAY:
-                delayNote = `Không có điền rải dãn cách. Đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price} VND / 1 mẫu trả lời. Kết quả lên ngay tức thì (Không bị giới hạn thời gian, khoảng mỗi mẫu cách nhau khoảng 1s).`;
-                break;
-            case OPTIONS_DELAY_ENUM.SHORT_DELAY:
-                delayNote = `Bill điền rải ngắn có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.SHORT_DELAY].price} VND / 1 mẫu trả lời. Rải random từ <b>1 đến 5 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và cần bạn bật lại tiếp tục chạy vào vào ngày hôm sau.</b>. Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 2 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
-                break;
-            case OPTIONS_DELAY_ENUM.STANDARD_DELAY:
-                delayNote = `Bill điền rải tiêu chuẩn có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.STANDARD_DELAY].price} VND / 1 mẫu trả lời. Rải random từ <b>1 đến 10 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và cần bạn bật lại tiếp tục chạy vào vào ngày hôm sau.</b>. Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 12 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
-                break;
-            case OPTIONS_DELAY_ENUM.LONG_DELAY:
-                delayNote = `Bill điền rải dài có đơn giá ${OPTIONS_DELAY[OPTIONS_DELAY_ENUM.LONG_DELAY].price} VND / 1 mẫu trả lời. Rải random từ <b>1 đến 20 phút</b> Bạn có thể dừng lại / tiếp tục tùy nhu cầu bản thân. Tool sẽ tự động dừng điền rải trước 22h mỗi ngày và cần bạn bật lại tiếp tục chạy vào vào ngày hôm sau.</b>. Thời gian hoàn thành 100 mẫu tiêu chuẩn là khoảng 24 giờ. (có thể thay đổi lớn phụ thuộc vào số lượng người dùng)`;
-                break;
-            default:
-                delayNote = "⚠️ Lựa chọn điền rải không hợp lệ!";
-        }
-
-        return {
-            pricePerAnswer,
-            total,
-            insufficientFunds,
-            delayNote,
-            message: insufficientFunds
-                ? 'KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ'
-                : `Bạn xác nhận sẽ buff ${numRequest} câu trả lời cho form này.`
-        };
+    const isInsufficientFunds = () => {
+        return numRequest * OPTIONS_DELAY[delayValue].price > (user?.credit || 0);
     };
 
     const syncFormHandle = async (): Promise<void> => {
@@ -335,7 +316,7 @@ export default function FormPrefill() {
     };
 
 
-    const { pricePerAnswer, total, insufficientFunds, delayNote, message } = calculatePriceAndDelay();
+    const insufficientFunds = isInsufficientFunds();
 
     useEffect(() => {
         if (dataForm?.form && dataForm?.form.loaddata) {
@@ -539,8 +520,8 @@ export default function FormPrefill() {
                                                                 defaultValue={data.field}
                                                             >
                                                                 {fields && fields.map((field: any) => (
-                                                                    <option key={field.value} value={field.value}>
-                                                                        {field.value}
+                                                                    <option key={field.id} value={field.id}>
+                                                                        {field.label}
                                                                     </option>
                                                                 ))}
                                                             </select>
@@ -552,121 +533,50 @@ export default function FormPrefill() {
                                     </div>
                                 </div>
 
-                                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <svg className="flex-shrink-0 h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                        <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU ĐIỀN FORM</h3>
-                                    </div>
-
-                                    <div className="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
-                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
-                                                Số dư tài khoản
-                                            </div>
-                                            <div className="col-span-2 flex items-center">
-                                                <div className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold w-40">
-                                                    {(user?.credit || 0).toLocaleString()} <span className="text-xs font-normal text-gray-500">VND</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
-                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
-                                                Đơn giá mỗi câu trả lời
-                                            </div>
-                                            <div className="col-span-2 flex items-center">
-                                                <div className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold">
-                                                    {pricePerAnswer.toLocaleString()} <span className="text-xs font-normal text-gray-500">VND</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
-                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
-                                                Số lượng câu trả lời cần tăng
-                                            </div>
-                                            <div className="col-span-2 flex items-center">
-                                                <input
-                                                    type="number"
-                                                    readOnly
-                                                    className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold w-40"
-                                                    value={numRequest}
-                                                    {...register("num_request")}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
-                                            <div className="flex items-center md:justify-end text-gray-700 font-medium">
-                                                Điền rải random như người thật
-                                            </div>
-                                            <div className="col-span-2">
-                                                <select
-                                                    className="block w-full rounded-md bg-white px-3 py-2.5 text-xs text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                                                    {...register("delay")}
-                                                >
-                                                    <option value="0">Không cần điền rải</option>
-                                                    <option value="1">Điền giãn cách ngắn</option>
-                                                    <option value="2">Điền giãn cách tiêu chuẩn</option>
-                                                    <option value="3">Điền giãn cách dài</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 my-6">
-                                        <h3 className="text-xl font-bold">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
-                                        <p className="text-sm text-left w-full" dangerouslySetInnerHTML={{ __html: delayNote }}></p>
-
-                                        {insufficientFunds && (
-                                            <div className="mt-4 p-4 bg-white rounded-lg">
-                                                <div className="p-3 bg-red-100 text-red-700 rounded-lg mb-4 text-center font-medium">
-                                                    ❌ KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ!
-                                                </div>
-                                                <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm {(total - (user?.credit || 0)).toLocaleString()} VND để tiếp tục</h4>
-
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Tên NH:</span>
-                                                        <span>{bankInfo?.data?.name}</span>
-                                                    </div>
-
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">STK:</span>
-                                                        <span>{bankInfo?.data?.number}</span>
-                                                    </div>
-
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Tên TK:</span>
-                                                        <span>VUONG TIEN DAT</span>
-                                                    </div>
-
-                                                    <div className="flex items-center">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Nội dung CK:</span>
-                                                        <span>{bankInfo?.data?.message_credit}</span>
-                                                    </div>
-
-                                                    <div className="flex items-start">
-                                                        <span className="w-1/3 font-medium text-right pr-3">Mã QR:</span>
-                                                        <Image
-                                                            src={bankInfo?.data?.qr_link || ""}
-                                                            alt="QRCode"
-                                                            width={200}
-                                                            height={200}
-                                                            className="w-[200px] h-auto"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                <CreateOrderForm
+                                    disabledDays={disabledDays}
+                                    scheduleEnabled={scheduleEnabled}
+                                    startTime={startTime}
+                                    endTime={endTime}
+                                    userCredit={user?.credit || 0}
+                                    numRequest={numRequest}
+                                    delayType={delayValue}
+                                    numRequestReadOnly={true}
+                                    formId={dataForm?.form?.id}
+                                    formName={dataForm?.form?.name}
+                                    bankInfo={bankInfo}
+                                    showBackButton={false}
+                                    specificStartDate={specificStartDate}
+                                    specificEndDate={specificEndDate}
+                                    specificDailySchedules={specificDailySchedules}
+                                    onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
+                                    onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
+                                    onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
+                                    onNumRequestChange={(value) => {
+                                        // This is read-only in prefill mode, but we need to provide the handler
+                                        // No action needed
+                                    }}
+                                    onDelayTypeChange={(value) => {
+                                        setDelayValue(value);
+                                    }}
+                                    onScheduleEnabledChange={(value) => {
+                                        setScheduleEnabled(value);
+                                    }}
+                                    onStartTimeChange={(value) => {
+                                        setStartTime(value);
+                                    }}
+                                    onEndTimeChange={(value) => {
+                                        setEndTime(value);
+                                    }}
+                                    onDisabledDaysChange={(value) => {
+                                        setDisabledDays(value);
+                                    }}
+                                    className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 max-w-[600px] mx-auto"
+                                />
 
                                 <button
                                     type="submit"
-                                    className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                    className={`w-full max-w-[600px] mx-auto mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
                                         ${insufficientFunds || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={insufficientFunds || submitDisabled}
                                 >

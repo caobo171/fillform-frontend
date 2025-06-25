@@ -2,12 +2,13 @@ const FAKE_DATA = {
   IMAGE_URL:
     'https://cungdecor.vn/wp-content/uploads/2019/04/kien-truc-noi-that-la-gi-xu-huong-thiet-ke-kien-truc-noi-that-hien-nay-02.jpg',
 };
+const IMAGE_URL = "https://fillformposts.s3.ap-southeast-1.amazonaws.com/";
 
-const IMAGE_URL = 'https://d2inr1ykkgbz5g.cloudfront.net/';
+export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.fillform.info';
 
-export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://appv2.fillform.info';
+export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.fillform.info';
 
-export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://appv2.fillform.info';
+export const AFFILIATE_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000' : 'https://app.fillform.info';
 
 export const POSTHOG_KEY = process.env.NODE_ENV !== 'production' ? 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD' : 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD';
 export const POSTHOG_HOST = process.env.NODE_ENV !== 'production' ? 'https://us.i.posthog.com' : 'https://us.i.posthog.com';
@@ -126,26 +127,37 @@ export const OPTIONS_DELAY_ENUM = {
   NO_DELAY: 0,
   SHORT_DELAY: 1,
   STANDARD_DELAY: 2,
-  LONG_DELAY: 3
+  LONG_DELAY: 3,
+  SPECIFIC_DELAY: 4
 }
 
 export const OPTIONS_DELAY = {
   [OPTIONS_DELAY_ENUM.NO_DELAY]: {
     name: "Không cần điền rải",
-    price: 350
+    price: 350,
+    description: "Gửi liên tiếp không giãn cách"
   },
   [OPTIONS_DELAY_ENUM.SHORT_DELAY]: {
     name: "Điền giãn cách ngắn",
-    price: 400
+    price: 400,
+    description: "Gửi với giãn cách 1-5 phút"
   },
   [OPTIONS_DELAY_ENUM.STANDARD_DELAY]: {
     name: "Điền giãn cách tiêu chuẩn",
-    price: 450
+    price: 450,
+    description: "Gửi với giãn cách 1-10 phút"
   },
   [OPTIONS_DELAY_ENUM.LONG_DELAY]: {
     name: "Điền giãn cách dài",
-    price: 500
+    price: 500,
+    description: "Gửi với giãn cách 1-20 phút"
+  },
+  [OPTIONS_DELAY_ENUM.SPECIFIC_DELAY]: {
+    name: "Điền giãn cách xác định chính xác thời gian",
+    price: 600,
+    description: "Gửi với giãn cách phù hợp với thời gian đã chọn"
   }
+
 }
 
 
@@ -162,3 +174,7 @@ export const BANK_INFO = {
     }
   }
 }
+
+
+export const REFER_PERCENT = 15;
+export const MIN_DRAW_CREDIT = 100000;

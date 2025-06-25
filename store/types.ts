@@ -27,22 +27,15 @@ export type Param = {
   value: number | string;
 };
 
-export type RawNotification = {
-  id: number;
-  user_id: number;
-  user_name: string;
-  metatype: string;
-  object_id: number;
-  object_type: string;
-  since: number;
-  image: string;
-  content: string;
-  from_avatar: RawImage;
-  from_name: string;
-  from_id: number;
-  status: number;
-  action: string;
-  link: string;
+export type RawWithdrawalRequest = {
+  id: string;
+  owner: string;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  amount: number;
+  status: string;
+  createdAt: string;
 };
 
 export type RawForm = {
@@ -67,6 +60,24 @@ export type RawUser = {
   credit: number;
   is_super_admin: number;
   createdAt: string;
+  isAffiliate: boolean;
+  idcredit: string;
+  referCredit: number;
+  referId: number;
+  referCreditDone: number;
+  referCreditWait: number;
+};
+
+
+export type RawSystemAnnoucement = {
+  id: number;
+  image: string;
+  content: string;
+  type: string;
+  createdAt: string;
+  status: string;
+  link: string;
+  owner: string
 };
 
 
@@ -101,6 +112,23 @@ export type RawOrder = {
   passed_num: number;
   failed_num: number;
   data: any[];
+  data_url?: string;
+  schedule_setup?: {
+    enabled: number;
+    config: {
+      [key: string]: string[][];
+    };
+  };
+  specific_delay?: {
+    start_date: string;
+    end_date: string;
+    daily_schedules: {
+      date: string;
+      start_time: string;
+      end_time: string;
+      enabled: number;
+    }[];
+  }
 };
 
 

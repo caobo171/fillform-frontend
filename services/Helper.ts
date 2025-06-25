@@ -52,11 +52,16 @@ export class Helper {
       return '';
     }
 
-    temp = temp.replace(/<\/[^>]*>/gm, ' ');
+    // Remove HTML tags
+    temp = temp.replace(/<\/[^>]*>/gm, '');
     temp = temp.replace(/<[^>]*>/gm, '');
     temp = temp.replace(/<>/gm, '');
-    temp = temp.replace(/^\s+|\s+$/gm, '');
-    temp = temp.replace(/\s+/gm, ' ');
+    
+    // Remove all whitespace characters (spaces, tabs, newlines, etc.)
+    temp = temp.replace(/\s+/gm, '');
+    
+    // Convert to lowercase
+    temp = temp.toLowerCase();
 
     return temp;
   };

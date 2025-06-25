@@ -80,16 +80,17 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
 
 
     useEffect(() => {
-        setQuery(searchParams.get('q') || '');
-        setCurrentPage(1);
-        dataOrder.mutate();
-    }, [searchParams.get('q')]);
-
-
-    useEffect(() => {
+        const searchQuery = searchParams.get('q') || '';
+        setQuery(searchQuery);
         setCurrentPage(page);
-        dataOrder.mutate();
-    }, [page]);
+        
+        // Only mutate once after state updates are complete
+        const timeoutId = setTimeout(() => {
+            dataOrder.mutate();
+        }, 0);
+        
+        return () => clearTimeout(timeoutId);
+    }, [searchParams, page]);
 
 
     useEffect(() => {

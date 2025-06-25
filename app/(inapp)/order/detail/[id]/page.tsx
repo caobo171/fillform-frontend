@@ -1,7 +1,7 @@
 'use client'
 
 import LoadingAbsolute, { Loading } from '@/components/loading'
-import { Code, OPTIONS_DELAY, ORDER_STATUS } from '@/core/Constants'
+import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_STATUS } from '@/core/Constants'
 import { useFormById } from '@/hooks/form'
 import { useOrderById } from '@/hooks/order'
 import { useMe } from '@/hooks/user'
@@ -11,10 +11,9 @@ import { SocketService } from '@/services/SocketClient'
 import { Toast } from '@/services/Toast'
 import { RawOrder } from '@/store/types'
 import { useParams } from 'next/navigation'
-import { FC, useState, useMemo, useEffect, use } from 'react'
+import { FC, useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import clsx from 'clsx'
-
 
 
 
@@ -29,10 +28,71 @@ const OrderPage = () => {
 
     const [owner, setOwner] = useState(order.data?.order.owner)
     const [delay, setDelay] = useState(order.data?.order.delay);
+    const [scheduleEnabled, setScheduleEnabled] = useState(Boolean(order.data?.order.schedule_setup?.enabled));
+    const [startTime, setStartTime] = useState('08:00');
+    const [endTime, setEndTime] = useState('20:00');
+    const [disabledDays, setDisabledDays] = useState<number[]>([]);
+    const [daysDropdownOpen, setDaysDropdownOpen] = useState<boolean>(false);
+    const daysDropdownRef = useRef<HTMLDivElement>(null);
+
+    // SPECIFIC_DELAY state
+    const [specificStartDate, setSpecificStartDate] = useState(order.data?.order.specific_delay?.start_date || '');
+    const [specificEndDate, setSpecificEndDate] = useState(order.data?.order.specific_delay?.end_date || '');
+    const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>(order.data?.order.specific_delay?.daily_schedules || []);
+    const [startDateWarning, setStartDateWarning] = useState('');
+    const [endDateWarning, setEndDateWarning] = useState('');
+    const [isGeneratingSchedules, setIsGeneratingSchedules] = useState(false);
 
     useEffect(() => {
         setOwner(order.data?.order.owner)
         setDelay(order.data?.order.delay)
+        setScheduleEnabled(Boolean(order.data?.order.schedule_setup?.enabled))
+
+        if (order.data?.order.delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY) { // SPECIFIC_DELAY
+            // Load specific delay info from backend if available
+            const spec = order.data?.order.specific_delay;
+            setSpecificStartDate(spec?.start_date || '');
+            setSpecificEndDate(spec?.end_date || '');
+            if (spec?.daily_schedules) {
+                setSpecificDailySchedules(spec.daily_schedules.map(s => ({
+                    date: s.date,
+                    startTime: s.start_time,
+                    endTime: s.end_time,
+                    enabled: !!s.enabled
+                })));
+            } else if (order.data?.order.schedule_setup?.config) {
+                // Fallback: Convert config to daily schedules if present
+                const config = order.data.order.schedule_setup.config;
+                const schedules = Object.entries(config).map(([date, slots]: [string, any]) => ({
+                    date,
+                    startTime: slots?.[0]?.[0] || '08:00',
+                    endTime: slots?.[0]?.[1] || '20:00',
+                    enabled: slots && slots.length > 0
+                }));
+                setSpecificDailySchedules(schedules);
+            }
+        } else if (order.data?.order.schedule_setup?.config) {
+            // Regular schedule
+            const allDays = Object.entries(order.data.order.schedule_setup.config);
+            if (allDays.length > 0) {
+                for (const [day, slots] of allDays) {
+                    if (slots && slots.length > 0 && slots[0].length >= 2) {
+                        setStartTime(slots[0][0] || '08:00');
+                        setEndTime(slots[0][1] || '20:00');
+                        break;
+                    }
+                }
+            }
+            // Find disabled days
+            const disabledDaysList: number[] = [];
+            for (let i = 0; i < 7; i++) {
+                const daySlots = order.data.order.schedule_setup.config[i.toString()];
+                if (!daySlots || daySlots.length === 0) {
+                    disabledDaysList.push(i);
+                }
+            }
+            setDisabledDays(disabledDaysList);
+        }
     }, [order.data?.order])
 
     let estimatedEndTime = useMemo(() => {
@@ -87,15 +147,27 @@ const OrderPage = () => {
     const onSaveChange = async () => {
         setIsFetching(true)
         try {
-            const res = await Fetch.postWithAccessToken<{ code: number }>('/api/order/update', {
+            let postData: any = {
                 id: params.id as string,
                 owner: owner,
-                delay: delay
-            })
-
+                delay: delay,
+                schedule_enabled: scheduleEnabled ? 1 : 0,
+            };
+            if (delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY) { // SPECIFIC_DELAY
+                postData.specific_start_date = specificStartDate;
+                postData.specific_end_date = specificEndDate;
+                postData.specific_daily_schedules = specificDailySchedules.map((s: any) => `${s.date}_${s.startTime}_${s.endTime}_${s.enabled}`).join(',');
+            } else {
+                postData.disabled_days = disabledDays.join(',');
+                postData.start_time = startTime;
+                postData.end_time = endTime;
+            }
+            const res = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/update', postData);
             if (res.data.code === Code.SUCCESS) {
                 order.mutate();
                 Toast.success('Thay đổi đã được lưu');
+            } else {
+                Toast.error(res.data.message);
             }
         } catch (error) {
             Toast.error('Lỗi khi lưu thay đổi');
@@ -178,11 +250,9 @@ const OrderPage = () => {
         return <Loading />
     }
 
-    console.log(order.data?.order.status)
-
 
     return (
-        <section className="py-12 bg-white">
+        <section className="bg-gradient-to-b from-primary-50 to-white py-12 mx-auto px-4 sm:px-6">
             {isFetching && <LoadingAbsolute />}
             <div className="container mx-auto text-center" data-aos="fade-up">
                 <div className="mb-10">
@@ -209,6 +279,64 @@ const OrderPage = () => {
                                     <span className="text-gray-600">Điền rải:</span>
                                     <span className="font-semibold">{OPTIONS_DELAY[(order.data?.order.delay) as keyof typeof OPTIONS_DELAY]?.name || 'Unknown'}</span>
                                 </div>
+
+                                {/* Specific Delay Schedule Display */}
+                                {order.data?.order.delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY && order.data?.order.specific_delay ? (
+                                    <div className="flex justify-between items-start">
+                                        <span className="text-gray-600">Lịch cụ thể:</span>
+                                        <div className="text-right">
+                                            <div className="text-xs text-gray-500">
+                                                <div><span className="font-medium">Bắt đầu:</span> {order.data?.order.specific_delay.start_date ? new Date(order.data?.order.specific_delay.start_date).toLocaleString() : '-'}</div>
+                                                <div><span className="font-medium">Kết thúc:</span> {order.data?.order.specific_delay.end_date ? new Date(order.data?.order.specific_delay.end_date).toLocaleString() : '-'}</div>
+                                            </div>
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                {order.data?.order.specific_delay.daily_schedules && Array.isArray(order.data?.order.specific_delay.daily_schedules) && order.data?.order.specific_delay.daily_schedules.length > 0 ? (
+                                                    order.data?.order.specific_delay.daily_schedules.map((sch: any, idx: number) => (
+                                                        <div key={idx} className="mb-1">
+                                                            <span className="font-medium">{sch.date}: </span>
+                                                            {sch.enabled ? (
+                                                                <span>{sch.start_time} - {sch.end_time}</span>
+                                                            ) : (
+                                                                <span className="text-red-400">Không có khung giờ</span>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-red-400">Không có lịch hàng ngày</div>
+                                                )}
+                                            </div>
+                                            {Array.isArray((order.data?.order.specific_delay as any)?.computed_delay_times) ? (
+                                                <div className="text-xs text-gray-400 mt-1">Số lần điền đã tính: {(order.data?.order.specific_delay as any).computed_delay_times.length}</div>
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                ) : null}
+
+                                {/* Only show Lịch điền if not SPECIFIC_DELAY */}
+                                {order.data?.order.delay !== OPTIONS_DELAY_ENUM.SPECIFIC_DELAY && Number(order.data?.order.schedule_setup?.enabled) ? (
+                                    <div className="flex justify-between items-start">
+                                        <span className="text-gray-600">Lịch điền:</span>
+                                        <div className="text-right">
+                                            <span className="font-semibold text-green-600">Đã kích hoạt</span>
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                {Object.entries(order.data?.order.schedule_setup?.config || {}).map(([day, slots]: [string, any]) => {
+                                                    if (!slots || slots.length === 0) return null;
+                                                    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+                                                    return (
+                                                        <div key={day} className="mb-1">
+                                                            <span className="font-medium">{dayNames[parseInt(day)]}: </span>
+                                                            {slots.map((slot: any, index: number) => (
+                                                                <span key={index}>
+                                                                    {slot[0]}-{slot[1]}{index < slots.length - 1 ? ', ' : ''}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : null}
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Ngày tạo:</span>
                                     <span className="font-semibold">{new Date(order.data?.order?.createdAt || '').toLocaleString()}</span>
@@ -233,12 +361,14 @@ const OrderPage = () => {
                                                 {estimatedEndTime ? new Date(estimatedEndTime).toLocaleString() : 'Chưa có dữ liệu'}
                                             </span>
                                         </div>
-                                        <div className="mt-2 text-yellow-600 text-xs italic">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                            </svg>
-                                            Order có thể được dừng bởi người dùng, hoặc dừng do không trong thời gian rải đơn (7-22h hằng ngày)
-                                        </div>
+                                        {!order.data?.order.schedule_setup?.enabled && (
+                                            <div className="mt-2 text-yellow-600 text-xs italic">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                </svg>
+                                                Order có thể được dừng bởi người dùng, hoặc dừng do không trong thời gian rải đơn (7-22h hằng ngày)
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -295,13 +425,35 @@ const OrderPage = () => {
                                         ></div>
                                     </div>
                                 </div>
+
+                                <div className="pt-2 border-t border-gray-100 mt-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-gray-600">Dữ liệu Form:</span>
+                                        {order.data?.order.data_url ? (
+                                            <a
+                                                href={order.data.order.data_url}
+                                                className="text-primary-600 hover:text-primary-800 font-medium flex items-center"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                                                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                                                </svg>
+                                                Xem bảng dữ liệu
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-500 italic text-sm">Không có dữ liệu</span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {isAdmin && (
-                    <div className="text-left mb-8 bg-white rounded shadow-sm p-4">
+                    <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
                         <h2 className="text-2xl font-bold mb-4">Quản lý Order</h2>
 
                         {
@@ -383,12 +535,12 @@ const OrderPage = () => {
                                                 id="delay"
                                                 name="delay"
                                                 value={delay}
-                                                onChange={(e) => setDelay(e.target.value)}
+                                                onChange={(e) => setDelay(Number(e.target.value))}
                                                 className="block w-full rounded-md bg-white px-3 py-2.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                             >
                                                 {
                                                     Object.keys(OPTIONS_DELAY).map((delay, index) => (
-                                                        <option key={index} value={delay}>{OPTIONS_DELAY[delay as keyof typeof OPTIONS_DELAY].name}</option>
+                                                        <option key={index} value={delay}>{OPTIONS_DELAY[Number(delay)].name}</option>
                                                     ))
                                                 }
                                             </select>
@@ -402,6 +554,248 @@ const OrderPage = () => {
                                         >
                                             Lưu thay đổi
                                         </button>
+                                    </div>
+
+                                    {/* Schedule Setup Section */}
+                                    <div className="sm:col-span-6 mt-4 border-t pt-6">
+                                        <h3 className="text-lg font-semibold mb-4">Lịch trình chạy</h3>
+
+                                        {/* SPECIFIC_DELAY schedule controls */}
+                                        {delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY ? (
+                                            <div className="border border-blue-200 rounded-lg p-4 mb-4 bg-blue-50">
+                                                <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label htmlFor="specific-start-date" className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu:</label>
+                                                        <input
+                                                            type="date"
+                                                            id="specific-start-date"
+                                                            value={specificStartDate}
+                                                            onChange={e => setSpecificStartDate(e.target.value)}
+                                                            className={`w-full border ${startDateWarning ? 'border-red-500' : 'border-gray-300'} rounded px-3 py-2`}
+                                                        />
+                                                        {startDateWarning && (
+                                                            <p className="text-red-500 text-xs mt-1">{startDateWarning}</p>
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <label htmlFor="specific-end-date" className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc (tối đa 7 ngày):</label>
+                                                        <input
+                                                            type="date"
+                                                            id="specific-end-date"
+                                                            value={specificEndDate}
+                                                            onChange={e => setSpecificEndDate(e.target.value)}
+                                                            className={`w-full border ${endDateWarning ? 'border-red-500' : 'border-gray-300'} rounded px-3 py-2`}
+                                                        />
+                                                        {endDateWarning && (
+                                                            <p className="text-red-500 text-xs mt-1">{endDateWarning}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="mb-2">
+                                                    <h5 className="font-medium text-gray-700 mb-2">Lịch trình chạy theo ngày:</h5>
+                                                    {isGeneratingSchedules ? (
+                                                        <div className="text-center py-4">
+                                                            <p className="text-gray-500">Đang tạo lịch trình...</p>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-3 max-h-60 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                                                            {specificDailySchedules.map((schedule, index) => {
+                                                                const date = new Date(schedule.date);
+                                                                const isFirstDay = index === 0;
+                                                                const isLastDay = index === specificDailySchedules.length - 1;
+                                                                const formattedDate = date.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                                                                return (
+                                                                    <div key={schedule.date} className="border border-gray-200 rounded-lg p-3 bg-white">
+                                                                        <div className="flex items-center justify-between mb-2">
+                                                                            <div className="font-medium">{formattedDate}</div>
+                                                                            <div className="flex items-center">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    id={`day-enabled-${index}`}
+                                                                                    checked={schedule.enabled}
+                                                                                    onChange={e => {
+                                                                                        const updated = [...specificDailySchedules];
+                                                                                        updated[index] = { ...updated[index], enabled: e.target.checked };
+                                                                                        setSpecificDailySchedules(updated);
+                                                                                    }}
+                                                                                    className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded"
+                                                                                />
+                                                                                <label htmlFor={`day-enabled-${index}`} className="ml-2 text-sm text-gray-700">Bật</label>
+                                                                            </div>
+                                                                        </div>
+                                                                        {schedule.enabled && (
+                                                                            <div className="grid grid-cols-2 gap-3">
+                                                                                <div>
+                                                                                    <label htmlFor={`day-start-${index}`} className="block text-xs text-gray-500 mb-1">Bắt đầu</label>
+                                                                                    <input
+                                                                                        type="time"
+                                                                                        id={`day-start-${index}`}
+                                                                                        value={schedule.startTime}
+                                                                                        onChange={e => {
+                                                                                            const updated = [...specificDailySchedules];
+                                                                                            updated[index] = { ...updated[index], startTime: e.target.value };
+                                                                                            setSpecificDailySchedules(updated);
+                                                                                        }}
+                                                                                        className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                                                                                    />
+                                                                                    {isFirstDay && <p className="text-xs text-gray-500 mt-1">Ngày đầu tiên</p>}
+                                                                                </div>
+                                                                                <div>
+                                                                                    <label htmlFor={`day-end-${index}`} className="block text-xs text-gray-500 mb-1">Kết thúc</label>
+                                                                                    <input
+                                                                                        type="time"
+                                                                                        id={`day-end-${index}`}
+                                                                                        value={schedule.endTime}
+                                                                                        onChange={e => {
+                                                                                            const updated = [...specificDailySchedules];
+                                                                                            updated[index] = { ...updated[index], endTime: e.target.value };
+                                                                                            setSpecificDailySchedules(updated);
+                                                                                        }}
+                                                                                        className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                                                                                    />
+                                                                                    {isLastDay && <p className="text-xs text-gray-500 mt-1">Ngày cuối cùng</p>}
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            // Regular schedule controls (existing UI)
+                                            <>
+                                                <div className="mb-4">
+                                                    <div
+                                                        className="flex items-center"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setScheduleEnabled(!scheduleEnabled);
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            id="schedule-enabled"
+                                                            checked={scheduleEnabled}
+                                                            onChange={(e) => {
+                                                                e.stopPropagation(); // Prevent event bubbling
+                                                                setScheduleEnabled(!scheduleEnabled);
+                                                            }}
+                                                            className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                                                        />
+                                                        <label
+                                                            htmlFor="schedule-enabled"
+                                                            className="ml-2 block text-sm text-gray-700 cursor-pointer"
+                                                        >
+                                                            Bật lịch trình (+50 VND/yêu cầu)
+                                                            {!scheduleEnabled && Number(delay) !== 0 && (
+                                                                <span className="block text-xs text-red-500 mt-1 font-sm">
+                                                                    Lưu ý: Nếu không bật lịch trình, yêu cầu sẽ tự động dừng từ 22h đến 7h hôm sau
+                                                                </span>
+                                                            )}
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                {scheduleEnabled && (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <div className="mb-3">
+                                                            <label className="block text-sm font-medium text-gray-700 mb-2">Thời gian chạy trong ngày:</label>
+                                                            <div className="flex space-x-2">
+                                                                <div className="flex-1">
+                                                                    <label htmlFor="start-time" className="block text-xs text-gray-500 mb-1">Từ</label>
+                                                                    <input
+                                                                        type="time"
+                                                                        id="start-time"
+                                                                        value={startTime}
+                                                                        onChange={(e) => setStartTime(e.target.value)}
+                                                                        className="w-full border border-gray-300 rounded px-3 py-2"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <label htmlFor="end-time" className="block text-xs text-gray-500 mb-1">Đến</label>
+                                                                    <input
+                                                                        type="time"
+                                                                        id="end-time"
+                                                                        value={endTime}
+                                                                        onChange={(e) => setEndTime(e.target.value)}
+                                                                        className="w-full border border-gray-300 rounded px-3 py-2"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label className="block text-sm font-medium text-gray-700 mb-2">Ngày <span className="font-bold text-red-600">KHÔNG</span> chạy trong tuần:</label>
+                                                            <div className="relative" ref={daysDropdownRef}>
+                                                                <div
+                                                                    className="w-full border border-gray-300 rounded px-3 py-2 bg-white cursor-pointer hover:border-blue-400 transition-colors"
+                                                                    onClick={() => setDaysDropdownOpen(!daysDropdownOpen)}
+                                                                >
+                                                                    <div className="flex justify-between items-center">
+                                                                        <span className="truncate font-sm">
+                                                                            {disabledDays.length === 0
+                                                                                ? 'Chạy tất cả các ngày'
+                                                                                : disabledDays
+                                                                                    .map(day => ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][day])
+                                                                                    .join(', ')}
+                                                                        </span>
+                                                                        <svg className="flex-shrink-0 fill-current h-4 w-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
+                                                                {daysDropdownOpen && (
+                                                                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow-lg">
+                                                                        {[0, 1, 2, 3, 4, 5, 6].map(day => {
+                                                                            const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+                                                                            const isSelected = disabledDays.includes(day);
+                                                                            return (
+                                                                                <div
+                                                                                    key={day}
+                                                                                    className={`p-3 hover:bg-gray-100 cursor-pointer flex items-center ${isSelected ? 'bg-blue-50' : ''}`}
+                                                                                    onClick={() => {
+                                                                                        const newDisabledDays = isSelected
+                                                                                            ? disabledDays.filter(d => d !== day)
+                                                                                            : [...disabledDays, day];
+                                                                                        setDisabledDays(newDisabledDays);
+                                                                                    }}
+                                                                                >
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={isSelected}
+                                                                                        onChange={() => { }}
+                                                                                        className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded mr-2"
+                                                                                    />
+                                                                                    <span>{dayNames[day]}</span>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {scheduleEnabled && (
+                                                            <div className="sm:col-span-2 bg-white rounded-lg p-3 mb-3 border border-green-100">
+                                                                <h4 className="font-sm text-green-700 mb-2">Lịch trình đã bật:</h4>
+                                                                <ul className="text-sm text-gray-700 space-y-1">
+                                                                    <li>• Thời gian chạy: <span className="font-sm">{startTime} - {endTime}</span> mỗi ngày</li>
+                                                                    {disabledDays.length > 0 && (
+                                                                        <li>• Không chạy vào: <span className="font-sm">
+                                                                            {disabledDays
+                                                                                .map(day => ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'][day])
+                                                                                .join(', ')}
+                                                                        </span></li>
+                                                                    )}
+                                                                    <li>• Phụ phí: <span className="font-sm text-green-600">+50 VND/yêu cầu</span></li>
+                                                                </ul>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 
@@ -448,74 +842,82 @@ const OrderPage = () => {
 
                 {/* Form Config */}
                 <div className="text-left">
-                    <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
+                    {
+                        order.data?.order.type !== 'Data có trước' ? (
+                            <>
+                                <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
 
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                        {order.data?.order.data.map((question, qIndex) => (
-                            <div key={qIndex} className="p-4 bg-white rounded shadow-sm text-xs mb-4">
-                                <div className="md:flex md:items-start gap-8">
-                                    <div className="md:w-1/4 mb-4 md:mb-0">
-                                        {question.description ? (
-                                            <>
-                                                <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
-                                                <label className="block truncate w-full text-gray-400">{question.description}</label>
-                                            </>
-                                        ) : (
-                                            <label className="block font-bold truncate w-full">{question.question}</label>
-                                        )}
-                                    </div>
+                                <div className="bg-white p-6 rounded-lg border border-gray-100">
+                                    {order.data?.order.data.map((question, qIndex) => (
+                                        <div key={qIndex} className="p-4 bg-gray-50 rounded shadow-sm text-xs mb-4">
+                                            <div className="md:flex md:items-start gap-8">
+                                                <div className="md:w-1/4 mb-4 md:mb-0">
+                                                    {question.description ? (
+                                                        <>
+                                                            <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
+                                                            <label className="block truncate w-full text-gray-400">{question.description}</label>
+                                                        </>
+                                                    ) : (
+                                                        <label className="block font-bold truncate w-full">{question.question}</label>
+                                                    )}
+                                                </div>
 
-                                    <div className="md:w-3/4">
-                                        {question.type ? (
-                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                                                {question.answer.map((answer: any, aIndex: any) => (
-                                                    answer.data && (
-                                                        <div key={aIndex} className="relative">
-                                                            <label
-                                                                htmlFor="name"
-                                                                className="absolute left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
-                                                            >
-                                                                {answer.data}
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                name={answer.id}
-                                                                id={answer.id}
-                                                                defaultValue={answer.count}
-                                                                className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
-                                                                disabled
-                                                            />
+                                                <div className="md:w-3/4">
+                                                    {question.type ? (
+                                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                                                            {question.answer.map((answer: any, aIndex: any) => (
+                                                                answer.data && (
+                                                                    <div key={aIndex} className="relative">
+                                                                        <label
+                                                                            htmlFor="name"
+                                                                            className="absolute left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                                        >
+                                                                            {answer.data}
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            name={answer.id}
+                                                                            id={answer.id}
+                                                                            defaultValue={answer.count}
+                                                                            className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                                            disabled
+                                                                        />
+                                                                    </div>
+                                                                )
+                                                            ))}
                                                         </div>
-                                                    )
-                                                ))}
+                                                    ) : (
+                                                        <div className="grid gap-2">
+                                                            {question.answer.map((answer: any, aIndex: any) => (
+                                                                <div key={aIndex} className="relative w-full">
+                                                                    <label
+                                                                        className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                                    >
+                                                                        Loại câu hỏi tự luận
+                                                                    </label>
+                                                                    <select
+                                                                        name={answer.id}
+                                                                        id={answer.id}
+                                                                        defaultValue={answer.count}
+                                                                        className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6"
+                                                                        disabled
+                                                                    >
+                                                                        <option value={answer.count}>{answer.count}</option>
+                                                                    </select>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        ) : (
-                                            <div className="grid gap-2">
-                                                {question.answer.map((answer: any, aIndex: any) => (
-                                                    <div key={aIndex} className="relative w-full">
-                                                        <label
-                                                            className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
-                                                        >
-                                                            Loại câu hỏi tự luận
-                                                        </label>
-                                                        <select
-                                                            name={answer.id}
-                                                            id={answer.id}
-                                                            defaultValue={answer.count}
-                                                            className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6"
-                                                            disabled
-                                                        >
-                                                            <option value={answer.count}>{answer.count}</option>
-                                                        </select>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            </>
+                        ) : null
+                    }
+
+
                 </div>
             </div>
         </section>

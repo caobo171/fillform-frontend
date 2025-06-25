@@ -13,6 +13,7 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 	const [isFullyLoaded, setFullyLoaded] = useState(false);;
 	const me = useMe();
 
+
 	useEffect(() => {
 		(async () => {
 			await Startup.init();
@@ -21,36 +22,36 @@ const AppWrapper = ({ children }: { children: ReactElement }) => {
 
 	}, []);
 
-	useEffect(() => {
-
-	}, []);
-
-
 
 
 	useEffect(() => {
 		if (me.data) {
 			SocketService.connect(me.data);
-
 			SocketService.socket.on('credit_update', (data: any) => {
 				console.log('credit_update', data);
 				Toast.success('Nạp tiền thành công!');
 				me.mutate();
 			});
 
-
-			const win = window as any;
-
 			//@ts-ignore
-			window.Frill('container', {
-				key: '8cfa155f-37e4-4e84-98f0-fe3bc9826335',
-				// Identify your users (optional)
-				user: { email: me.data?.email, name: me.data?.username }
-			})
+			const win = window as any;
+			win.PulseSurvey({
+				write_key: 'C2zDGLbBAc6ABGb79ADdUQcimYyK63fsyVIcBwHKMHhjT-b7IO3kAINFiHdSQMrYbge7w8KEexA_YjyFWe-MXc5WceAwHkRIj0Rvr-XwT00', // Required
+				email: me.data?.email, // Required
+				name: me.data?.username, // Required
+				traits: { // Optional
+				},
 
+				onReady: function (params: any) {
+					// Params contains latest_reponse, survey, had_ignored, identifier
+					console.log('Ready to show', params);
+				},
+
+				onError: function () {
+					console.log('Some error happens');
+				}
+			});
 		}
-
-
 	}, [me]);
 
 

@@ -140,6 +140,16 @@ export default function Login() {
               <Button className="w-full" size="large" loading={isSubmitting}>
                 Đăng nhập
               </Button>
+
+              <p className="left mt-4">
+                Bạn chưa có tài khoản? &nbsp;
+                <Link
+                  href="/authentication/register"
+                  className="text-primary hover:text-primary-700"
+                >
+                  Đăng kí ngay
+                </Link>
+              </p>
             </form>
 
             {errorMessage && (
@@ -148,15 +158,7 @@ export default function Login() {
               </p>
             )}
 
-            <p className="absolute z-10 bottom-10 left">
-              Bạn chưa có tài khoản? &nbsp;
-              <Link
-                href="/authentication/register"
-                className="text-primary hover:text-primary-700"
-              >
-                Đăng kí ngay
-              </Link>
-            </p>
+
           </div>
         </div>
       </div>

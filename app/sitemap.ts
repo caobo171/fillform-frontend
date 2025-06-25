@@ -9,13 +9,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: 'https://appv2 .fillform.info/',
+      url: 'https://app .fillform.info/',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: 'https://appv2.fillform.info/',
+      url: 'https://app.fillform.info/',
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.5,

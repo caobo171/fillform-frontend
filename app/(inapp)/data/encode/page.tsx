@@ -8,7 +8,6 @@ import { z } from 'zod'
 import { Button, Input } from '@/components/common'
 import { FormItem, InlineFormItem } from '@/components/form/FormItem'
 import Fetch from '@/lib/core/fetch/Fetch'
-import { Container } from '@/components/layout/container/container'
 import { Helper } from '@/services/Helper'
 import { CSVLink } from 'react-csv'
 import LoadingAbsolute from '@/components/loading'
@@ -91,11 +90,11 @@ export default function FormCreate() {
     };
 
     return (
-        <Container>
+        <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
             <div className="relative isolate overflow-hidden py-12">
                 {loading && <LoadingAbsolute />}
 
-                <div className="container mx-auto">
+                <div className="container mx-auto" data-aos="fade-up">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <h2 className="text-3xl font-bold mb-3">Mã hóa data từ kết quả có sẵn</h2>
@@ -105,7 +104,7 @@ export default function FormCreate() {
                     </div>
 
                     {/* Form Section */}
-                    <div className="bg-white shadow-sm rounded-lg pb-6 mb-10">
+                    <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
                         <form
                             onSubmit={handleSubmit(onSubmit)}
                             className="p-6"
@@ -152,12 +151,17 @@ export default function FormCreate() {
                             </InlineFormItem>
 
                             <Button 
-                                className="w-full" 
+                                className="w-full font-bold" 
                                 size="large" 
                                 loading={isSubmitting || loading}
                                 htmlType="submit"
                             >
-                                Mã hoá dữ liệu ngay
+                                <div className="flex items-center justify-center">
+                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Mã hoá dữ liệu ngay
+                                </div>
                             </Button>
 
                             <CSVLink 
@@ -207,6 +211,6 @@ export default function FormCreate() {
                     </div>
                 </div>
             </div>
-        </Container>
+        </section>
     )
 }

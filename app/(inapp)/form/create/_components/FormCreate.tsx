@@ -1,8 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { XCircle } from 'lucide-react'
@@ -11,7 +10,6 @@ import { z } from 'zod'
 import Fetch from '@/lib/core/fetch/Fetch'
 import { Toast } from '@/services/Toast'
 import LoadingAbsolute from '@/components/loading'
-import { Container } from '@/components/layout/container/container'
 import { Button, Input } from '@/components/common'
 import { FormItem, InlineFormItem } from '@/components/form/FormItem'
 import Meta from '@/components/ui/Meta'
@@ -26,16 +24,34 @@ export default function FormCreate() {
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const [msg, setMsg] = useState<string>('');
+    const [isViewFormLink, setIsViewFormLink] = useState<boolean>(false);
 
     const {
         control,
         handleSubmit,
+        watch,
         formState: { isSubmitting, errors },
     } = useForm<CreateFormValues>();
+    
+    const formLink = watch('form_link');
+    
+    useEffect(() => {
+        if (formLink && formLink?.includes('/viewform')) {
+            setIsViewFormLink(true);
+        } else {
+            setIsViewFormLink(false);
+            setMsg('');
+        }
+    }, [formLink]);
 
     const onSubmit = async (formData: CreateFormValues) => {
-        if (!formData.form_link) {
+        if (!formData?.form_link) {
             setMsg('Vui lòng nhập đường dẫn edit form!');
+            return;
+        }
+        
+        if (formData?.form_link.includes('/viewform')) {
+            setMsg('Bạn đang sử dụng link xem form (/viewform). Vui lòng sử dụng link edit form (/edit) thay thế!');
             return;
         }
 
@@ -43,7 +59,7 @@ export default function FormCreate() {
 
         try {
             const res: any = await Fetch.postWithAccessToken('/api/form/create', {
-                form_link: formData.form_link,
+                form_link: formData?.form_link,
             });
 
             if (res.data?.form){
@@ -59,11 +75,11 @@ export default function FormCreate() {
     };
 
     return (
-        <Container>
+        <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
             <div className="relative isolate overflow-hidden py-12">
                 {loading && <LoadingAbsolute />}
 
-                <div className="container mx-auto">
+                <div className="container mx-auto" data-aos="fade-up">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <h2 className="text-3xl font-bold mb-3">Tạo Form mới</h2>
@@ -73,8 +89,8 @@ export default function FormCreate() {
                     </div>
 
                     {/* Form Section */}
-                    <div className="bg-white shadow-sm rounded-lg pb-6">
-                        <form onSubmit={handleSubmit(onSubmit)} className="mb-4">
+                    <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
+                        <form onSubmit={handleSubmit(onSubmit)} className="p-6">
                             <InlineFormItem 
                                 label="Điền Edit Link Form" 
                                 className="mb-6"
@@ -97,11 +113,16 @@ export default function FormCreate() {
 
                             <Button 
                                 htmlType="submit" 
-                                className="w-full" 
+                                className="w-full font-bold" 
                                 size="large" 
                                 loading={isSubmitting || loading}
                             >
-                                Tạo ngay
+                                <div className="flex items-center justify-center">
+                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Tạo ngay
+                                </div>
                             </Button>
                         </form>
 
@@ -111,6 +132,42 @@ export default function FormCreate() {
                                 <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
                                     <XCircle className="w-5 h-5 flex-shrink-0" /> 
                                     <span>{msg}</span>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* ViewForm Link Warning */}
+                        {isViewFormLink && (
+                            <div className="mt-4">
+                                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                                    <h4 className="text-red-700 font-bold mb-2 flex items-center gap-2">
+                                        <XCircle className="w-5 h-5" />
+                                        Bạn đang sử dụng link xem form (/viewform)
+                                    </h4>
+                                    <p className="text-red-700 mb-4">
+                                        Vui lòng sử dụng link <strong>edit form</strong> có đuôi <strong>/edit</strong> thay vì link xem form có đuôi <strong>/viewform</strong>.
+                                    </p>
+                                    <div className="bg-white p-3 rounded border border-red-100 mb-3">
+                                        <p className="text-sm font-medium text-gray-700 mb-2">Link xem form (không đúng):</p>
+                                        <p className="text-xs bg-red-50 p-2 rounded overflow-auto text-red-700 font-mono">
+                                            https://docs.google.com/forms/d/xxx/viewform
+                                        </p>
+                                    </div>
+                                    <div className="bg-white p-3 rounded border border-green-100">
+                                        <p className="text-sm font-medium text-gray-700 mb-2">Link edit form (đúng):</p>
+                                        <p className="text-xs bg-green-50 p-2 rounded overflow-auto text-green-700 font-mono">
+                                            https://docs.google.com/forms/d/xxx/edit
+                                        </p>
+                                    </div>
+                                    <div className="mt-4">
+                                        <Image
+                                            src="/static/img/guide-s1.png"
+                                            alt="Edit Link Guide"
+                                            width={600}
+                                            height={400}
+                                            className="w-full rounded-lg shadow-sm border border-gray-200"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -236,6 +293,6 @@ export default function FormCreate() {
                     </div>
                 </div>
             </div>
-        </Container>
+        </section>
     )
 }

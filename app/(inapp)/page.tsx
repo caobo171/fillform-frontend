@@ -4,7 +4,7 @@ import React, { Suspense, lazy } from 'react';
 import 'slick-carousel/slick/slick-theme.css';
 import 'slick-carousel/slick/slick.css';
 import { MetaData } from '@/core/Metadata';
-import HomeComponent from './Home';
+import HomeComponent from './_components/Home';
 
 type Props = {
   params: { id: string };

@@ -29,7 +29,8 @@ export default function RootLayout({ children }: { children: ReactElement }) {
       <Script>
         {
           `
-          (function(t,r){function s(){var a=r.getElementsByTagName("script")[0],e=r.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://widget.frill.co/v2/container.js",a.parentNode.insertBefore(e,a)}if(!t.Frill){var o=0,i={};t.Frill=function(e,p){var n,l=o++,c=new Promise(function(v,d){i[l]={params:[e,p],resolve:function(f){n=f,v(f)},reject:d}});return c.destroy=function(){delete i[l],n&&n.destroy()},c},t.Frill.q=i}r.readyState==="complete"||r.readyState==="interactive"?s():r.addEventListener("DOMContentLoaded",s)})(window,document);
+          !function(){window.PulseSurvey=window.PulseSurvey||function(){(window.PulseSurvey.q=window.PulseSurvey.q||[]).push(arguments),window.PulseSurvey.app_domain='success.net',window.PulseSurvey.l=1*new Date,window.PulseSurvey.events=window.PulseSurvey.events||[];var e=document.createElement('script'),s=document.getElementsByTagName('script')[0].parentNode;e.async=1,e.src='https://static-success.stdfiles.com/pulses/js/distribute/widget.js',s.appendChild(e);}}();
+          
           `
         }
       </Script>
