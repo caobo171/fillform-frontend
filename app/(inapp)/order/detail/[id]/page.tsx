@@ -1,7 +1,7 @@
 'use client'
 
 import LoadingAbsolute, { Loading } from '@/components/loading'
-import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_STATUS } from '@/core/Constants'
+import Constants, { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_STATUS, ORDER_TYPE } from '@/core/Constants'
 import { useFormById } from '@/hooks/form'
 import { useOrderById } from '@/hooks/order'
 import { useMe } from '@/hooks/user'
@@ -223,20 +223,38 @@ const OrderPage = () => {
                     return SocketService.socket;
                 })
 
-                SocketService.socket.on('order_running', (data: any) => {
 
-                    console.log('order_running', data)
-                    order.mutate();
-                })
+                // Create throttled version of order.mutate that executes at most once every 5 seconds
+                let lastMutateTime = 0;
+                const throttledMutate = () => {
+                    const now = Date.now();
+                    if (now - lastMutateTime >= 5000) { // 5000ms = 5s
+                        lastMutateTime = now;
+                        order.mutate();
+                    } else {
+                        console.log('Throttled order.mutate call', now - lastMutateTime, 'ms since last call');
+                    }
+                };
+
+                SocketService.socket.on('order_running', (data: any) => {
+                    console.log('order_running', data);
+                    throttledMutate();
+                });
 
                 SocketService.socket.on('order_completed', (data: any) => {
-                    console.log('order_completed', data)
-                    order.mutate();
-                })
+                    console.log('order_completed', data);
+                    throttledMutate();
+                });
+
+                SocketService.socket.on('ai_thinking', (data: any) => {
+                    console.log('ai_thinking', data);
+                    throttledMutate();
+                });
 
                 return () => {
                     SocketService.socket.off('order_running');
                     SocketService.socket.off('order_completed');
+                    SocketService.socket.off('ai_thinking');
                 }
             })()
 
@@ -425,6 +443,40 @@ const OrderPage = () => {
                                         ></div>
                                     </div>
                                 </div>
+
+
+
+                                {
+                                    order.data?.order.type === ORDER_TYPE.AGENT && order.data?.order.ai_result?.status !== 'DONE_AI_THINKING' ? (
+                                        <div className="pt-2 border-t border-gray-100 mt-2">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-gray-600">AI is thinking</span>
+                                                <div className="flex items-center">
+                                                    {order.data?.order.createdAt && new Date().getTime() - new Date(order.data.order.createdAt).getTime() > 15 * 60 * 1000 ? (
+                                                        <div className="flex items-center">
+                                                            <div className="mr-2 h-4 w-4 text-red-600">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                                </svg>
+                                                            </div>
+                                                            <span className="text-red-600 italic text-sm">Request may be stuck (waiting &gt;15 min)</span>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <div className="animate-spin mr-2 h-4 w-4 text-primary-600">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <span className="text-gray-500 italic text-sm">{order.data?.order.ai_result?.status}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : null
+                                }
 
                                 <div className="pt-2 border-t border-gray-100 mt-2">
                                     <div className="flex items-center justify-between">
@@ -842,80 +894,186 @@ const OrderPage = () => {
 
                 {/* Form Config */}
                 <div className="text-left">
-                    {
-                        order.data?.order.type !== 'Data có trước' ? (
-                            <>
-                                <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
 
-                                <div className="bg-white p-6 rounded-lg border border-gray-100">
-                                    {order.data?.order.data.map((question, qIndex) => (
-                                        <div key={qIndex} className="p-4 bg-gray-50 rounded shadow-sm text-xs mb-4">
-                                            <div className="md:flex md:items-start gap-8">
-                                                <div className="md:w-1/4 mb-4 md:mb-0">
-                                                    {question.description ? (
-                                                        <>
-                                                            <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
-                                                            <label className="block truncate w-full text-gray-400">{question.description}</label>
-                                                        </>
-                                                    ) : (
-                                                        <label className="block font-bold truncate w-full">{question.question}</label>
-                                                    )}
-                                                </div>
+                    <>
+                        {
+                            order.data?.order.type == ORDER_TYPE.AGENT && (
+                                <>
+                                    <h2 className="text-2xl font-bold mb-4">Cấu hình AI Agent</h2>
 
-                                                <div className="md:w-3/4">
-                                                    {question.type ? (
-                                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                                                            {question.answer.map((answer: any, aIndex: any) => (
-                                                                answer.data && (
-                                                                    <div key={aIndex} className="relative">
+                                    <div className="bg-white p-6 rounded-lg border border-gray-100 mb-6">
+                                        <div className="mb-6">
+                                            <h3 className="text-lg font-semibold mb-2">Kết quả nhân khẩu học mong muốn</h3>
+                                            <div className="p-4 bg-gray-50 rounded whitespace-pre-wrap">
+                                                {order.data?.order.config_data?.demographic_goal || 'Không có thông tin'}
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-6">
+                                            <h3 className="text-lg font-semibold mb-2">Kết quả về dữ liệu mong muốn</h3>
+                                            <div className="p-4 bg-gray-50 rounded whitespace-pre-wrap">
+                                                {order.data?.order.config_data?.spss_goal || 'Không có thông tin'}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {order.data?.order.ai_result && (
+                                        <div className="bg-white p-6 rounded-lg border border-gray-100">
+                                            <h3 className="text-xl font-bold mb-4">Kết quả phân tích</h3>
+
+                                            <div className="flex flex-col sm:flex-row gap-4">
+                                                {order.data.order.ai_result.data_file && (
+                                                    <a
+                                                        href={Constants.IMAGE_URL + order.data.order.ai_result.data_file.url}
+                                                        download={order.data.order.ai_result.data_file.name || "data.csv"}
+                                                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+                                                        onClick={(e) => {
+                                                            // Force download using Fetch API
+                                                            e.preventDefault();
+                                                            const url = Constants.IMAGE_URL + (order.data?.order?.ai_result?.data_file?.url || '');
+                                                            const filename = order.data?.order?.ai_result?.data_file?.name || "data.csv";
+
+                                                            fetch(url)
+                                                                .then(response => response.blob())
+                                                                .then(blob => {
+                                                                    const blobUrl = window.URL.createObjectURL(blob);
+                                                                    const a = document.createElement('a');
+                                                                    a.style.display = 'none';
+                                                                    a.href = blobUrl;
+                                                                    a.download = filename;
+                                                                    document.body.appendChild(a);
+                                                                    a.click();
+                                                                    window.URL.revokeObjectURL(blobUrl);
+                                                                    document.body.removeChild(a);
+                                                                })
+                                                                .catch(() => window.open(url, '_blank'));
+                                                        }}
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                        <span>Tải file dữ liệu CSV</span>
+                                                    </a>
+                                                )}
+
+                                                {order.data.order.ai_result.report_file && (
+                                                    <a
+                                                        href={Constants.IMAGE_URL + order.data.order.ai_result.report_file.url}
+                                                        download={order.data.order.ai_result.report_file.name || "report.pdf"}
+                                                        className="flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg border border-red-200 transition-colors"
+                                                        onClick={(e) => {
+                                                            // Force download using Fetch API
+                                                            e.preventDefault();
+                                                            const url = Constants.IMAGE_URL + (order.data?.order?.ai_result?.report_file?.url || '');
+                                                            const filename = order.data?.order?.ai_result?.report_file?.name || "report.pdf";
+
+                                                            fetch(url)
+                                                                .then(response => response.blob())
+                                                                .then(blob => {
+                                                                    const blobUrl = window.URL.createObjectURL(blob);
+                                                                    const a = document.createElement('a');
+                                                                    a.style.display = 'none';
+                                                                    a.href = blobUrl;
+                                                                    a.download = filename;
+                                                                    document.body.appendChild(a);
+                                                                    a.click();
+                                                                    window.URL.revokeObjectURL(blobUrl);
+                                                                    document.body.removeChild(a);
+                                                                })
+                                                                .catch(() => window.open(url, '_blank'));
+                                                        }}
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                        <span>Tải báo cáo phân tích PDF</span>
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )
+                        }
+                    </>
+
+                    <>
+                        {
+                            order.data?.order.type === ORDER_TYPE.PREFILL ? (
+                                <>
+                                    <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
+
+                                    <div className="bg-white p-6 rounded-lg border border-gray-100">
+                                        {order.data?.order.data.map((question, qIndex) => (
+                                            <div key={qIndex} className="p-4 bg-gray-50 rounded shadow-sm text-xs mb-4">
+                                                <div className="md:flex md:items-start gap-8">
+                                                    <div className="md:w-1/4 mb-4 md:mb-0">
+                                                        {question.description ? (
+                                                            <>
+                                                                <label className="block font-bold mb-1 truncate w-full">{question.question}</label>
+                                                                <label className="block truncate w-full text-gray-400">{question.description}</label>
+                                                            </>
+                                                        ) : (
+                                                            <label className="block font-bold truncate w-full">{question.question}</label>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="md:w-3/4">
+                                                        {question.type ? (
+                                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                                                                {question.answer.map((answer: any, aIndex: any) => (
+                                                                    answer.data && (
+                                                                        <div key={aIndex} className="relative">
+                                                                            <label
+                                                                                htmlFor="name"
+                                                                                className="absolute left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                                            >
+                                                                                {answer.data}
+                                                                            </label>
+                                                                            <input
+                                                                                type="number"
+                                                                                name={answer.id}
+                                                                                id={answer.id}
+                                                                                defaultValue={answer.count}
+                                                                                className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                                                disabled
+                                                                            />
+                                                                        </div>
+                                                                    )
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="grid gap-2">
+                                                                {question.answer.map((answer: any, aIndex: any) => (
+                                                                    <div key={aIndex} className="relative w-full">
                                                                         <label
-                                                                            htmlFor="name"
-                                                                            className="absolute left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
+                                                                            className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
                                                                         >
-                                                                            {answer.data}
+                                                                            Loại câu hỏi tự luận
                                                                         </label>
-                                                                        <input
-                                                                            type="number"
+                                                                        <select
                                                                             name={answer.id}
                                                                             id={answer.id}
                                                                             defaultValue={answer.count}
-                                                                            className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-sm/6"
+                                                                            className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6"
                                                                             disabled
-                                                                        />
+                                                                        >
+                                                                            <option value={answer.count}>{answer.count}</option>
+                                                                        </select>
                                                                     </div>
-                                                                )
-                                                            ))}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="grid gap-2">
-                                                            {question.answer.map((answer: any, aIndex: any) => (
-                                                                <div key={aIndex} className="relative w-full">
-                                                                    <label
-                                                                        className="absolute -top-2 left-2 inline-block rounded-lg bg-white px-1 text-xs font-medium text-gray-900 max-w-full truncate"
-                                                                    >
-                                                                        Loại câu hỏi tự luận
-                                                                    </label>
-                                                                    <select
-                                                                        name={answer.id}
-                                                                        id={answer.id}
-                                                                        defaultValue={answer.count}
-                                                                        className="block w-full rounded-md bg-white px-3 py-1.5 mt-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6"
-                                                                        disabled
-                                                                    >
-                                                                        <option value={answer.count}>{answer.count}</option>
-                                                                    </select>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        ) : null
-                    }
+                                        ))}
+                                    </div>
+                                </>
+                            ) : null
+                        }
+
+                    </>
 
 
                 </div>

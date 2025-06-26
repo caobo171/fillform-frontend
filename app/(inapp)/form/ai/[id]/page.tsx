@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { RawForm } from '@/store/types';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
+import CreateOrderForm from '@/components/form/CreateOrderForm';
 import { Toast } from '@/services/Toast';
 import { useMe, useMyBankInfo } from '@/hooks/user';
 import { useFormById } from '@/hooks/form';
@@ -43,53 +44,24 @@ export default function FormAIOrder() {
   const posthog = usePostHog();
   const router = useRouter();
 
+  // CreateOrderForm state variables
   const [numRequest, setNumRequest] = useState('');
-  const [expectedOutcome, setExpectedOutcome] = useState('');
   const [delayType, setDelayType] = useState('0');
-  const [email, setEmail] = useState(me?.data?.email || '');
-  const [message, setMessage] = useState('');
+  const [disabledDays, setDisabledDays] = useState<number[]>([]);
+  const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [startTime, setStartTime] = useState('08:00');
+  const [endTime, setEndTime] = useState('20:00');
+  const [specificStartDate, setSpecificStartDate] = useState('');
+  const [specificEndDate, setSpecificEndDate] = useState('');
+  const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);
+
+  // AI-specific state variables
+  const [demographicGoal, setDemographicGoal] = useState('');
+  const [spssGoal, setSpssGoal] = useState('');
   const [submitDisabled, setSubmitDisabled] = useState(false);
-  const [hasEnoughCredit, setHasEnoughCredit] = useState(true);
   const [chatOpen, setChatOpen] = useState<boolean>(true);
   const [chatErrors, setChatErrors] = useState<ChatError[]>([]);
   const [reloadEvent, setReloadEvent] = useState(false);
-
-  const prices = useMemo(() => ({
-    noDelay: OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price + AI_PREMIUM,
-    shortDelay: OPTIONS_DELAY[OPTIONS_DELAY_ENUM.SHORT_DELAY].price + AI_PREMIUM,
-    standardDelay: OPTIONS_DELAY[OPTIONS_DELAY_ENUM.STANDARD_DELAY].price + AI_PREMIUM,
-    longDelay: OPTIONS_DELAY[OPTIONS_DELAY_ENUM.LONG_DELAY].price + AI_PREMIUM,
-  }), []);
-
-  const pricePerAnswer = useMemo(() => {
-    const delayPrices = {
-      [OPTIONS_DELAY_ENUM.SHORT_DELAY]: prices.shortDelay,
-      [OPTIONS_DELAY_ENUM.STANDARD_DELAY]: prices.standardDelay,
-      [OPTIONS_DELAY_ENUM.LONG_DELAY]: prices.longDelay,
-    };
-    return delayPrices[delayType as keyof typeof delayPrices] || prices.noDelay;
-  }, [delayType, prices]);
-
-  const total = useMemo(() => (parseInt(numRequest) || 0) * pricePerAnswer, [numRequest, pricePerAnswer]);
-
-  useMemo(() => {
-    const userCredit = me.data?.credit || 0;
-    const num = parseInt(numRequest) || 0;
-
-    if (total > userCredit) {
-      setHasEnoughCredit(false);
-      setMessage('KHÔNG ĐỦ SỐ DƯ, BẠN HÃY NẠP THÊM TIỀN NHÉ!');
-      setSubmitDisabled(true);
-    } else if (num > 0) {
-      setHasEnoughCredit(true);
-      setSubmitDisabled(false);
-      setMessage(`Bạn xác nhận sẽ điền ${num} câu trả lời cho form này bằng AI Agent.`);
-    } else {
-      setHasEnoughCredit(true);
-      setMessage('');
-      setSubmitDisabled(true);
-    }
-  }, [total, me.data?.credit, numRequest]);
 
   const toggleChat = (): void => {
     setChatOpen(!chatOpen);
@@ -247,54 +219,82 @@ export default function FormAIOrder() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!dataForm || !numRequest || parseInt(numRequest) <= 0) {
       Toast.error('Vui lòng nhập số lượng khảo sát');
       return;
     }
-    if (!expectedOutcome) {
-      Toast.error('Vui lòng nhập kết quả mong muốn');
+    if (!demographicGoal) {
+      Toast.error('Vui lòng nhập kết quả nhân khẩu học mong muốn');
       return;
     }
-    if (expectedOutcome.length > MAX_EXPECTED_OUTCOME_LENGTH) {
-      Toast.error(`Kết quả mong muốn không được vượt quá ${MAX_EXPECTED_OUTCOME_LENGTH} từ`);
+    if (demographicGoal.length > MAX_EXPECTED_OUTCOME_LENGTH) {
+      Toast.error(`Kết quả nhân khẩu học không được vượt quá ${MAX_EXPECTED_OUTCOME_LENGTH} từ`);
       return;
     }
-    if (!email) {
-      Toast.error('Vui lòng nhập email để nhận báo cáo phân tích');
+    if (!spssGoal) {
+      Toast.error('Vui lòng nhập kết quả dữ liệu mong muốn');
+      return;
+    }
+    if (spssGoal.length > MAX_EXPECTED_OUTCOME_LENGTH) {
+      Toast.error(`Kết quả dữ liệu không được vượt quá ${MAX_EXPECTED_OUTCOME_LENGTH} từ`);
       return;
     }
 
     setIsLoading(true);
+    setSubmitDisabled(true);
 
     try {
       const response = await Fetch.postWithAccessToken<ApiResponse>('/api/order/create.agent.run', {
         form_id: dataForm.form.id,
         num_request: parseInt(numRequest),
-        expected_outcome: expectedOutcome,
+        demographic_goal: demographicGoal,
+        spss_goal: spssGoal,
         delay_type: parseInt(delayType),
-        email,
+        // Add scheduling parameters
+        disabled_days: disabledDays.join(','),
+        schedule_enabled: scheduleEnabled ? 1 : 0,
+        start_time: startTime,
+        end_time: endTime,
+        specific_start_date: specificStartDate,
+        specific_end_date: specificEndDate,
+        specific_daily_schedules: specificDailySchedules.map((schedule) =>
+          `${schedule.date}_${schedule.startTime}_${schedule.endTime}_${schedule.enabled}`).join(',')
       });
 
       if (response.data.code === Code.SUCCESS) {
         posthog?.capture('create_ai_order', {
           formId: dataForm.form.id,
           numRequest: parseInt(numRequest),
-          expectedOutcome,
+          demographicGoal,
+          spssGoal,
           delayType: parseInt(delayType),
         });
 
         Toast.success('Đặt đơn thành công');
         router.push(`/`);
+
+        // Survey prompt (similar to FormRateOrder)
+        const win = window as any;
+        if (win.PulseSurvey?.surveyIgnored?.('My5wdWxzZXN1cnZleXM')) {
+          console.log('User has ignored the survey');
+        } else if (win.PulseSurvey?.surveyResponded?.('My5wdWxzZXN1cnZleXM')) {
+          console.log('User has answered the survey');
+        } else if (win.PulseSurvey?.showSurvey) {
+          // Show survey directly
+          win.PulseSurvey.showSurvey('My5wdWxzZXN1cnZleXM');
+        }
       } else {
         Toast.error(response.data.message || 'Có lỗi xảy ra');
       }
     } catch (error) {
       console.error('Error creating order:', error);
       Toast.error('Có lỗi xảy ra');
+    } finally {
+      setIsLoading(false);
+      setSubmitDisabled(false);
     }
-
-    setIsLoading(false);
   };
 
   if (isLoadingForm || !dataForm) return <LoadingAbsolute />;
@@ -406,199 +406,118 @@ export default function FormAIOrder() {
                   <h3 className="text-xl font-bold text-gray-900">CẤU HÌNH AI AGENT</h3>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="relative">
-                    <label htmlFor="numRequest" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                      Số lượng khảo sát cần điền
-                    </label>
-                    <div className="flex">
-                      <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                        </svg>
-                      </span>
-                      <input
-                        type="number"
-                        id="numRequest"
-                        min="1"
-                        value={numRequest}
-                        onChange={(e) => setNumRequest(e.target.value)}
-                        className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                        placeholder="Nhập số lượng khảo sát cần điền"
+                <form className='space-y-6' onSubmit={handleSubmit}>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <label htmlFor="demographicGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                        Kết quả nhân khẩu học mong muốn
+                      </label>
+
+                      <textarea
+                        id="demographicGoal"
+                        value={demographicGoal}
+                        onChange={(e) => setDemographicGoal(e.target.value)}
+                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[120px]"
+                        placeholder="Mô tả kết quả bạn mong muốn đạt được từ khảo sát này. Ví dụ: Xu hướng tiêu cực về chất lượng dịch vụ, hoặc phản hồi tích cực về trải nghiệm sản phẩm..."
+                        maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
                       />
+                      <p className="mt-2 text-xs text-gray-600 flex justify-between">
+                        <span>Mô tả càng chi tiết, AI càng hiểu rõ mong muốn của bạn</span>
+                        <span>{demographicGoal.length}/{MAX_EXPECTED_OUTCOME_LENGTH}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <label htmlFor="spssGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                        Kết quả về dữ liệu mong muốn
+                      </label>
+                      <textarea
+                        id="spssGoal"
+                        value={spssGoal}
+                        onChange={(e) => setSpssGoal(e.target.value)}
+                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[120px]"
+                        placeholder="Mô tả kết quả bạn mong muốn đạt được từ khảo sát này. Ví dụ: Xu hướng tiêu cực về chất lượng dịch vụ, hoặc phản hồi tích cực về trải nghiệm sản phẩm..."
+                        maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
+                      />
+                      <p className="mt-2 text-xs text-gray-600 flex justify-between">
+                        <span>Mô tả càng chi tiết, AI càng hiểu rõ mong muốn của bạn</span>
+                        <span>{spssGoal.length}/{MAX_EXPECTED_OUTCOME_LENGTH}</span>
+                      </p>
                     </div>
                   </div>
 
-                  <div className="relative">
-                    <label htmlFor="expectedOutcome" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                      Kết quả mong muốn
-                    </label>
-                    <textarea
-                      id="expectedOutcome"
-                      value={expectedOutcome}
-                      onChange={(e) => setExpectedOutcome(e.target.value)}
-                      className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[120px]"
-                      placeholder="Mô tả kết quả bạn mong muốn đạt được từ khảo sát này. Ví dụ: Xu hướng tiêu cực về chất lượng dịch vụ, hoặc phản hồi tích cực về trải nghiệm sản phẩm..."
-                      maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
+                  <div className='space-y-6'>
+
+                  </div>
+                  <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-4">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                          Các số liệu về tỉ lệ sẽ chỉ là tương đối không thể chính xác 100%, AI agent sẽ điều chỉnh cho sát với thực tế nhất
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-2 mb-4">
+                      <svg className="flex-shrink-0 h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU ĐIỀN FORM</h3>
+                    </div>
+
+                    <CreateOrderForm
+                      userCredit={me.data?.credit || 0}
+                      numRequest={parseInt(numRequest) || 0}
+                      delayType={parseInt(delayType) || 0}
+                      formId={dataForm?.form?.id}
+                      formName={dataForm?.form?.name}
+                      bankInfo={bankInfo}
+                      disabledDays={disabledDays}
+                      scheduleEnabled={scheduleEnabled}
+                      startTime={startTime}
+                      endTime={endTime}
+                      onNumRequestChange={(value) => setNumRequest(value.toString())}
+                      onDelayTypeChange={(value) => setDelayType(value.toString())}
+                      onScheduleEnabledChange={(value) => setScheduleEnabled(value)}
+                      onStartTimeChange={(value) => setStartTime(value)}
+                      onEndTimeChange={(value) => setEndTime(value)}
+                      onDisabledDaysChange={(value) => setDisabledDays(value)}
+                      specificStartDate={specificStartDate}
+                      specificEndDate={specificEndDate}
+                      specificDailySchedules={specificDailySchedules}
+                      onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
+                      onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
+                      onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
+                      className="max-w-full"
+                      showTitle={false}
+                      showBackButton={false}
                     />
-                    <p className="mt-2 text-xs text-gray-600 flex justify-between">
-                      <span>Mô tả càng chi tiết, AI càng hiểu rõ mong muốn của bạn</span>
-                      <span>{expectedOutcome.length}/{MAX_EXPECTED_OUTCOME_LENGTH}</span>
-                    </p>
-                  </div>
 
-                  <div className="relative">
-                    <label htmlFor="delay" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                      Điền rải random như người thật
-                    </label>
-                    <select
-                      className="block w-full rounded-md bg-white px-3 py-2.5 text-xs text-gray-700 border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                      name="delay"
-                      id="delay"
-                      value={delayType}
-                      onChange={(e) => setDelayType(e.target.value)}
-                    >
-                      {Object.keys(OPTIONS_DELAY).map(e => parseInt(e)).map((key: number) => (
-                        <option key={key} value={key}>
-                          {OPTIONS_DELAY[key].name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="relative">
-                    <label htmlFor="email" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                      Email nhận báo cáo phân tích
-                    </label>
-                    <div className="flex">
-                      <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </span>
-                      <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                        placeholder="Nhập email của bạn"
-                      />
-                    </div>
-                    <p className="mt-2 text-xs text-gray-600">
-                      AI Agent sẽ gửi báo cáo chi tiết về lý do chọn các câu trả lời qua email này
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-4">
-                  <svg className="flex-shrink-0 h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU ĐIỀN FORM</h3>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
-                    <div className="flex items-center md:justify-end text-gray-700 font-medium">
-                      Số dư tài khoản
-                    </div>
-                    <div className="col-span-2 flex items-center">
-                      <div className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold w-40">
-                        {(me.data?.credit || 0).toLocaleString()} <span className="text-xs font-normal text-gray-500">VND</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
-                    <div className="flex items-center md:justify-end text-gray-700 font-medium">
-                      Đơn giá mỗi câu trả lời
-                    </div>
-                    <div className="col-span-2 flex items-center">
-                      <div className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold">
-                        {pricePerAnswer.toLocaleString()} <span className="text-xs font-normal text-gray-500">VND</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8 mb-4">
-                    <div className="flex items-center md:justify-end text-gray-700 font-medium">
-                      Số lượng câu trả lời cần tăng
-                    </div>
-                    <div className="col-span-2 flex items-center">
-                      <div className="bg-white rounded-md px-4 py-2 border border-gray-200 text-primary-700 font-semibold w-40">
-                        {numRequest ? parseInt(numRequest) : 0}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 my-6">
-                  <h3 className="text-xl font-bold">TỔNG CỘNG : {total.toLocaleString()} VND</h3>
-
-                  {message && (
-                    <div className={`mt-3 p-3 rounded-lg ${!hasEnoughCredit ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-800'} text-center font-medium`}>
-                      {message}
-                    </div>
-                  )}
-
-                  {!hasEnoughCredit && bankInfo?.data && (
-                    <div className="mt-4 p-4 bg-white rounded-lg">
-                      <h4 className="text-lg font-bold mb-3 text-center">Nạp thêm {(total - (me.data?.credit || 0)).toLocaleString()} VND để tiếp tục</h4>
-
-                      <div className="space-y-3">
-                        <div className="flex items-center">
-                          <span className="w-1/3 font-medium text-right pr-3">Tên NH:</span>
-                          <span>{bankInfo?.data?.name}</span>
-                        </div>
-
-                        <div className="flex items-center">
-                          <span className="w-1/3 font-medium text-right pr-3">STK:</span>
-                          <span>{bankInfo?.data?.number}</span>
-                        </div>
-
-                        <div className="flex items-center">
-                          <span className="w-1/3 font-medium text-right pr-3">Tên TK:</span>
-                          <span>VUONG TIEN DAT</span>
-                        </div>
-
-                        <div className="flex items-center">
-                          <span className="w-1/3 font-medium text-right pr-3">Nội dung CK:</span>
-                          <span>{bankInfo?.data?.message_credit}</span>
-                        </div>
-
-                        {bankInfo.data.qr_link && (
-                          <div className="flex items-start">
-                            <span className="w-1/3 font-medium text-right pr-3">Mã QR:</span>
-                            <Image
-                              src={bankInfo.data.qr_link}
-                              alt="QRCode"
-                              width={200}
-                              height={200}
-                              className="w-[200px] h-auto"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleSubmit}
-                  disabled={submitDisabled || isLoading}
-                  className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                    <button
+                      disabled={submitDisabled || isLoading}
+                      className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
                     ${submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {isLoading ? 'Đang xử lý...' : 'Đặt đơn ngay'}
-                </button>
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {isLoading ? 'Đang xử lý...' : 'Đặt đơn ngay'}
+                    </button>
+                  </div>
+                </form>
+
+
               </div>
+
+
             </div>
           </div>
         </div>

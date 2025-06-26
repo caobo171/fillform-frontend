@@ -176,5 +176,13 @@ export const BANK_INFO = {
 }
 
 
+export const ORDER_TYPE = {
+  AUTOFILL: 'Điền theo tỉ lệ',
+  PREFILL: 'Data có trước',
+  AGENT: 'Agent'
+}
+
+
+
 export const REFER_PERCENT = 15;
 export const MIN_DRAW_CREDIT = 100000;

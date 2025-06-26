@@ -119,6 +119,26 @@ export type RawOrder = {
       [key: string]: string[][];
     };
   };
+  config_data?: {
+    spss_goal: string;
+    demographic_goal: string;
+    status: string;
+  };
+  ai_result?: {
+    output_model: any;
+    demographicQuestions: any[];
+    analyzeData: any;
+    demographicAnalysis: any;
+    data_file: {
+      name: string;
+      url: string;
+    };
+    status: string;
+    report_file: {
+      name: string;
+      url: string;
+    };
+  }
   specific_delay?: {
     start_date: string;
     end_date: string;
