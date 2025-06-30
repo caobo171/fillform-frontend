@@ -32,7 +32,7 @@ interface ChatError {
 }
 
 
-const MAX_EXPECTED_OUTCOME_LENGTH = 1000;
+const MAX_EXPECTED_OUTCOME_LENGTH = 10000000;
 const AI_PREMIUM = 100;
 
 export default function FormAIOrder() {
