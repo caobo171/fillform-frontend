@@ -66,6 +66,7 @@ export type RawUser = {
   referId: number;
   referCreditDone: number;
   referCreditWait: number;
+  role: string;
 };
 
 

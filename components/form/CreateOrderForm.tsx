@@ -3,6 +3,7 @@ import { OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { useMe } from '@/hooks/user';
 
 interface CreateOrderFormProps {
   userCredit: number;
@@ -88,6 +89,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   onSpecificEndDateChange = () => { },
   onSpecificDailySchedulesChange = () => { }
 }) => {
+  const user = useMe();
   const [pricePerUnit, setPricePerUnit] = useState<number>(OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price);
   const [total, setTotal] = useState<number>(0);
   const [delayInfo, setDelayInfo] = useState<string>('');
@@ -378,8 +380,13 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   useEffect(() => {
     const adjustedPricePerUnit = pricePerUnit + schedulePriceAdjustment;
     const calculatedTotal = numRequest * adjustedPricePerUnit;
-    setTotal(calculatedTotal);
-  }, [numRequest, pricePerUnit, schedulePriceAdjustment]);
+    if (user.data?.role == 'testuser') {
+      setTotal(0);
+    } else {
+      setTotal(calculatedTotal);
+    }
+
+  }, [numRequest, pricePerUnit, schedulePriceAdjustment, user.data]);
 
 
 
