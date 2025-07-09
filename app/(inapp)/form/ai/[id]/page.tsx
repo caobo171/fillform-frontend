@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { RawForm } from '@/store/types';
 import Fetch from '@/lib/core/fetch/Fetch';
-import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
+import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
 import CreateOrderForm from '@/components/form/CreateOrderForm';
 import { Toast } from '@/services/Toast';
 import { useMe, useMyBankInfo } from '@/hooks/user';
@@ -316,33 +316,40 @@ export default function FormAIOrder() {
             <FormTypeNavigation formId={dataForm.form.id} type={'ai'} />
 
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-              <div className="space-y-4 text-xs text-gray-700">
-                <div className="flex items-center gap-2">
-                  <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p>Điền form tự động bằng AI Agent thông minh, tạo ra dữ liệu đa dạng và chân thực</p>
+              <div className="md:grid md:grid-cols-2 md:gap-8">
+                <div className="space-y-4 text-sm text-gray-700">
+                  <div className="flex items-start gap-3">
+                    <svg className="flex-shrink-0 h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p>Điền form tự động bằng AI Agent thông minh, tạo ra dữ liệu đa dạng và chân thực.</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <svg className="flex-shrink-0 h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <p>Bạn có thể điều chỉnh kết quả mong muốn và tốc độ điền form theo nhu cầu.</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <svg className="flex-shrink-0 h-6 w-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    <p>Nếu bạn có thay đổi ở Google Form, hãy <button onClick={syncFormHandle} className="mx-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-md font-semibold hover:bg-primary-200 transition-all duration-200 inline-flex items-center text-sm">đồng bộ lại cấu hình</button> để cập nhật.</p>
+                  </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <p>Bạn có thể điều chỉnh kết quả mong muốn và tốc độ điền form theo nhu cầu</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                  <p>
-                    Nếu bạn có thay đổi ở Google Form, hãy
-                    <button onClick={syncFormHandle} className="mx-1 px-3 py-0.5 bg-primary-100 text-primary-700 rounded-full font-medium hover:bg-primary-200 transition inline-flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                      </svg>
-                      đồng bộ lại cấu hình
-                    </button>
-                    để cập nhật lại nhé
-                  </p>
+                <div className="border-t md:border-t-0 md:border-l border-gray-200 mt-6 md:mt-0 pt-6 md:pt-0 md:pl-8">
+                  <ul className="space-y-3 text-sm text-gray-700">
+                    <li className="flex items-start gap-3 transition-all duration-200 hover:text-primary-600">
+                      <svg className="flex-shrink-0 h-5 w-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                      <p>Tạo ra dữ liệu chân thực và có ý nghĩa học thuật.</p>
+                    </li>
+                    <li className="flex items-start gap-3 transition-all duration-200 hover:text-primary-600">
+                      <svg className="flex-shrink-0 h-5 w-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                      <p>Tự động điền form liên kết chuẩn dữ liệu nhân khẩu học theo yêu cầu.</p>
+                    </li>
+                    <li className="flex items-start gap-3 transition-all duration-200 hover:text-primary-600">
+                      <svg className="flex-shrink-0 h-5 w-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                      <p>Tự động điền form để dữ liệu nghiên cứu có ý nghĩa.</p>
+                    </li>
+                    <li className="flex items-start gap-3 transition-all duration-200 hover:text-primary-600">
+                      <svg className="flex-shrink-0 h-5 w-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                      <p>Xuất báo cáo học thuật, đọc dữ liệu miễn phí.</p>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -351,7 +358,7 @@ export default function FormAIOrder() {
           <div className="container mx-auto mb-8">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Thông tin Form</h3>
-              <div className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <div className="relative">
                   <label htmlFor="urlMain" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
                     Link Form
@@ -399,12 +406,17 @@ export default function FormAIOrder() {
           <div className="container mx-auto">
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-2">
                   <svg className="flex-shrink-0 h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                   <h3 className="text-xl font-bold text-gray-900">CẤU HÌNH AI AGENT</h3>
                 </div>
+                <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm pl-2 mb-8">
+                  <li>Loại bỏ điều hướng session, chỉ nên dùng 1 luồng khảo sát cho 1 đối tượng</li>
+                  <li>Viết prompt để Pass qua hết gạn lọc, mặc định chúng đều hợp lệ</li>
+                  <li>Không nên trộn lẫn kết quả với các nguồn khảo sát khác</li>
+                </ul>
 
                 <form className='space-y-6' onSubmit={handleSubmit}>
                   <div className="space-y-4">
@@ -417,8 +429,12 @@ export default function FormAIOrder() {
                         id="demographicGoal"
                         value={demographicGoal}
                         onChange={(e) => setDemographicGoal(e.target.value)}
-                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[120px]"
-                        placeholder="Mô tả kết quả bạn mong muốn đạt được từ khảo sát này. Ví dụ: Xu hướng tiêu cực về chất lượng dịch vụ, hoặc phản hồi tích cực về trải nghiệm sản phẩm..."
+                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                        placeholder={`Giới tính của Anh/Chị/Bạn? gần 60% nữ
+- Độ tuổi của Anh/Chị/Bạn?"
+18-22 tuổi: 55.6%
+23-25 tuổi: 35,7%
+26-28 tuổi: 8,7%`}
                         maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
                       />
                       <p className="mt-2 text-xs text-gray-600 flex justify-between">
@@ -436,8 +452,17 @@ export default function FormAIOrder() {
                         id="spssGoal"
                         value={spssGoal}
                         onChange={(e) => setSpssGoal(e.target.value)}
-                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[120px]"
-                        placeholder="Mô tả kết quả bạn mong muốn đạt được từ khảo sát này. Ví dụ: Xu hướng tiêu cực về chất lượng dịch vụ, hoặc phản hồi tích cực về trải nghiệm sản phẩm..."
+                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                        placeholder={`Mô hình hồi quy 5 biến độc lập TC,NC,AT,CX,TN tác động 1 biến phụ thuộc "sự hài lòng". Sử dụng thang đo linkert 5
+Nghiên cứu các giả thuyết các yếu tố ảnh hưởng tích cực đến sự hài lòng. Yêu cầu chấp nhận tất cả các giả thuyết.
+Chú thích các yếu tố tương ứng với các câu hỏi trong form như sau
+TC:Khả năng tiếp cận
+NC: Tính nhanh chóng
+AT: An toàn , An ninh
+CX:Tính chính xác
+TN: Tiện nghi, thoải mái
+Xác định và đo lường mức độ ảnh hưởng của các yếu tố trên đến sự hài lòng chất lượng dịch vụ
+Xác định các yếu tố này tác động trực tiếp hay gián tiếp đến sự hài lòng chất lượng dịch vụ`}
                         maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
                       />
                       <p className="mt-2 text-xs text-gray-600 flex justify-between">
@@ -473,6 +498,7 @@ export default function FormAIOrder() {
                     </div>
 
                     <CreateOrderForm
+                      orderType={ORDER_TYPE.AGENT}
                       userCredit={me.data?.credit || 0}
                       numRequest={parseInt(numRequest) || 0}
                       delayType={parseInt(delayType) || 0}

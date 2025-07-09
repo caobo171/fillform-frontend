@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
+import { OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -22,6 +22,7 @@ interface CreateOrderFormProps {
   startTime?: string;
   endTime?: string;
   disabledDays?: number[];
+  orderType?: string;
   onScheduleEnabledChange?: (value: boolean) => void;
   onStartTimeChange?: (value: string) => void;
   onEndTimeChange?: (value: string) => void;
@@ -77,6 +78,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   startTime = '08:00',
   endTime = '20:00',
   disabledDays = [],
+  orderType = ORDER_TYPE.AUTOFILL,
   onScheduleEnabledChange = () => { },
   onStartTimeChange = () => { },
   onEndTimeChange = () => { },
@@ -143,6 +145,10 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         break;
     }
 
+    // Temporarily
+    if (orderType === ORDER_TYPE.AGENT) {
+      currentPricePerUnit = 0;
+    }
     setPricePerUnit(currentPricePerUnit);
     setDelayInfo(delayMessage);
   }, [delayType, localScheduleEnabled]);
@@ -490,7 +496,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         {/* Schedule Options - Only show for non-SPECIFIC_DELAY types */}
         {delayType !== OPTIONS_DELAY_ENUM.SPECIFIC_DELAY && (
           <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
-            <label htmlFor="schedule" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Lịch trình chạy:</label>
+            <label htmlFor="schedule" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Đặt giờ chạy:</label>
             <div className="w-full sm:w-1/2">
               <div
                 className="flex items-center"
@@ -649,7 +655,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
             {/* Daily Schedule Configuration */}
             <div className="mb-2">
-              <h5 className="font-medium text-gray-700 mb-2">Lịch trình chạy theo ngày:</h5>
+              <h5 className="font-medium text-gray-700 mb-2">Đặt giờ chạy theo ngày:</h5>
 
               {isGeneratingSchedules ? (
                 <div className="text-center py-4">
@@ -753,7 +759,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         {/* Specific Delay Schedule Summary */}
         {delayType === OPTIONS_DELAY_ENUM.SPECIFIC_DELAY && (
           <div className="bg-white rounded-lg p-3 mb-3 border border-green-100">
-            <h4 className="font-sm text-green-700 mb-2">Lịch trình chạy xác định:</h4>
+            <h4 className="font-sm text-green-700 mb-2">Đặt giờ chạy xác định:</h4>
             <ul className="text-sm text-gray-700 space-y-1">
               <li>• Thời gian chạy: <span className="font-sm">{new Date(localSpecificStartDate).toLocaleDateString('vi-VN')} đến {new Date(localSpecificEndDate).toLocaleDateString('vi-VN')}</span></li>
               <li>• Số ngày chạy: <span className="font-sm">{localSpecificDailySchedules.filter(s => s.enabled).length} ngày</span></li>

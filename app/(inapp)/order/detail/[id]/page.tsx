@@ -610,7 +610,7 @@ const OrderPage = () => {
 
                                     {/* Schedule Setup Section */}
                                     <div className="sm:col-span-6 mt-4 border-t pt-6">
-                                        <h3 className="text-lg font-semibold mb-4">Lịch trình chạy</h3>
+                                        <h3 className="text-lg font-semibold mb-4">Đặt giờ chạy</h3>
 
                                         {/* SPECIFIC_DELAY schedule controls */}
                                         {delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY ? (
@@ -644,7 +644,7 @@ const OrderPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="mb-2">
-                                                    <h5 className="font-medium text-gray-700 mb-2">Lịch trình chạy theo ngày:</h5>
+                                                    <h5 className="font-medium text-gray-700 mb-2">Đặt giờ chạy theo ngày:</h5>
                                                     {isGeneratingSchedules ? (
                                                         <div className="text-center py-4">
                                                             <p className="text-gray-500">Đang tạo lịch trình...</p>
