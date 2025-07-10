@@ -1008,7 +1008,7 @@ const OrderPage = () => {
 
                     <>
                         {
-                            order.data?.order.type === ORDER_TYPE.PREFILL ? (
+                            order.data?.order.type === ORDER_TYPE.AUTOFILL ? (
                                 <>
                                     <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
 
