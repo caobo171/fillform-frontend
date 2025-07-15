@@ -386,7 +386,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   useEffect(() => {
     const adjustedPricePerUnit = pricePerUnit + schedulePriceAdjustment;
     const calculatedTotal = numRequest * adjustedPricePerUnit;
-    if (user.data?.role == 'testuser') {
+    if (user.data?.role == 'testuser' && orderType == ORDER_TYPE.AGENT) {
       setTotal(0);
     } else {
       setTotal(calculatedTotal);
