@@ -327,6 +327,10 @@ export default function FormAIOrder() {
                     <p>Bạn có thể điều chỉnh kết quả mong muốn và tốc độ điền form theo nhu cầu.</p>
                   </div>
                   <div className="flex items-start gap-3">
+                    <svg className="flex-shrink-0 h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <p>Nếu mô hình của bạnn chứa biến điều tiết, hãy liên hệ với chúng tôi để được hỗ trợ.</p>
+                  </div>  
+                  <div className="flex items-start gap-3">
                     <svg className="flex-shrink-0 h-6 w-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
                     <p>Nếu bạn có thay đổi ở Google Form, hãy <button onClick={syncFormHandle} className="mx-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-md font-semibold hover:bg-primary-200 transition-all duration-200 inline-flex items-center text-sm">đồng bộ lại cấu hình</button> để cập nhật.</p>
                   </div>
@@ -349,6 +353,11 @@ export default function FormAIOrder() {
                       <svg className="flex-shrink-0 h-5 w-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                       <p>Xuất báo cáo học thuật, đọc dữ liệu miễn phí.</p>
                     </li>
+                    <li className="flex items-start gap-3 transition-all duration-200 hover:text-primary-600">
+                      <svg className="flex-shrink-0 h-5 w-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                      <p>Phù hợp cho các nghiên cứu về các mô hình hồi quy, mô hình SEM trong phần mềm SPSS.</p>
+                    </li>
+
                   </ul>
                 </div>
               </div>
@@ -446,7 +455,7 @@ export default function FormAIOrder() {
                   <div className="space-y-4">
                     <div className="relative">
                       <label htmlFor="spssGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                        Kết quả về dữ liệu mong muốn
+                        Yêu cầu về mô hình mong muốn
                       </label>
                       <textarea
                         id="spssGoal"

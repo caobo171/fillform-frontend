@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
+import { AI_PRICE, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -147,11 +147,11 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
     // Temporarily
     if (orderType === ORDER_TYPE.AGENT) {
-      currentPricePerUnit = 0;
+      currentPricePerUnit = currentPricePerUnit + AI_PRICE;
     }
     setPricePerUnit(currentPricePerUnit);
     setDelayInfo(delayMessage);
-  }, [delayType, localScheduleEnabled]);
+  }, [delayType, localScheduleEnabled, orderType]);
 
   // Sync local state with props
   useEffect(() => {
@@ -384,15 +384,10 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
   // Calculate total cost
   useEffect(() => {
-    const adjustedPricePerUnit = pricePerUnit + schedulePriceAdjustment;
+    let adjustedPricePerUnit = pricePerUnit + schedulePriceAdjustment;
     const calculatedTotal = numRequest * adjustedPricePerUnit;
-    if (user.data?.role == 'testuser' && orderType == ORDER_TYPE.AGENT) {
-      setTotal(0);
-    } else {
-      setTotal(calculatedTotal);
-    }
-
-  }, [numRequest, pricePerUnit, schedulePriceAdjustment, user.data]);
+    setTotal(calculatedTotal);
+  }, [numRequest, pricePerUnit, schedulePriceAdjustment]);
 
 
 
