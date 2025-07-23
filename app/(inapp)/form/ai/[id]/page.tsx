@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { RawForm } from '@/store/types';
 import Fetch from '@/lib/core/fetch/Fetch';
-import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
+import { Code, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE, AI_CASES } from '@/core/Constants';
 import CreateOrderForm from '@/components/form/CreateOrderForm';
 import { Toast } from '@/services/Toast';
 import { useMe, useMyBankInfo } from '@/hooks/user';
@@ -62,6 +62,7 @@ export default function FormAIOrder() {
   const [chatOpen, setChatOpen] = useState<boolean>(true);
   const [chatErrors, setChatErrors] = useState<ChatError[]>([]);
   const [reloadEvent, setReloadEvent] = useState(false);
+  const [selectedCaseIndex, setSelectedCaseIndex] = useState(0);
 
   const toggleChat = (): void => {
     setChatOpen(!chatOpen);
@@ -181,7 +182,7 @@ export default function FormAIOrder() {
   };
 
   useEffect(() => {
-    if (dataForm?.form) {
+    if (dataForm) {
       const validateAll = () => {
         let chatErrors: ChatError[] = [];
         validateConfig(chatErrors);
@@ -329,7 +330,7 @@ export default function FormAIOrder() {
                   <div className="flex items-start gap-3">
                     <svg className="flex-shrink-0 h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     <p>Nếu mô hình của bạn chứa biến điều tiết AI sẽ chưa xử lý được, hãy liên hệ với chúng tôi để được hỗ trợ</p>
-                  </div>  
+                  </div>
                   <div className="flex items-start gap-3">
                     <svg className="flex-shrink-0 h-6 w-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
                     <p>Nếu bạn có thay đổi ở Google Form, hãy <button onClick={syncFormHandle} className="mx-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-md font-semibold hover:bg-primary-200 transition-all duration-200 inline-flex items-center text-sm">đồng bộ lại cấu hình</button> để cập nhật.</p>
@@ -430,36 +431,46 @@ export default function FormAIOrder() {
 
                 <form className='space-y-6' onSubmit={handleSubmit}>
                   <div className="space-y-4">
-                    <div className="relative">
-                      <label htmlFor="demographicGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                        Kết quả nhân khẩu học mong muốn
-                      </label>
-
-                      <textarea
-                        id="demographicGoal"
-                        value={demographicGoal}
-                        onChange={(e) => setDemographicGoal(e.target.value)}
-                        className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
-                        placeholder={`Giới tính của Anh/Chị/Bạn? gần 60% nữ
+                  </div>
+                  <div className="flex flex-col lg:flex-row gap-8 mb-6">
+                    {/* Left Column - Prompt Section */}
+                    <div className="w-full lg:w-1/2">
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2 mb-2">
+                          <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Prompt
+                        </h3>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="relative">
+                          <label htmlFor="demographicGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                            Yêu cầu nhân khẩu học mong muốn
+                          </label>
+                          <textarea
+                            id="demographicGoal"
+                            value={demographicGoal}
+                            onChange={(e) => setDemographicGoal(e.target.value)}
+                            className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                            placeholder={`Giới tính của Anh/Chị/Bạn? gần 60% nữ
 - Độ tuổi của Anh/Chị/Bạn?"
 18-22 tuổi: 55.6%
 23-25 tuổi: 35,7%
 26-28 tuổi: 8,7%`}
-                        maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="relative">
-                      <label htmlFor="spssGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                        Yêu cầu về mô hình mong muốn
-                      </label>
-                      <textarea
-                        id="spssGoal"
-                        value={spssGoal}
-                        onChange={(e) => setSpssGoal(e.target.value)}
-                        className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
-                        placeholder={`Mô hình hồi quy 5 biến độc lập TC,NC,AT,CX,TN tác động 1 biến phụ thuộc "sự hài lòng". Sử dụng thang đo linkert 5
+                            maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
+                          />
+                        </div>
+                        <div className="relative">
+                          <label htmlFor="spssGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
+                            Yêu cầu về dữ liệu & đánh giá
+                          </label>
+                          <textarea
+                            id="spssGoal"
+                            value={spssGoal}
+                            onChange={(e) => setSpssGoal(e.target.value)}
+                            className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                            placeholder={`Mô hình hồi quy 5 biến độc lập TC,NC,AT,CX,TN tác động 1 biến phụ thuộc "sự hài lòng". Sử dụng thang đo linkert 5
 Nghiên cứu các giả thuyết các yếu tố ảnh hưởng tích cực đến sự hài lòng. Yêu cầu chấp nhận tất cả các giả thuyết.
 Chú thích các yếu tố tương ứng với các câu hỏi trong form như sau
 TC:Khả năng tiếp cận
@@ -469,26 +480,125 @@ CX:Tính chính xác
 TN: Tiện nghi, thoải mái
 Xác định và đo lường mức độ ảnh hưởng của các yếu tố trên đến sự hài lòng chất lượng dịch vụ
 Xác định các yếu tố này tác động trực tiếp hay gián tiếp đến sự hài lòng chất lượng dịch vụ`}
-                        maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
-                      />
+                            maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column - Results Section */}
+                    <div className="w-full lg:w-1/2 flex flex-col">
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2 mb-2">
+                          <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Kết quả mẫu
+                        </h3>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="text-5xl font-bold text-primary-600">{AI_CASES[selectedCaseIndex]?.numRequest || 100}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {AI_CASES.map((aiCase, index) => (
+                              <button
+                                key={aiCase.id}
+                                type="button"
+                                onClick={() => setSelectedCaseIndex(index)}
+                                className={`text-xs px-3 py-1.5 rounded-full ${selectedCaseIndex === index ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                              >
+                                Use Case {index + 1}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mb-4">
+                          {AI_CASES[selectedCaseIndex]?.result_data_url && (
+                            <a
+                              href={`/static/usecase/${AI_CASES[selectedCaseIndex].result_data_url}`}
+                              download
+                              className="text-sm px-3 py-2 flex items-center gap-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                            >
+                              <svg className="h-4 w-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              Form khảo sát
+                            </a>
+                          )}
+                          {AI_CASES[selectedCaseIndex]?.result_report_url && (
+                            <a
+                              href={`/static/usecase/${AI_CASES[selectedCaseIndex].result_report_url}`}
+                              download
+                              className="text-sm px-3 py-2 flex items-center gap-1.5 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                            >
+                              <svg className="h-4 w-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                              </svg>
+                              Báo cáo kết quả
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+
+                        {AI_CASES[selectedCaseIndex]?.image && (
+                          <div className="mt-2 text-center">
+                            <img
+                              src={`/static/usecase/${AI_CASES[selectedCaseIndex].image}`}
+                              alt="Sample result visualization"
+                              className="max-h-[200px] mx-auto rounded-md border border-gray-200 object-contain"
+                            />
+                          </div>
+                        )}
+                        <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                          <div className="flex items-center mb-2">
+                            <svg className="h-5 w-5 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span className="font-medium text-sm">Yêu cầu nhân khẩu học mong muốn</span>
+                          </div>
+                          <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[150px] text-sm">
+                            <div className="text-gray-700">
+                              
+                              <div className="text-xs text-gray-600 whitespace-pre-line">
+                                {AI_CASES[selectedCaseIndex]?.demographicGoal || 'Chưa có yêu cầu nhân khẩu học.'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                          <div className="flex items-center mb-2">
+                            <svg className="h-5 w-5 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span className="font-medium text-sm">Yêu cầu về dữ liệu & đánh giá</span>
+                          </div>
+                          <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[150px] text-sm">
+                            <div className="text-gray-700">
+                              
+                              <div className="text-xs text-gray-600 whitespace-pre-line">
+                                {AI_CASES[selectedCaseIndex]?.spssGoal || 'Chưa có yêu cầu về dữ liệu và đánh giá.'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
                     </div>
                   </div>
-
                   <div className='space-y-6'>
 
                   </div>
-                  <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-4">
-                    <div className="flex items-start">
+                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200 mb-4 mt-2">
+                    <div className="flex items-center gap-2">
                       <div className="flex-shrink-0">
                         <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <div className="ml-3">
-                        <p className="text-sm text-yellow-700">
-                          Các số liệu về tỉ lệ sẽ chỉ là tương đối không thể chính xác 100%, AI agent sẽ điều chỉnh cho sát với thực tế nhất
-                        </p>
-                      </div>
+                      <p className="text-sm text-yellow-700">
+                        Các số liệu về tỉ lệ sẽ chỉ là tương đối không thể chính xác 100%, AI agent sẽ điều chỉnh cho sát với thực tế nhất
+                      </p>
                     </div>
                   </div>
                   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">

@@ -192,6 +192,7 @@ export const AI_PRICE = 350;
 export const AI_CASES = [
   {
     id: 'phan_tich_quyet_dinh_mua_hang_genz',
+    numRequest: 203,
     demographicGoal: `Ngẫu nhiên sao cho hướng đến GenZ, sinh viên trên địa bàn Đà Nẵng, hầu hết sử dụng tiktok shop để mua hàng với nhiều lí do khác nhau.`,
     spssGoal: `
     Mô hình hồi quy, 5 biến độc lập, 1 biến phụ thuộc, thang đo likert 5
@@ -203,11 +204,14 @@ export const AI_CASES = [
     Tiện ích mua hàng tác động tích cực đến Quyết định mua hàng trên Tiktok Shop 
     Âm thanh, hình ảnh hấp dẫn tác động tích cực đến Quyết định mua hàng trên Tiktok Shop
     `,
-    image: 'phan_tich_quyet_dinh_mua_hang_genz.png'
+    image: 'phan_tich_quyet_dinh_mua_hang_genz.png',
+    result_report_url: 'phan_tich_quyet_dinh_mua_hang_genz.pdf',
+    result_data_url: 'phan_tich_quyet_dinh_mua_hang_genz.csv'
 
   },
   {
     id: 'phan_tich_su_hai_long_kh',
+    numRequest: 173,
     demographicGoal: `Ngẫu nhiên sao cho hợp lý`,
     spssGoal: `
     Giả thiết TC (Khả năng tiếp cận), NC (Tính nhanh chóng), AT (An toàn), TN (Tiện nghi, thoải mái), CX (Tính chính xác), và có quan hệ cùng chiều với sự hài lòng của khách hàng.
@@ -222,11 +226,14 @@ export const AI_CASES = [
     Thành phần Sự hài lòng gồm 3 biến quan sát được mã hóa là: SHL1 – SHL3
 
     `,
-    image: 'phan_tich_su_hai_long_kh.png'
+    image: 'phan_tich_su_hai_long_kh.png',
+    result_report_url: 'phan_tich_su_hai_long_kh.pdf',
+    result_data_url: 'phan_tich_su_hai_long_kh.csv'
 
   },
   {
     id: 'phan_tich_quyet_dinh_nhan_viec',
+    numRequest: 400,
     demographicGoal: `
     - Giới tính của Anh/Chị/Bạn? gần 60% nữ
     - Độ tuổi của Anh/Chị/Bạn?
@@ -259,7 +266,9 @@ export const AI_CASES = [
       Giả thuyết H5: Nhận thức công bằng trong tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
       Giả thuyết H6: Tốc độ của quy trình tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
     `,
-    image: 'phan_tich_quyet_dinh_nhan_viec.png'
+    image: 'phan_tich_quyet_dinh_nhan_viec.png',
+    result_report_url: 'phan_tich_quyet_dinh_nhan_viec.pdf',
+    result_data_url: 'phan_tich_quyet_dinh_nhan_viec.csv'
 
   },
 ];
