@@ -425,6 +425,7 @@ export default function FormAIOrder() {
                   <li>Loại bỏ điều hướng session, chỉ nên dùng 1 luồng khảo sát cho 1 đối tượng</li>
                   <li>Viết prompt để Pass qua hết gạn lọc, mặc định chúng đều hợp lệ</li>
                   <li>Không nên trộn lẫn kết quả với các nguồn khảo sát khác</li>
+                  <li>Mô tả càng chi tiết, AI càng hiểu rõ mong muốn của bạn</li>
                 </ul>
 
                 <form className='space-y-6' onSubmit={handleSubmit}>
@@ -438,7 +439,7 @@ export default function FormAIOrder() {
                         id="demographicGoal"
                         value={demographicGoal}
                         onChange={(e) => setDemographicGoal(e.target.value)}
-                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                        className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
                         placeholder={`Giới tính của Anh/Chị/Bạn? gần 60% nữ
 - Độ tuổi của Anh/Chị/Bạn?"
 18-22 tuổi: 55.6%
@@ -446,10 +447,6 @@ export default function FormAIOrder() {
 26-28 tuổi: 8,7%`}
                         maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
                       />
-                      <p className="mt-2 text-xs text-gray-600 flex justify-between">
-                        <span>Mô tả càng chi tiết, AI càng hiểu rõ mong muốn của bạn</span>
-                        <span>{demographicGoal.length}/{MAX_EXPECTED_OUTCOME_LENGTH}</span>
-                      </p>
                     </div>
                   </div>
                   <div className="space-y-4">
@@ -461,7 +458,7 @@ export default function FormAIOrder() {
                         id="spssGoal"
                         value={spssGoal}
                         onChange={(e) => setSpssGoal(e.target.value)}
-                        className="w-full p-3 border rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                        className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
                         placeholder={`Mô hình hồi quy 5 biến độc lập TC,NC,AT,CX,TN tác động 1 biến phụ thuộc "sự hài lòng". Sử dụng thang đo linkert 5
 Nghiên cứu các giả thuyết các yếu tố ảnh hưởng tích cực đến sự hài lòng. Yêu cầu chấp nhận tất cả các giả thuyết.
 Chú thích các yếu tố tương ứng với các câu hỏi trong form như sau
@@ -474,10 +471,6 @@ Xác định và đo lường mức độ ảnh hưởng của các yếu tố t
 Xác định các yếu tố này tác động trực tiếp hay gián tiếp đến sự hài lòng chất lượng dịch vụ`}
                         maxLength={MAX_EXPECTED_OUTCOME_LENGTH}
                       />
-                      <p className="mt-2 text-xs text-gray-600 flex justify-between">
-                        <span>Mô tả càng chi tiết, AI càng hiểu rõ mong muốn của bạn</span>
-                        <span>{spssGoal.length}/{MAX_EXPECTED_OUTCOME_LENGTH}</span>
-                      </p>
                     </div>
                   </div>
 
