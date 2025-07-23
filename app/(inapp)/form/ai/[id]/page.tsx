@@ -521,7 +521,10 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
                               <svg className="h-4 w-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
-                              Form khảo sát
+                              Bảng dữ liệu
+                              <svg className="h-4 w-4 text-primary-600 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
                             </a>
                           )}
                           {AI_CASES[selectedCaseIndex]?.result_report_url && (
@@ -534,6 +537,9 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                               </svg>
                               Báo cáo kết quả
+                              <svg className="h-4 w-4 text-primary-600 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
                             </a>
                           )}
                         </div>
@@ -552,9 +558,6 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
                         )}
                         <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
                           <div className="flex items-center mb-2">
-                            <svg className="h-5 w-5 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
                             <span className="font-medium text-sm">Yêu cầu nhân khẩu học mong muốn</span>
                           </div>
                           <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[150px] text-sm">
@@ -568,9 +571,6 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
                         </div>
                         <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
                           <div className="flex items-center mb-2">
-                            <svg className="h-5 w-5 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
                             <span className="font-medium text-sm">Yêu cầu về dữ liệu & đánh giá</span>
                           </div>
                           <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[150px] text-sm">
