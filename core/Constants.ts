@@ -188,3 +188,78 @@ export const REFER_PERCENT = 15;
 export const MIN_DRAW_CREDIT = 100000;
 export const AI_PRICE = 350;
 
+
+export const AI_CASES = [
+  {
+    id: 'phan_tich_quyet_dinh_mua_hang_genz',
+    demographicGoal: `Ngẫu nhiên sao cho hướng đến GenZ, sinh viên trên địa bàn Đà Nẵng, hầu hết sử dụng tiktok shop để mua hàng với nhiều lí do khác nhau.`,
+    spssGoal: `
+    Mô hình hồi quy, 5 biến độc lập, 1 biến phụ thuộc, thang đo likert 5
+    phân tích và đánh giá cách TikTok Shop ảnh hưởng đến hành vi và mô hình tiêu dùng của thế hệ Gen Z tại Đà Nẵng, từ đó đề xuất giải pháp cho doanh nghiệp trong việc tiếp cận nhóm khách hàng này hiệu quả hơn. 
+    Chấp nhận tất cả các giả thuyết sau
+    Sự lan truyền nội dung tác động tích cực đến Quyết định mua hàng trên Tiktok Shop 
+    Thái độ xã hội/ tâm lý đám đông tác động tích cực đến Quyết định mua hàng trên Tiktok Shop 
+    Trào lưu tiêu dùng tức thời tác động tích cực đến Quyết định mua hàng trên Tiktok Shop 
+    Tiện ích mua hàng tác động tích cực đến Quyết định mua hàng trên Tiktok Shop 
+    Âm thanh, hình ảnh hấp dẫn tác động tích cực đến Quyết định mua hàng trên Tiktok Shop
+    `,
+    image: 'phan_tich_quyet_dinh_mua_hang_genz.png'
+
+  },
+  {
+    id: 'phan_tich_su_hai_long_kh',
+    demographicGoal: `Ngẫu nhiên sao cho hợp lý`,
+    spssGoal: `
+    Giả thiết TC (Khả năng tiếp cận), NC (Tính nhanh chóng), AT (An toàn), TN (Tiện nghi, thoải mái), CX (Tính chính xác), và có quan hệ cùng chiều với sự hài lòng của khách hàng.
+    Chấp nhận/ bác bỏ giả thuyết nào: ngẫu nhiện 
+    Có loại bỏ biến quan sát nào không: ngẫu nhiên
+    Thang đo dự thảo chất lượng dịch vụ trên tuyến buýt số 10 được xây dựng bởi các nhân tố tác động đến sự hài lòng khách hàng được xác định gồm 5 nhân tố với 25 biến quan sát.
+    Thành phần Khả năng tiếp cận gồm 6 biến quan sát được mã hóa là: TC1 – TC6
+    Thành phần Tính nhanh chóng gồm 4 biến quan sát được mã hóa là: NC1 – NC4
+    Thành phần An toàn gồm 4 biến quan sát được mã hóa là: AT1 – AT4
+    Thành phần Tính chính xác gồm 3 biến quan sát được mã hóa là: CX1 – CX3
+    Thành phần Tiện nghi, thoải mái gồm 5 biến quan sát được mã hóa là: TN1 – TN5
+    Thành phần Sự hài lòng gồm 3 biến quan sát được mã hóa là: SHL1 – SHL3
+
+    `,
+    image: 'phan_tich_su_hai_long_kh.png'
+
+  },
+  {
+    id: 'phan_tich_quyet_dinh_nhan_viec',
+    demographicGoal: `
+    - Giới tính của Anh/Chị/Bạn? gần 60% nữ
+    - Độ tuổi của Anh/Chị/Bạn?
+      18-22 tuổi: 55.6%
+      23-25 tuổi: 35,7%
+      26-28 tuổi: 8,7%
+    - Trình độ học vấn của Anh/Chị/Bạn là gì?
+      Đại học: gần 80%, còn lại chia ra
+    - Anh/Chị/Bạn đang là?
+      Sinh viên: 29.3%
+      Vừa tốt nghiệp: 40.1%
+      Đã đi làm dưới 2 năm: 20.2%
+      Đã đi làm từ 2 năm trở lên: 10.4%
+    - Anh/Chị/Bạn đã từng ứng tuyển vào bao nhiêu công ty?
+      1 - 2 công ty: 40%
+      3 - 5 công ty: 35%
+      Hơn 5 công ty: 25%
+    - Công ty gần nhất Anh/Chị/Bạn ứng tuyển là khi nào?
+      Trong vòng 12 tháng qua: 60%
+      Từ 1 đến dưới 3 năm trước: 35%
+      Hơn 3 năm trước: 5%
+`,
+    spssGoal: `
+      Thang đo Likert từ 1-5
+      Dùng phân tích hồi quy, không sử dụng SEM
+      Giả thuyết H1: Thông tin tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại TP. Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H2: Công nghệ tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại TP. Hồ Chí Minh. ⇒ CÓ THỂ BÁC BỎ
+      Giả thuyết H3: Tương tác với nhà tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H4: Thái độ của nhà tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H5: Nhận thức công bằng trong tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H6: Tốc độ của quy trình tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+    `,
+    image: 'phan_tich_quyet_dinh_nhan_viec.png'
+
+  },
+];
