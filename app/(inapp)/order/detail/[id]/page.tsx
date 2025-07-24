@@ -365,7 +365,8 @@ const OrderPage = () => {
                                         order.data?.order.status === ORDER_STATUS.RUNNING ? "bg-blue-100 text-blue-800" : "",
                                         order.data?.order.status === ORDER_STATUS.PAUSE ? "bg-yellow-100 text-yellow-800" : "",
                                         order.data?.order.status === ORDER_STATUS.CANCELED ? "bg-red-100 text-red-800" : "",
-                                        order.data?.order.status === ORDER_STATUS.SUCCESS ? "bg-green-100 text-green-800" : ""
+                                        order.data?.order.status === ORDER_STATUS.SUCCESS ? "bg-green-100 text-green-800" : "",
+                                        order.data?.order.status === ORDER_STATUS.ERROR ? "bg-red-100 text-red-800" : ""
                                     )}>
                                         {order.data?.order.status}
                                     </span>

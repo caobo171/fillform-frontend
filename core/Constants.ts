@@ -78,6 +78,7 @@ export const ORDER_STATUS = {
   FAILED: 'Thất bại',
   CANCELED: 'Đã hủy',
   SUCCESS: 'Hoàn thành',
+  ERROR: 'ERROR',
 };
 
 
