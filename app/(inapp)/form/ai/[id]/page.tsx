@@ -452,7 +452,8 @@ export default function FormAIOrder() {
                             id="demographicGoal"
                             value={demographicGoal}
                             onChange={(e) => setDemographicGoal(e.target.value)}
-                            className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                            style={{ height: 354}}
+                            className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[320px]"
                             placeholder={`Giới tính của Anh/Chị/Bạn? gần 60% nữ
 - Độ tuổi của Anh/Chị/Bạn?"
 18-22 tuổi: 55.6%
@@ -469,7 +470,7 @@ export default function FormAIOrder() {
                             id="spssGoal"
                             value={spssGoal}
                             onChange={(e) => setSpssGoal(e.target.value)}
-                            className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[160px]"
+                            className="w-full p-3 border text-xs rounded-md border-gray-300 focus:ring-2 focus:ring-primary-600 focus:border-transparent min-h-[180px]"
                             placeholder={`Mô hình hồi quy 5 biến độc lập TC,NC,AT,CX,TN tác động 1 biến phụ thuộc "sự hài lòng". Sử dụng thang đo linkert 5
 Nghiên cứu các giả thuyết các yếu tố ảnh hưởng tích cực đến sự hài lòng. Yêu cầu chấp nhận tất cả các giả thuyết.
 Chú thích các yếu tố tương ứng với các câu hỏi trong form như sau
@@ -488,15 +489,15 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
 
                     {/* Right Column - Results Section */}
                     <div className="w-full lg:w-1/2 flex flex-col">
-                      <div className="mb-4">
+                      <div className="">
                         <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2 mb-2">
                           <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           Kết quả mẫu
                         </h3>
+
                         <div className="flex justify-between items-center mb-4">
-                          <div className="text-5xl font-bold text-primary-600">{AI_CASES[selectedCaseIndex]?.numRequest || 100}</div>
                           <div className="flex flex-wrap gap-2">
                             {AI_CASES.map((aiCase, index) => (
                               <button
@@ -508,9 +509,18 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
                                 Use Case {index + 1}
                               </button>
                             ))}
+                            {AI_CASES[selectedCaseIndex]?.image && (
+                              <div className="mt-2 text-center">
+                                <img
+                                  src={`/static/usecase/${AI_CASES[selectedCaseIndex].image}`}
+                                  alt="Sample result visualization"
+                                  className="max-h-[80px] mx-auto rounded-md border border-gray-200 object-contain"
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
-                        
+
                         <div className="flex gap-2 mb-4">
                           {AI_CASES[selectedCaseIndex]?.result_data_url && (
                             <a
@@ -545,39 +555,29 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-2">
-
-                        {AI_CASES[selectedCaseIndex]?.image && (
-                          <div className="mt-2 text-center">
-                            <img
-                              src={`/static/usecase/${AI_CASES[selectedCaseIndex].image}`}
-                              alt="Sample result visualization"
-                              className="max-h-[200px] mx-auto rounded-md border border-gray-200 object-contain"
-                            />
-                          </div>
-                        )}
+                      <div className="flex flex-col gap-6">
                         <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                          <div className="flex items-center mb-2">
-                            <span className="font-medium text-sm">Yêu cầu nhân khẩu học mong muốn</span>
+                          <div className="flex items-center mb-4">
+                            <span className="font-medium text-xs">Yêu cầu nhân khẩu học mong muốn</span>
                           </div>
-                          <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[150px] text-sm">
+                          <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[140px] text-xs">
                             <div className="text-gray-700">
-                              
+
                               <div className="text-xs text-gray-600 whitespace-pre-line">
-                                {AI_CASES[selectedCaseIndex]?.demographicGoal || 'Chưa có yêu cầu nhân khẩu học.'}
+                                {AI_CASES[selectedCaseIndex]?.demographicGoal?.trim() || 'Chưa có yêu cầu nhân khẩu học.'}
                               </div>
                             </div>
                           </div>
                         </div>
                         <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                          <div className="flex items-center mb-2">
-                            <span className="font-medium text-sm">Yêu cầu về dữ liệu & đánh giá</span>
+                          <div className="flex items-center mb-4">
+                            <span className="font-medium text-xs">Yêu cầu về dữ liệu & đánh giá</span>
                           </div>
-                          <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[150px] text-sm">
+                          <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[120px] text-xs">
                             <div className="text-gray-700">
-                              
+
                               <div className="text-xs text-gray-600 whitespace-pre-line">
-                                {AI_CASES[selectedCaseIndex]?.spssGoal || 'Chưa có yêu cầu về dữ liệu và đánh giá.'}
+                                {AI_CASES[selectedCaseIndex]?.spssGoal?.trim() || 'Chưa có yêu cầu về dữ liệu và đánh giá.'}
                               </div>
                             </div>
                           </div>

@@ -271,7 +271,7 @@ const OrderPage = () => {
 
     return (
         <section className="bg-gradient-to-b from-primary-50 to-white py-12 mx-auto px-4 sm:px-6">
-            {isFetching && <LoadingAbsolute />}
+            {isFetching ?    <LoadingAbsolute /> : <></>}
             <div className="container mx-auto text-center" data-aos="fade-up">
                 <div className="mb-10">
                     <h2 className="text-3xl font-bold mb-4">Chi tiết Order</h2>
@@ -372,7 +372,7 @@ const OrderPage = () => {
                                     </span>
                                 </div>
 
-                                {order.data?.order.status === ORDER_STATUS.RUNNING && (
+                                {order.data?.order.status === ORDER_STATUS.RUNNING ? (
                                     <div className="pt-2 border-t border-gray-100">
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600">Dự kiến hoàn thành:</span>
@@ -389,7 +389,7 @@ const OrderPage = () => {
                                             </div>
                                         )}
                                     </div>
-                                )}
+                                ) : <></>}
                             </div>
                         </div>
 
@@ -453,14 +453,14 @@ const OrderPage = () => {
                                             <div className="flex items-center justify-between">
                                                 <span className="text-gray-600">AI is thinking</span>
                                                 <div className="flex items-center">
-                                                    {order.data?.order.createdAt && new Date().getTime() - new Date(order.data.order.createdAt).getTime() > 15 * 60 * 1000 ? (
+                                                    {order.data?.order.createdAt && new Date().getTime() - new Date(order.data.order.createdAt).getTime() > 30 * 60 * 1000 ? (
                                                         <div className="flex items-center">
                                                             <div className="mr-2 h-4 w-4 text-red-600">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                                                 </svg>
                                                             </div>
-                                                            <span className="text-red-600 italic text-sm">Request may be stuck (waiting &gt;15 min)</span>
+                                                            <span className="text-red-600 italic text-sm">Request may be stuck (waiting &gt;30 min)</span>
                                                         </div>
                                                     ) : (
                                                         <>
@@ -505,7 +505,7 @@ const OrderPage = () => {
                     </div>
                 </div>
 
-                {isAdmin && (
+                {isAdmin ? (
                     <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
                         <h2 className="text-2xl font-bold mb-4">Quản lý Order</h2>
 
@@ -880,25 +880,25 @@ const OrderPage = () => {
                                                     Xem
                                                 </a>
                                             </div>
-                                            {detail.start_time && (
+                                            {detail.start_time ? (
                                                 <div className="p-2 bg-gray-50 text-xs">
                                                     Bắt đầu: {new Date(Number(detail.start_time)).toLocaleString()}
                                                 </div>
-                                            )}
+                                            ) : <></>}
                                         </div>
                                     ))}
                                 </div>
                             )}
                         </div>
                     </div>
-                )}
+                ) : <></>}
 
                 {/* Form Config */}
                 <div className="text-left">
 
                     <>
                         {
-                            order.data?.order.type == ORDER_TYPE.AGENT && (
+                            order.data?.order.type == ORDER_TYPE.AGENT ? (
                                 <>
                                     <h2 className="text-2xl font-bold mb-4">Cấu hình AI Agent</h2>
 
@@ -1003,8 +1003,8 @@ const OrderPage = () => {
                                         </div>
                                     )}
                                 </>
-                            )
-                        }
+                            ) : <></>
+                        } 
                     </>
 
                     <>

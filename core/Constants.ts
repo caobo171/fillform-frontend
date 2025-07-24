@@ -192,6 +192,46 @@ export const AI_PRICE = 350;
 
 export const AI_CASES = [
   {
+    id: 'phan_tich_quyet_dinh_nhan_viec',
+    numRequest: 400,
+    demographicGoal: `
+    - Giới tính của Anh/Chị/Bạn? gần 60% nữ
+    - Độ tuổi của Anh/Chị/Bạn?
+      18-22 tuổi: 55.6%
+      23-25 tuổi: 35,7%
+      26-28 tuổi: 8,7%
+    - Trình độ học vấn của Anh/Chị/Bạn là gì?
+      Đại học: gần 80%, còn lại chia ra
+    - Anh/Chị/Bạn đang là?
+      Sinh viên: 29.3%
+      Vừa tốt nghiệp: 40.1%
+      Đã đi làm dưới 2 năm: 20.2%
+      Đã đi làm từ 2 năm trở lên: 10.4%
+    - Anh/Chị/Bạn đã từng ứng tuyển vào bao nhiêu công ty?
+      1 - 2 công ty: 40%
+      3 - 5 công ty: 35%
+      Hơn 5 công ty: 25%
+    - Công ty gần nhất Anh/Chị/Bạn ứng tuyển là khi nào?
+      Trong vòng 12 tháng qua: 60%
+      Từ 1 đến dưới 3 năm trước: 35%
+      Hơn 3 năm trước: 5%
+`,
+    spssGoal: `
+      Thang đo Likert từ 1-5
+      Dùng phân tích hồi quy, không sử dụng SEM
+      Giả thuyết H1: Thông tin tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại TP. Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H2: Công nghệ tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại TP. Hồ Chí Minh. ⇒ CÓ THỂ BÁC BỎ
+      Giả thuyết H3: Tương tác với nhà tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H4: Thái độ của nhà tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H5: Nhận thức công bằng trong tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+      Giả thuyết H6: Tốc độ của quy trình tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
+    `,
+    image: 'phan_tich_quyet_dinh_nhan_viec.png',
+    result_report_url: 'phan_tich_quyet_dinh_nhan_viec.pdf',
+    result_data_url: 'phan_tich_quyet_dinh_nhan_viec.csv'
+
+  },
+  {
     id: 'phan_tich_quyet_dinh_mua_hang_genz',
     numRequest: 203,
     demographicGoal: `Ngẫu nhiên sao cho hướng đến GenZ, sinh viên trên địa bàn Đà Nẵng, hầu hết sử dụng tiktok shop để mua hàng với nhiều lí do khác nhau.`,
@@ -232,44 +272,5 @@ export const AI_CASES = [
     result_data_url: 'phan_tich_su_hai_long_kh.csv'
 
   },
-  {
-    id: 'phan_tich_quyet_dinh_nhan_viec',
-    numRequest: 400,
-    demographicGoal: `
-    - Giới tính của Anh/Chị/Bạn? gần 60% nữ
-    - Độ tuổi của Anh/Chị/Bạn?
-      18-22 tuổi: 55.6%
-      23-25 tuổi: 35,7%
-      26-28 tuổi: 8,7%
-    - Trình độ học vấn của Anh/Chị/Bạn là gì?
-      Đại học: gần 80%, còn lại chia ra
-    - Anh/Chị/Bạn đang là?
-      Sinh viên: 29.3%
-      Vừa tốt nghiệp: 40.1%
-      Đã đi làm dưới 2 năm: 20.2%
-      Đã đi làm từ 2 năm trở lên: 10.4%
-    - Anh/Chị/Bạn đã từng ứng tuyển vào bao nhiêu công ty?
-      1 - 2 công ty: 40%
-      3 - 5 công ty: 35%
-      Hơn 5 công ty: 25%
-    - Công ty gần nhất Anh/Chị/Bạn ứng tuyển là khi nào?
-      Trong vòng 12 tháng qua: 60%
-      Từ 1 đến dưới 3 năm trước: 35%
-      Hơn 3 năm trước: 5%
-`,
-    spssGoal: `
-      Thang đo Likert từ 1-5
-      Dùng phân tích hồi quy, không sử dụng SEM
-      Giả thuyết H1: Thông tin tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại TP. Hồ Chí Minh. ⇒ CHẤP NHẬN
-      Giả thuyết H2: Công nghệ tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại TP. Hồ Chí Minh. ⇒ CÓ THỂ BÁC BỎ
-      Giả thuyết H3: Tương tác với nhà tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
-      Giả thuyết H4: Thái độ của nhà tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
-      Giả thuyết H5: Nhận thức công bằng trong tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
-      Giả thuyết H6: Tốc độ của quy trình tuyển dụng có tác động tích cực đến quyết định nhận việc của Gen Z tại Thành phố Hồ Chí Minh. ⇒ CHẤP NHẬN
-    `,
-    image: 'phan_tich_quyet_dinh_nhan_viec.png',
-    result_report_url: 'phan_tich_quyet_dinh_nhan_viec.pdf',
-    result_data_url: 'phan_tich_quyet_dinh_nhan_viec.csv'
 
-  },
 ];
