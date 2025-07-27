@@ -6,6 +6,7 @@ import { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 import 'react-responsive-modal/styles.css';
 import 'react-toastify/dist/ReactToastify.css';
+import 'react-quill/dist/quill.snow.css';
 import { SWRConfig } from 'swr';
 
 import { PostHogProvider } from '@/components/PostHogProvider';
