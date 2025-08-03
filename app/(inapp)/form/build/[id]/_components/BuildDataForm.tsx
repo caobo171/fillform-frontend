@@ -438,7 +438,7 @@ export default function FormRate() {
                     </div>
 
                     <div className="container mx-auto mb-2">
-                        <ModelBuilder dataForm={dataForm} model={model} />
+                        <ModelBuilder dataForm={dataForm} model={model} setModel={setModel} />
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-1 rounded-lg container mx-auto">

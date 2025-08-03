@@ -1,4 +1,5 @@
 import { useMe } from '@/hooks/user';
+import { Helper } from '@/services/Helper';
 import { DataModel, RawForm } from '@/store/types';
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
@@ -10,7 +11,7 @@ interface ModelBuilderProps {
         config: any;
     },
     model?: DataModel | null;
-    onSaveModel?: (model: DataModel) => void;
+    setModel?: (model: DataModel) => void;
 }
 
 type FormQuestion = {
@@ -20,76 +21,57 @@ type FormQuestion = {
 };
 
 type Variable = {
-    id: string;
     name: string;
     code: string;
     metatype: 'observed_variable' | 'dependent_variable';
     coefficient: number;
     mean: number;
     standard_deviation: number;
-    questions: { id: string, question: string, answers?: string[] }[];
+    questions?: { id: string, question: string, answers?: string[] }[];
 };
 
-type LocalModel = {
-    code: string;
-    name: string;
-    model: "linear_regression";
-    questions: FormQuestion[];
-};
-
-export const ModelBuilder = ({ dataForm, model, onSaveModel }: ModelBuilderProps) => {
-    // Model name will be auto-generated when saving
-    const [dependentVariable, setDependentVariable] = useState<Variable | null>(null);
-    const [variables, setVariables] = useState<Variable[]>([]);
+export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) => {
     const availableQuestions = dataForm?.form?.loaddata || [];
 
+    // Get dependent and independent variables from model
+    const dependentVariable = model?.observedItems?.find(item => item.metatype === 'dependent_variable') || null;
+    const variables = model?.observedItems?.filter(item => item.metatype === 'observed_variable') || [];
 
-    // Extract questions from form sections
+
+
+    // Initialize model if it doesn't exist
     useEffect(() => {
-
-
-        // Initialize dependent variable on mount
-        if (!dependentVariable) {
-            const newVar = {
-                id: generateId(),
-                name: 'Dependent Variable',
-                code: generateId().substring(0, 8),
-                questions: [],
-                metatype: 'dependent_variable' as const,
-                coefficient: 1.0,
-                mean: 0,
-                standard_deviation: 1
+        if (!model && setModel) {
+            const initialModel: DataModel = {
+                model: {
+                    code: `model_${Date.now()}`,
+                    name: `Regression_Model_${Date.now()}`,
+                    model: 'linear_regression',
+                    questions: []
+                },
+                observedItems: [
+                    {
+                        name: 'Biến phụ thuộc',
+                        code: generateId().substring(0, 8),
+                        questions: [],
+                        metatype: 'dependent_variable' as const,
+                        coefficient: 1.0,
+                        mean: 0,
+                        standard_deviation: 1
+                    }
+                ]
             };
-            setDependentVariable(newVar);
+            setModel(initialModel);
         }
-    }, [dataForm, dependentVariable]);
+    }, [model, setModel]);
 
-    // Initialize from existing model if available
-    useEffect(() => {
-        if (model) {
-            const dependentItem = model.observedItems.find(item => item.metatype === 'dependent_variable');
-            const independentItems = model.observedItems.filter(item => item.metatype === 'observed_variable');
 
-            if (dependentItem) {
-                setDependentVariable({
-                    id: `dv_${Date.now()}`,
-                    ...dependentItem,
-                    questions: dependentItem.questions || []
-                });
-            }
-
-            setVariables(independentItems.map(item => ({
-                id: `var_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                ...item,
-                questions: item.questions || []
-            })));
-        }
-    }, [model]);
 
     const handleAddVariable = () => {
+        if (!model || !setModel) return;
+
         const newVar: Variable = {
-            id: `var_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            name: `Variable ${variables.length + 1}`,
+            name: `Biến độc lập ${variables.length + 1}`,
             code: `var${variables.length + 1}`,
             metatype: "observed_variable",
             coefficient: 0,
@@ -98,11 +80,26 @@ export const ModelBuilder = ({ dataForm, model, onSaveModel }: ModelBuilderProps
             questions: []
         };
 
-        setVariables([...variables, newVar]);
+        const updatedModel = {
+            ...model,
+            observedItems: [...model.observedItems, newVar]
+        };
+        setModel(updatedModel);
     };
 
-    const handleRemoveVariable = (id: string) => {
-        setVariables(variables.filter(v => v.id !== id));
+    const handleRemoveVariable = (index: number) => {
+        if (!model || !setModel) return;
+        
+        const updatedModel = {
+            ...model,
+            observedItems: model.observedItems.filter((_, i) => {
+                // Keep dependent variable and remove only the specific independent variable
+                if (model.observedItems[i].metatype === 'dependent_variable') return true;
+                const independentIndex = model.observedItems.slice(0, i).filter(item => item.metatype === 'observed_variable').length;
+                return independentIndex !== index;
+            })
+        };
+        setModel(updatedModel);
     };
 
     // Generate a unique ID for variables
@@ -110,67 +107,58 @@ export const ModelBuilder = ({ dataForm, model, onSaveModel }: ModelBuilderProps
         return `id_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     };
 
-    const handleUpdateVariable = (id: string, field: keyof Variable, value: string | number) => {
-        if (dependentVariable && dependentVariable.id === id) {
-            setDependentVariable({ ...dependentVariable, [field]: value });
-        } else {
-            setVariables(variables.map(v => v.id === id ? { ...v, [field]: value } : v));
+    const handleUpdateVariable = (variableType: 'dependent' | 'independent', index: number, field: keyof Variable, value: string | number) => {
+        if (!model || !setModel) return;
+        
+        let updateVars: any = {};
+        updateVars[field] = value;
+        if (field === 'name') {
+            updateVars.code = Helper.purify(value.toString().toLowerCase().split(' ').map(e => e.charAt(0).toUpperCase()).join(''));
         }
+
+        const updatedModel = {
+            ...model,
+            observedItems: model.observedItems.map((v, i) => {
+                if (variableType === 'dependent' && v.metatype === 'dependent_variable') {
+                    return { ...v, ...updateVars };
+                }
+                if (variableType === 'independent' && v.metatype === 'observed_variable') {
+                    const independentIndex = model.observedItems.slice(0, i).filter(item => item.metatype === 'observed_variable').length;
+                    if (independentIndex === index) {
+                        return { ...v, ...updateVars };
+                    }
+                }
+                return v;
+            })
+        };
+        setModel(updatedModel);
     };
 
-    const handleAddQuestionsToVariable = (variableId: string, selectedQuestions: MultiValue<{ value: string; label: string; }>) => {
+    const handleAddQuestionsToVariable = (variableType: 'dependent' | 'independent', index: number, selectedQuestions: MultiValue<{ value: string; label: string; }>) => {
+        if (!model || !setModel) return;
+        
         const questions = Array.from(selectedQuestions).map(option =>
             availableQuestions.find(q => q.id === option.value)
         ).filter(Boolean) as FormQuestion[];
 
-        if (dependentVariable && dependentVariable.id === variableId) {
-            setDependentVariable({
-                ...dependentVariable,
-                questions: questions
-            });
-        } else {
-            setVariables(variables.map(v => {
-                if (v.id === variableId) {
-                    return {
-                        ...v,
-                        questions: questions
-                    };
+        const updatedModel = {
+            ...model,
+            observedItems: model.observedItems.map((v, i) => {
+                if (variableType === 'dependent' && v.metatype === 'dependent_variable') {
+                    return { ...v, questions };
+                }
+                if (variableType === 'independent' && v.metatype === 'observed_variable') {
+                    const independentIndex = model.observedItems.slice(0, i).filter(item => item.metatype === 'observed_variable').length;
+                    if (independentIndex === index) {
+                        return { ...v, questions };
+                    }
                 }
                 return v;
-            }));
-        }
-    };
-
-    const handleSaveModel = () => {
-        if (!dependentVariable || variables.length === 0) return;
-
-        // Generate model name and code
-        const generatedModelName = `Regression_Model_${Date.now()}`;
-        const generatedModelCode = generatedModelName.toLowerCase().replace(/\s+/g, '_').substring(0, 15) + '_' + Date.now().toString().substring(9, 13);
-
-        // Build the model structure
-        const model: DataModel = {
-            model: {
-                code: generatedModelCode,
-                name: generatedModelName,
-                model: 'linear_regression',
-                questions: dependentVariable.questions,
-                residual: 0.05 // Default residual
-            },
-            observedItems: [
-                // Dependent variable
-                {
-                    ...dependentVariable,
-                    metatype: 'dependent_variable',
-                },
-                // Independent variables
-                ...variables
-            ]
+            })
         };
-
-        // Call the provided callback
-        onSaveModel?.(model);
+        setModel(updatedModel);
     };
+
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
@@ -210,179 +198,187 @@ export const ModelBuilder = ({ dataForm, model, onSaveModel }: ModelBuilderProps
 
 
 
-            {/* Variables Section */}
-            <div className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-medium">Model Variables</h4>
-                    <button
-                        onClick={handleAddVariable}
-                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-colors"
-                    >
-                        + Add Variable
-                    </button>
-                </div>
+            {/* Main Content Grid: Variables on Left, Visualization on Right */}
+            <div className="grid lg:grid-cols-2 gap-8 mb-6">
+                {/* Left Column: Variables Section */}
+                <div>
+                    <div className="mb-3">
+                        <h4 className="font-medium">Model Variables</h4>
+                    </div>
 
-                {/* Dependent Variable */}
-                <div className="bg-white p-4 border border-gray-200 rounded-lg">
-                    <h5 className="font-medium mb-2 text-primary">Dependent Variable (Target)</h5>
-                    {dependentVariable && (
-                        <div>
-                            <div className="mb-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Variable Name</label>
-                                    <input
-                                        type="text"
-                                        value={dependentVariable.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable(dependentVariable.id, 'name', e.target.value)}
-                                        className="w-full rounded-md border border-gray-300 flex-1 appearance-none px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                                    />
+                    {/* Compact Variable Grid */}
+                    <div className="grid gap-4">
+                        {/* Biến phụ thuộc*/}
+                        <div className="bg-green-50 p-2 border-2 border-green-200 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                                <h5 className="font-medium text-green-700 text-xs">Biến phụ thuộc(Target)</h5>
+                            </div>
+                            {dependentVariable && (
+                                <div className="flex align-items gap-8">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Tên biến</label>
+                                        <input
+                                            type="text"
+                                            value={dependentVariable.name}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('dependent', 0, 'name', e.target.value)}
+                                            className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi đã chọn ({(dependentVariable.questions || []).length})</label>
+                                        <Select
+                                            isMulti
+                                            value={(dependentVariable.questions || []).map(q => {
+                                            let question = availableQuestions.find(e => e.id === q.id);
+                                            return {
+                                                value: q.id,
+                                                label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
+                                            };
+                                        })}
+                                        onChange={(selectedOptions) => handleAddQuestionsToVariable('dependent', 0, selectedOptions || [])}
+                                            options={availableQuestions.map(q => ({
+                                                value: q.id,
+                                                label: q.question + (q.description ? ' (' + q.description + ')' : '')
+                                            }))}
+                                            placeholder="Hãy chọn các câu hỏi thuộc biến này"
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    minHeight: '32px',
+                                                    fontSize: '14px',
+                                                    borderColor: '#d1d5db'
+                                                }),
+                                                valueContainer: (provided) => ({
+                                                    ...provided,
+                                                    padding: '2px 6px'
+                                                }),
+                                                multiValue: (provided) => ({
+                                                    ...provided,
+                                                    fontSize: '12px'
+                                                })
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Independent Variables */}
+                        {variables.map((variable, index) => (
+                            <div key={index} className="bg-blue-50 p-2 border-2 border-blue-200 rounded-lg">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h5 className="font-medium text-blue-700 text-xs">Biến độc lập {index + 1}</h5>
+                                    <button
+                                        onClick={() => handleRemoveVariable(index)}
+                                        className="text-red-500 hover:text-red-700 text-xs px-2 py-1 rounded"
+                                    >
+                                        Xoá biến
+                                    </button>
+                                </div>
+                                <div className="flex align-items gap-8">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Tên biến</label>
+                                        <input
+                                            type="text"
+                                            value={variable.name}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('independent', index, 'name', e.target.value)}
+                                            className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi đã chọn ({(variable.questions || []).length})</label>
+                                        <Select
+                                            isMulti
+                                            value={(variable.questions || []).map(q => {
+                                            let question = availableQuestions.find(e => e.id === q.id);
+                                            return {
+                                                value: q.id,
+                                                label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
+                                            };
+                                        })}
+                                        onChange={(selectedOptions) => handleAddQuestionsToVariable('independent', index, selectedOptions || [])}
+                                            options={availableQuestions.map(q => ({
+                                                value: q.id,
+                                                label: q.question + (q.description ? ' (' + q.description + ')' : '')
+                                            }))}
+                                            placeholder="Hãy chọn các câu hỏi thuộc biến này"
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    minHeight: '32px',
+                                                    fontSize: '14px',
+                                                    borderColor: '#d1d5db'
+                                                }),
+                                                valueContainer: (provided) => ({
+                                                    ...provided,
+                                                    padding: '2px 6px'
+                                                }),
+                                                multiValue: (provided) => ({
+                                                    ...provided,
+                                                    fontSize: '12px'
+                                                })
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             </div>
+                        ))}
 
-                            {/* Questions mapping */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Questions that measure this variable</label>
-                                <Select
-                                    isMulti
-                                    value={dependentVariable.questions.map(q => {
-                                        let question = availableQuestions.find(e => e.id === q.id);
-                                        return {
-                                            value: q.id,
-                                            label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
-                                        };
-                                    })}
-                                    onChange={(selectedOptions) => handleAddQuestionsToVariable(dependentVariable.id, selectedOptions || [])}
-                                    options={availableQuestions.map(q => ({
-                                        value: q.id,
-                                        label: q.question + (q.description ? ' (' + q.description + ')' : '')
-                                    }))}
-                                    placeholder="Select questions..."
-                                    className="mb-2"
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            borderColor: '#d1d5db',
-                                            '&:hover': {
-                                                borderColor: '#d1d5db'
-                                            },
-                                            '&:focus': {
-                                                borderColor: '#2563eb',
-                                                boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.2)'
-                                            }
-                                        })
-                                    }}
-                                />
-                            </div>
+                        {/* Add Variable Button */}
+                        <div className="mt-3">
+                            <button
+                                onClick={handleAddVariable}
+                                className="w-full flex items-center justify-center px-3 py-2 text-xs font-medium text-primary border-2 border-dashed border-primary rounded-lg hover:bg-primary hover:text-white transition-colors"
+                            >
+                                + Thêm biến độc lập
+                            </button>
                         </div>
-                    )}
+                    </div>
                 </div>
 
-                {/* Independent Variables */}
-                <div className="space-y-4">
-                    {variables.map((variable) => (
-                        <div key={variable.id} className="p-4 border border-gray-200 rounded-lg">
-                            <div className="flex justify-between items-center mb-3">
-                                <h5 className="font-medium">Independent Variable</h5>
-                                <button
-                                    onClick={() => handleRemoveVariable(variable.id)}
-                                    className="text-red-500 hover:text-red-700 px-2 py-1 rounded"
-                                >
-                                    🗑️ Remove
-                                </button>
-                            </div>
-
-                            <div className="mb-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Variable Name</label>
-                                    <input
-                                        type="text"
-                                        value={variable.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable(variable.id, 'name', e.target.value)}
-                                        className="w-full rounded-md border border-gray-300 flex-1 appearance-none px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Questions mapping */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Questions that measure this variable</label>
-                                <Select
-                                    isMulti
-                                    value={variable.questions.map(q => {
-                                        let question = availableQuestions.find(e => e.id === q.id);
-                                        return {
-                                            value: q.id,
-                                            label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
-                                        };
-                                    })}
-                                    onChange={(selectedOptions) => handleAddQuestionsToVariable(variable.id, selectedOptions || [])}
-                                    options={availableQuestions.map(q => ({
-                                        value: q.id,
-                                        label: q.question + (q.description ? ' (' + q.description + ')' : '')
-                                    }))}
-                                    placeholder="Select questions..."
-                                    className="mb-2"
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            borderColor: '#d1d5db',
-                                            '&:hover': {
-                                                borderColor: '#d1d5db'
-                                            },
-                                            '&:focus': {
-                                                borderColor: '#2563eb',
-                                                boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.2)'
-                                            }
-                                        })
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Model Visualization */}
-            {dependentVariable && variables.length > 0 && (
-                <div className="mb-8">
-                    <h4 className="font-medium mb-4">Model Visualization</h4>
-                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                        <div className="flex flex-col items-center">
-                            {/* Independent variables in a row */}
-                            <div className="flex flex-wrap justify-center gap-4 mb-6">
-                                {variables.map((variable) => (
-                                    <div key={variable.id} className="text-center p-3 bg-white border-2 border-blue-400 rounded-md shadow-sm min-w-[150px]">
-                                        <p className="font-medium text-sm">{variable.name || 'Independent Variable'}</p>
-                                        <p className="text-xs text-gray-500">{variable.questions.length} questions</p>
+                {/* Right Column: Model Visualization */}
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-medium mb-4">Hiển thị mô hình</h4>
+                    {dependentVariable && variables.length > 0 ? (
+                        <div className="flex flex-row items-center justify-center h-full min-h-[400px]">
+                            {/* Independent Variables (Rectangles) */}
+                            <div className="space-y-3">
+                                {variables.map((variable, index) => (
+                                    <div key={variable.id} className="flex items-center">
+                                        {/* Variable Box */}
+                                        <div className="bg-white border-2 border-gray-800 px-4 py-2 text-xs font-medium min-w-[180px] text-center">
+                                            {variable.name || `Variable ${index + 1}`}
+                                        </div>
+                                        {/* Hypothesis Label */}
+                                        <div className="ml-4 text-xs font-medium text-gray-700">
+                                            H{index + 1} +
+                                        </div>
+                                        {/* Arrow */}
+                                        <div className="ml-2">
+                                            <svg width="40" height="20" viewBox="0 0 40 20" className="text-gray-600">
+                                                <path d="M5 10 L30 10 M25 5 L30 10 L25 15" stroke="currentColor" strokeWidth="2" fill="none" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Arrows pointing down */}
-                            <div className="flex justify-center w-full mb-4">
-                                <div className="text-blue-500 text-2xl">↓ ↓ ↓</div>
-                            </div>
-
-                            {/* Dependent variable */}
-                            <div className="text-center p-4 bg-white border-2 border-green-500 rounded-md shadow-sm min-w-[180px]">
-                                <p className="font-medium text-green-700">{dependentVariable.name || 'Dependent Variable'}</p>
-                                <p className="text-xs text-gray-500">{dependentVariable.questions.length} questions</p>
+                            {/* Biến phụ thuộc(Ellipse) */}
+                            <div className="bg-white border-2 border-gray-800 rounded-full px-6 py-4 text-center min-w-[160px]">
+                                <div className="text-xs font-medium">
+                                    {dependentVariable.name || 'Biến phụ thuộc'}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="flex items-center justify-center h-full min-h-[400px] text-gray-500">
+                            <div className="text-center">
+                                <p className="text-xs">Thêm biến độc lập để nhìn mô hình</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
-
-            {/* Save Button */}
-            <div className="flex justify-end">
-                <button
-                    onClick={handleSaveModel}
-                    disabled={!dependentVariable || variables.length === 0}
-                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                >
-                    💾 Save Model
-                </button>
             </div>
         </div>
     );
-}
+};
