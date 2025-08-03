@@ -1,7 +1,7 @@
 import { MetaData } from '@/core/Metadata';
 import { Metadata, ResolvingMetadata } from 'next';
 import React from 'react';
-import FormAIOrder from './_components/FormAIOrder';
+import BuildDataForm from './_components/BuildDataForm';
 
 type Props = {
   params: { id: string };
@@ -30,6 +30,6 @@ export async function generateMetadata(
 }
 export default function _FormAIOrderPage() {
   return (
-    <FormAIOrder />
+    <BuildDataForm />
   );
 }
