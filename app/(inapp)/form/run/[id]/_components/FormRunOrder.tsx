@@ -92,51 +92,50 @@ export default function FormRateOrder() {
         <section id="about" className="bg-gradient-to-b from-primary-50 to-white py-10 mx-auto px-4 sm:px-6">
             <div className="container mx-auto text-center min-h-screen" data-aos="fade-up">
                 <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-6 sm:mt-12 border border-gray-100">
-                    <div className="p-4">
-                        {(isLoading || isLoadingForm) ? <LoadingAbsolute /> : <></>}
-                        <form onSubmit={handleSubmit}>
-                            <CreateOrderForm
-                                userCredit={me.data?.credit || 0}
-                                numRequest={parseInt(numRequest) || 0}
-                                delayType={parseInt(delayType) || 0}
-                                formId={formData?.form.id}
-                                formName={formData?.form.name}
-                                bankInfo={bankInfo}
-                                disabledDays={disabledDays}
-                                scheduleEnabled={scheduleEnabled}
-                                startTime={startTime}
-                                endTime={endTime}
-                                onNumRequestChange={(value) => setNumRequest(value.toString())}
-                                onDelayTypeChange={(value) => setDelayType(value.toString())}
-                                onScheduleEnabledChange={(value) => setScheduleEnabled(value)}
-                                onStartTimeChange={(value) => setStartTime(value)}
-                                onEndTimeChange={(value) => setEndTime(value)}
-                                onDisabledDaysChange={(value) => setDisabledDays(value)}
 
-                                specificStartDate={specificStartDate}
-                                specificEndDate={specificEndDate}
-                                specificDailySchedules={specificDailySchedules}
-                                onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
-                                onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
-                                onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
-                                className="max-w-full"
-                            />
-                            <div className="mt-6">
-                                <button
-                                    className={`bg-primary-600 hover:bg-primary-700 text-white w-full py-3 px-4 rounded-md font-bold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all ${submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    type="submit"
-                                    disabled={submitDisabled}
-                                >
-                                    <div className="flex items-center justify-center">
-                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Bắt đầu điền form
-                                    </div>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    {(isLoading || isLoadingForm) ? <LoadingAbsolute /> : <></>}
+                    <form onSubmit={handleSubmit}>
+                        <CreateOrderForm
+                            userCredit={me.data?.credit || 0}
+                            numRequest={parseInt(numRequest) || 0}
+                            delayType={parseInt(delayType) || 0}
+                            formId={formData?.form.id}
+                            formName={formData?.form.name}
+                            bankInfo={bankInfo}
+                            disabledDays={disabledDays}
+                            scheduleEnabled={scheduleEnabled}
+                            startTime={startTime}
+                            endTime={endTime}
+                            onNumRequestChange={(value) => setNumRequest(value.toString())}
+                            onDelayTypeChange={(value) => setDelayType(value.toString())}
+                            onScheduleEnabledChange={(value) => setScheduleEnabled(value)}
+                            onStartTimeChange={(value) => setStartTime(value)}
+                            onEndTimeChange={(value) => setEndTime(value)}
+                            onDisabledDaysChange={(value) => setDisabledDays(value)}
+
+                            specificStartDate={specificStartDate}
+                            specificEndDate={specificEndDate}
+                            specificDailySchedules={specificDailySchedules}
+                            onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
+                            onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
+                            onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
+                            className="max-w-full"
+                        />
+                        <div className="mt-6">
+                            <button
+                                className={`bg-primary-600 hover:bg-primary-700 text-white w-full py-3 px-4 rounded-md font-bold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all ${submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                type="submit"
+                                disabled={submitDisabled}
+                            >
+                                <div className="flex items-center justify-center">
+                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Bắt đầu điền form
+                                </div>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>

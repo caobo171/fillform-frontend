@@ -38,35 +38,6 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
     const variables = model?.observedItems?.filter(item => item.metatype === 'observed_variable') || [];
 
 
-
-    // Initialize model if it doesn't exist
-    useEffect(() => {
-        if (!model && setModel) {
-            const initialModel: DataModel = {
-                model: {
-                    code: `model_${Date.now()}`,
-                    name: `Regression_Model_${Date.now()}`,
-                    model: 'linear_regression',
-                    questions: []
-                },
-                observedItems: [
-                    {
-                        name: 'Biến phụ thuộc',
-                        code: generateId().substring(0, 8),
-                        questions: [],
-                        metatype: 'dependent_variable' as const,
-                        coefficient: 1.0,
-                        mean: 0,
-                        standard_deviation: 1
-                    }
-                ]
-            };
-            setModel(initialModel);
-        }
-    }, [model, setModel]);
-
-
-
     const handleAddVariable = () => {
         if (!model || !setModel) return;
 
@@ -89,7 +60,7 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
 
     const handleRemoveVariable = (index: number) => {
         if (!model || !setModel) return;
-        
+
         const updatedModel = {
             ...model,
             observedItems: model.observedItems.filter((_, i) => {
@@ -102,14 +73,9 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
         setModel(updatedModel);
     };
 
-    // Generate a unique ID for variables
-    const generateId = () => {
-        return `id_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    };
-
     const handleUpdateVariable = (variableType: 'dependent' | 'independent', index: number, field: keyof Variable, value: string | number) => {
         if (!model || !setModel) return;
-        
+
         let updateVars: any = {};
         updateVars[field] = value;
         if (field === 'name') {
@@ -136,7 +102,7 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
 
     const handleAddQuestionsToVariable = (variableType: 'dependent' | 'independent', index: number, selectedQuestions: MultiValue<{ value: string; label: string; }>) => {
         if (!model || !setModel) return;
-        
+
         const questions = Array.from(selectedQuestions).map(option =>
             availableQuestions.find(q => q.id === option.value)
         ).filter(Boolean) as FormQuestion[];
@@ -164,39 +130,6 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold mb-4 text-gray-900">Xây dựng Model</h3>
 
-            {/* Form info */}
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <div className="relative">
-                    <label htmlFor="urlMain" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                        Link Form
-                    </label>
-                    <div className="flex">
-                        <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                            </svg>
-                        </span>
-                        <input type="text" id="urlMain" name="urlMain" defaultValue={dataForm?.form.urlMain}
-                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" readOnly />
-                    </div>
-                </div>
-                <div className="relative">
-                    <label htmlFor="urlCopy" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                        Tên Form
-                    </label>
-                    <div className="flex">
-                        <span className="inline-flex items-center px-3 text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </span>
-                        <input type="text" id="urlCopy" name="urlCopy" defaultValue={dataForm?.form.name}
-                            className="rounded-r-md border-gray-300 flex-1 appearance-none border px-3 py-2 bg-white text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent" readOnly />
-                    </div>
-                </div>
-            </div>
-
-
 
             {/* Main Content Grid: Variables on Left, Visualization on Right */}
             <div className="grid lg:grid-cols-2 gap-8 mb-6">
@@ -220,22 +153,23 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                         <input
                                             type="text"
                                             value={dependentVariable.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('dependent', 0, 'name', e.target.value)}
-                                            className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('dependent', 0, 'name', e.target.value)}
+                                            className="min-w-[200px] w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi đã chọn ({(dependentVariable.questions || []).length})</label>
                                         <Select
+                                            className='flex-wrap max-w-[320px]'
                                             isMulti
                                             value={(dependentVariable.questions || []).map(q => {
-                                            let question = availableQuestions.find(e => e.id === q.id);
-                                            return {
-                                                value: q.id,
-                                                label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
-                                            };
-                                        })}
-                                        onChange={(selectedOptions) => handleAddQuestionsToVariable('dependent', 0, selectedOptions || [])}
+                                                let question = availableQuestions.find(e => e.id === q.id);
+                                                return {
+                                                    value: q.id,
+                                                    label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
+                                                };
+                                            })}
+                                            onChange={(selectedOptions) => handleAddQuestionsToVariable('dependent', 0, selectedOptions || [])}
                                             options={availableQuestions.map(q => ({
                                                 value: q.id,
                                                 label: q.question + (q.description ? ' (' + q.description + ')' : '')
@@ -281,22 +215,23 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                         <input
                                             type="text"
                                             value={variable.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('independent', index, 'name', e.target.value)}
-                                            className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('independent', index, 'name', e.target.value)}
+                                            className="min-w-[200px] w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi đã chọn ({(variable.questions || []).length})</label>
                                         <Select
                                             isMulti
+                                            className='flex-wrap max-w-[320px]'
                                             value={(variable.questions || []).map(q => {
-                                            let question = availableQuestions.find(e => e.id === q.id);
-                                            return {
-                                                value: q.id,
-                                                label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
-                                            };
-                                        })}
-                                        onChange={(selectedOptions) => handleAddQuestionsToVariable('independent', index, selectedOptions || [])}
+                                                let question = availableQuestions.find(e => e.id === q.id);
+                                                return {
+                                                    value: q.id,
+                                                    label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
+                                                };
+                                            })}
+                                            onChange={(selectedOptions) => handleAddQuestionsToVariable('independent', index, selectedOptions || [])}
                                             options={availableQuestions.map(q => ({
                                                 value: q.id,
                                                 label: q.question + (q.description ? ' (' + q.description + ')' : '')
@@ -344,7 +279,7 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                             {/* Independent Variables (Rectangles) */}
                             <div className="space-y-3">
                                 {variables.map((variable, index) => (
-                                    <div key={variable.id} className="flex items-center">
+                                    <div key={variable.code} className="flex items-center">
                                         {/* Variable Box */}
                                         <div className="bg-white border-2 border-gray-800 px-4 py-2 text-xs font-medium min-w-[180px] text-center">
                                             {variable.name || `Variable ${index + 1}`}

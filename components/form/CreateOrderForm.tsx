@@ -395,7 +395,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   const submitDisabled = insufficientFunds || numRequest <= 0;
 
   return (
-    <div className={`${className} relative px-3`}>
+    <div className={`${className} relative`}>
       {formId && showBackButton && (
         <Link
           href={`/form/${formId}`}

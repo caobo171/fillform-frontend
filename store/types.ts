@@ -52,6 +52,7 @@ export type RawForm = {
   urlMain: string,
   version: string,
   sections: any,
+  data_model: any,
 };
 
 export type RawUser = {

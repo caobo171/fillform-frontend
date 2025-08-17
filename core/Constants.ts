@@ -180,7 +180,8 @@ export const BANK_INFO = {
 export const ORDER_TYPE = {
   AUTOFILL: 'Điền theo tỉ lệ',
   PREFILL: 'Data có trước',
-  AGENT: 'Agent'
+  AGENT: 'Agent',
+  DATA_MODEL: 'Data model'
 }
 
 
@@ -188,6 +189,7 @@ export const ORDER_TYPE = {
 export const REFER_PERCENT = 15;
 export const MIN_DRAW_CREDIT = 100000;
 export const AI_PRICE = 350;
+export const MODEL_PRICE = 200;
 
 
 export const AI_CASES = [

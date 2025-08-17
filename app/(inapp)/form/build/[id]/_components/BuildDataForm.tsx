@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormTypeNavigation } from "../../../_components/FormTypeNavigation"
 import WarningChatBox from "../../../_components/WarningChatBox";
@@ -11,9 +11,12 @@ import LoadingAbsolute from '@/components/loading';
 import { DataModel, RawForm } from '@/store/types';
 import { Helper } from '@/services/Helper';
 import { useRouter } from 'next/navigation';
-import { QUESTION_TYPE } from '@/core/Constants';
+import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM } from '@/core/Constants';
 import { FormInfoSection } from '../../../_components/FormInfoSection';
 import { ModelBuilder } from './ModelBuilder';
+import { Toast } from '@/services/Toast';
+import { CreateOrderForm } from "@/components/form";
+import { useMe, useMyBankInfo } from '@/hooks/user';
 
 interface ChatError {
     id: string;
@@ -37,20 +40,111 @@ export default function FormRate() {
 
     const [model, setModel] = useState<DataModel | null>(null);
 
+    // CreateOrderForm state variables
+    const { data: user } = useMe();
+    const bankInfo = useMyBankInfo();
+    const [submitDisabled, setSubmitDisabled] = useState(false);
+    const [isShowErrorMessage, setIsShowErrorMessage] = useState<boolean>(false);
+    const [delayValue, setDelayValue] = useState<number>(OPTIONS_DELAY_ENUM.NO_DELAY);
+    const [scheduleEnabled, setScheduleEnabled] = useState<boolean>(false);
+    const [startTime, setStartTime] = useState<string>('08:00');
+    const [endTime, setEndTime] = useState<string>('20:00');
+    const [disabledDays, setDisabledDays] = useState<number[]>([]);
+    const [specificStartDate, setSpecificStartDate] = useState('');
+    const [specificEndDate, setSpecificEndDate] = useState('');
+    const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);
+
+    const [numRequest, setNumRequest] = useState<number>(1);
+
+    const modelQuestions = useMemo(() => {
+        let res: any[] = model?.model?.questions || [];
+
+        function getQuestions(observedItems: any[]) {
+            for (let i = 0; i < (observedItems?.length || 0); i++) {
+                res = [...res, ...(observedItems[i].questions || [])];
+                if (observedItems[i].observedItems) {
+                    getQuestions(observedItems[i].observedItems);
+                }
+            }
+        }
+
+        getQuestions(model?.observedItems || []);
+        return res;
+    }, [model]);
+
     const onSubmit = async (data: any) => {
         // Handle form submission
         setIsSaved(true);
         try {
-            await Fetch.postWithAccessToken('/api/form/save', {
+            await Fetch.postWithAccessToken('/api/form/save.model', {
                 id: dataForm?.form.id,
                 ...data,
+                model: JSON.stringify(model),
             });
+
+            Toast.success('Lưu model thành công');
         } catch (error) {
             console.error(error);
+            Toast.error(error.message || 'Lỗi khi lưu model');
         }
 
         setIsLoading(false);
         setIsSaved(true);
+    };
+
+    // Form submission handler for CreateOrderForm
+    const onSubmitOrder = async () => {
+        if (chatErrors.some(error => error.type === 'error') && !isShowErrorMessage) {
+            setIsShowErrorMessage(true);
+            return;
+        }
+
+        setIsLoading(true);
+        setSubmitDisabled(true);
+
+        try {
+            const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.model.run', {
+                form_id: dataForm?.form?.id,
+                model: JSON.stringify(model),
+                delay_type: delayValue,
+                num_request: numRequest,
+                schedule_enabled: scheduleEnabled ? 1 : 0,
+                start_time: startTime,
+                end_time: endTime,
+                disabled_days: disabledDays.join(','),
+                specific_start_date: specificStartDate,
+                specific_end_date: specificEndDate,
+                specific_daily_schedules: specificDailySchedules.map(e => `${e.date}_${e.startTime}_${e.endTime}_${e.enabled}`).join(',')
+            });
+
+            if (response.data?.code == Code.SUCCESS) {
+                Toast.success('Đã tạo yêu cầu điền form thành công!');
+                router.push(`/`);
+
+                const win = window as any;
+                //@ts-ignore
+                if (win.PulseSurvey?.surveyIgnored('My5wdWxzZXN1cnZleXM')) {
+                    console.log('User has ignored the survey');
+                } else if (win.PulseSurvey?.surveyResponded('My5wdWxzZXN1cnZleXM')) {
+                    console.log('User has answered the survey');
+                } else {
+                    // You can call to show survey directly
+                    win.PulseSurvey?.showSurvey('My5wdWxzZXN1cnZleXM');
+                }
+            } else {
+                Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
+                console.error('Form submission failed');
+            }
+
+            console.log("res", response);
+            setIsLoading(false);
+        } catch (err) {
+            Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+            console.error('Form submission failed');
+            setIsLoading(false);
+        }
+
+        setSubmitDisabled(false);
     };
 
 
@@ -298,6 +392,36 @@ export default function FormRate() {
     };
 
     useEffect(() => {
+        // Generate a unique ID for variables
+        const generateId = () => {
+            return `id_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        };
+        if (dataForm?.form && dataForm?.form.data_model) {
+            setModel(dataForm?.form.data_model);
+
+        } else if (dataForm?.form && !dataForm?.form.data_model) {
+            const initialModel: DataModel = {
+                model: {
+                    code: `model_${Date.now()}`,
+                    name: `Regression_Model_${Date.now()}`,
+                    model: 'linear_regression',
+                    questions: []
+                },
+                observedItems: [
+                    {
+                        name: 'Biến phụ thuộc',
+                        code: generateId().substring(0, 8),
+                        questions: [],
+                        metatype: 'dependent_variable' as const,
+                        coefficient: 1.0,
+                        mean: 0,
+                        standard_deviation: 1
+                    }
+                ]
+            };
+            setModel(initialModel);
+        }
+
         if (dataForm?.form && dataForm?.form.loaddata) {
             const validateAll = () => {
                 let chatErrors: ChatError[] = [];
@@ -375,7 +499,7 @@ export default function FormRate() {
 
                     {(isLoading) && <LoadingAbsolute />}
                     <div className="container mx-auto mb-8">
-                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo tỉ lệ mong muốn</h1>
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Xây dựng data đẹp</h1>
 
                         <FormTypeNavigation formId={dataForm?.form?.id} type={'build'} />
 
@@ -443,7 +567,7 @@ export default function FormRate() {
 
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-1 rounded-lg container mx-auto">
                         <div className="space-y-2">
-                            {dataForm?.form.loaddata && dataForm?.form.loaddata.map((question, questionIndex) => (
+                            {dataForm?.form.loaddata && dataForm?.form.loaddata.filter(e => !modelQuestions.find(modelQuestion => modelQuestion.id == e.id)).map((question, questionIndex) => (
                                 <div key={questionIndex} id={`question-${question.id}`} className="js-question p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
                                         <div className="md:w-1/4 md:max-w-1/4 md:min-w-1/4 mb-1 md:mb-0 flex-shrink-0">
@@ -541,29 +665,88 @@ export default function FormRate() {
                             </button>
 
                             {isSaved && !chatErrors.some(error => error.type === 'error') && (
-                                <div
-                                    className="animate-fade-in bg-green-50 border-l-4 border-green-600 p-6 mb-6 rounded-lg shadow-sm flex flex-col items-center text-center"
-                                    role="alert"
-                                >
+                                <div className="animate-fade-in bg-green-50 border-l-4 border-green-600 p-6 mb-6 rounded-lg shadow-sm flex flex-col items-center text-center">
                                     <div className="flex items-center gap-2 mb-3">
                                         <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span className="text-green-800 font-semibold text-lg">Đã lưu dữ liệu thành công</span>
                                     </div>
-                                    <button
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            router.push(`/form/run/${dataForm?.form.id}`);
+
+
+                                    <CreateOrderForm
+                                        disabledDays={disabledDays}
+                                        scheduleEnabled={scheduleEnabled}
+                                        startTime={startTime}
+                                        endTime={endTime}
+                                        userCredit={user?.credit || 0}
+                                        numRequest={numRequest}
+                                        delayType={delayValue}
+                                        formId={dataForm?.form?.id}
+                                        formName={dataForm?.form?.name}
+                                        bankInfo={bankInfo}
+                                        showBackButton={false}
+                                        specificStartDate={specificStartDate}
+                                        specificEndDate={specificEndDate}
+                                        specificDailySchedules={specificDailySchedules}
+                                        onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
+                                        onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
+                                        onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
+                                        onNumRequestChange={(value) => {
+                                            setNumRequest(value);
                                         }}
-                                        className="mt-2 mb-2 inline-flex items-center justify-center px-5 py-2 bg-primary-600 text-white font-medium rounded-md shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-all"
+                                        onDelayTypeChange={(value) => {
+                                            setDelayValue(value);
+                                        }}
+                                        onScheduleEnabledChange={(value) => {
+                                            setScheduleEnabled(value);
+                                        }}
+                                        onStartTimeChange={(value) => {
+                                            setStartTime(value);
+                                        }}
+                                        onEndTimeChange={(value) => {
+                                            setEndTime(value);
+                                        }}
+                                        onDisabledDaysChange={(value) => {
+                                            setDisabledDays(value);
+                                        }}
+                                        className="bg-white p-10 rounded-lg shadow-sm border border-gray-100 max-w-2xl"
+                                    />
+
+                                    <button
+                                        type="submit"
+                                        onClick={() => {
+                                            onSubmitOrder();
+                                        }}
+                                        className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                                ${(user?.credit || 0) < numRequest || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={(user?.credit || 0) < numRequest || submitDisabled}
                                     >
-                                        <span>Tạo yêu cầu điền đơn ngay!</span>
-                                        <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
+                                        {isShowErrorMessage ? 'Vẫn tiếp tục điền form' : 'Bắt đầu điền form'}
                                     </button>
 
+
+                                    <div className="w-full mt-4 flex items-center justify-center">
+                                        {isShowErrorMessage && chatErrors.some(error => error.type === 'error') && (
+                                            <div className="w-full max-w-md text-red-800 bg-red-50 px-5 py-4 rounded-lg border border-red-200 shadow flex flex-col items-center animate-shake text-center" role="alert">
+                                                <div className="flex items-center mb-2">
+                                                    <svg className="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                    </svg>
+                                                    <span className="text-base font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
+                                                </div>
+                                                <ul className="list-disc list-inside text-sm text-left pl-5 mb-3">
+                                                    {chatErrors.filter(error => error.type === 'error').map((error, index) => (
+                                                        <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                             <div className="w-full mt-4 flex justify-center items-center">
@@ -582,7 +765,7 @@ export default function FormRate() {
                                             ))}
                                         </ul>
                                         <button
-                                            onClick={() => router.push(`/form/run/${dataForm?.form.id}`)}
+                                            onClick={() => onSubmitOrder()}
                                             className="inline-flex items-center px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all"
                                         >
                                             Vẫn chạy điền form
