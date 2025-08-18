@@ -195,6 +195,7 @@ export default function BuildDataForm() {
         try {
             await Fetch.postWithAccessToken('/api/form/sync.config', {
                 id: dataForm?.form.id,
+                model: JSON.stringify(model),
             });
 
             await mutateForm();
