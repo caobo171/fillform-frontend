@@ -85,6 +85,8 @@ export default function BuildDataForm() {
             Toast.success('Lưu model thành công');
         } catch (error) {
             console.error(error);
+
+            // @ts-ignore
             Toast.error(error.message || 'Lỗi khi lưu model');
         }
 
@@ -509,7 +511,7 @@ export default function BuildDataForm() {
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p>Bạn có thể tự xây dụng mô hình hồi quy tuyến tính, sau đó với mỗi biến, bạn có thể chọn danh sách các câu hỏi thuộc biến trong mô hình</p>
+                                    <p>Bạn có thể <b>tự xây dụng mô hình hồi quy tuyến tính</b>, sau đó với mỗi biến, bạn có thể chọn danh sách các câu hỏi thuộc biến trong mô hình</p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -551,7 +553,7 @@ export default function BuildDataForm() {
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
-                                    <p><b>Hãy chỉnh sửa tỉ lệ để phù hợp nhất với đề tài của bạn.</b> FillForm sẽ chỉ cam kết điền form đúng theo yêu cầu tỉ lệ</p>
+                                    <p><b>Hãy chỉnh sửa mô hình hồi quy tuyến tính để phù hợp nhất với đề tài của bạn.</b> FillForm sẽ chỉ cam kết điền form đúng theo mô hình của bạn</p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
