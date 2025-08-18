@@ -404,22 +404,12 @@ export default function BuildDataForm() {
         } else if (dataForm?.form && !dataForm?.form.data_model) {
             const initialModel: DataModel = {
                 model: {
-                    code: `model_${Date.now()}`,
-                    name: `Regression_Model_${Date.now()}`,
+                    code: generateId().substring(0, 8),
+                    name: `Biến phụ thuộc`,
                     model: 'linear_regression',
                     questions: []
                 },
-                observedItems: [
-                    {
-                        name: 'Biến phụ thuộc',
-                        code: generateId().substring(0, 8),
-                        questions: [],
-                        metatype: 'dependent_variable' as const,
-                        coefficient: 1.0,
-                        mean: 0,
-                        standard_deviation: 1
-                    }
-                ]
+                observedItems: []
             };
             setModel(initialModel);
         }

@@ -34,8 +34,8 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
     const availableQuestions = dataForm?.form?.loaddata || [];
 
     // Get dependent and independent variables from model
-    const dependentVariable = model?.observedItems?.find(item => item.metatype === 'dependent_variable') || null;
-    const variables = model?.observedItems?.filter(item => item.metatype === 'observed_variable') || [];
+    const dependentVariable = model?.model;
+    const variables = model?.observedItems || [];
 
 
     const handleAddVariable = () => {
@@ -65,7 +65,6 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
             ...model,
             observedItems: model.observedItems.filter((_, i) => {
                 // Keep dependent variable and remove only the specific independent variable
-                if (model.observedItems[i].metatype === 'dependent_variable') return true;
                 const independentIndex = model.observedItems.slice(0, i).filter(item => item.metatype === 'observed_variable').length;
                 return independentIndex !== index;
             })
@@ -82,12 +81,22 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
             updateVars.code = Helper.purify(value.toString().toLowerCase().split(' ').map(e => e.charAt(0).toUpperCase()).join(''));
         }
 
+
+        if (variableType === 'dependent'){
+            const updatedModel = {
+                ...model,
+                model: {
+                    ...model.model,
+                    ...updateVars
+                }
+            };
+            setModel(updatedModel);
+            return;
+        }
+
         const updatedModel = {
             ...model,
             observedItems: model.observedItems.map((v, i) => {
-                if (variableType === 'dependent' && v.metatype === 'dependent_variable') {
-                    return { ...v, ...updateVars };
-                }
                 if (variableType === 'independent' && v.metatype === 'observed_variable') {
                     const independentIndex = model.observedItems.slice(0, i).filter(item => item.metatype === 'observed_variable').length;
                     if (independentIndex === index) {
@@ -107,12 +116,21 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
             availableQuestions.find(q => q.id === option.value)
         ).filter(Boolean) as FormQuestion[];
 
+        if (variableType === 'dependent') {
+            const updatedModel = {
+                ...model,
+                model: {
+                    ...model.model,
+                    questions
+                }
+            };
+            setModel(updatedModel);
+            return;
+        }
+
         const updatedModel = {
             ...model,
             observedItems: model.observedItems.map((v, i) => {
-                if (variableType === 'dependent' && v.metatype === 'dependent_variable') {
-                    return { ...v, questions };
-                }
                 if (variableType === 'independent' && v.metatype === 'observed_variable') {
                     const independentIndex = model.observedItems.slice(0, i).filter(item => item.metatype === 'observed_variable').length;
                     if (independentIndex === index) {
