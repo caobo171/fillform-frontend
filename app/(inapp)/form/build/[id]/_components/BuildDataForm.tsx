@@ -501,7 +501,7 @@ export default function BuildDataForm() {
 
                     {(isLoading) && <LoadingAbsolute />}
                     <div className="container mx-auto mb-8">
-                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Xây dựng data chuẩn SPSS</h1>
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Điền theo mô hình NCKH</h1>
 
                         <FormTypeNavigation formId={dataForm?.form?.id} type={'build'} />
 
@@ -518,6 +518,12 @@ export default function BuildDataForm() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <p>Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi với những câu hỏi còn lại không thuộc mô hình</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p>Hãy loại bỏ điều hướng session hoặc điền tỉ lệ để đạt hết gạn lọc nhé.</p>
                                 </div>
                                 <div className="flex items-start gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -553,7 +559,7 @@ export default function BuildDataForm() {
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
-                                    <p><b>Hãy chỉnh sửa mô hình hồi quy tuyến tính để phù hợp nhất với đề tài của bạn.</b> FillForm sẽ chỉ cam kết điền form đúng theo mô hình của bạn</p>
+                                    <p>FillForm sẽ cam kết điền form đúng theo tỉ lệ và tất cả giả thuyết trong mô hình</p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
