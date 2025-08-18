@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Fetch from '@/lib/core/fetch/Fetch';
-import { Code, ORDER_TYPE, AI_CASES } from '@/core/Constants';
+import { Code, ORDER_TYPE, AI_CASES, PULSES_TOKEN } from '@/core/Constants';
 import CreateOrderForm from '@/components/form/CreateOrderForm';
 import { Toast } from '@/services/Toast';
 import { useMe, useMyBankInfo } from '@/hooks/user';
@@ -276,13 +276,13 @@ export default function FormAIOrder() {
 
                 // Survey prompt (similar to FormRateOrder)
                 const win = window as any;
-                if (win.PulseSurvey?.surveyIgnored?.('My5wdWxzZXN1cnZleXM')) {
+                if (win.PulseSurvey?.surveyIgnored?.(PULSES_TOKEN)) {
                     console.log('User has ignored the survey');
-                } else if (win.PulseSurvey?.surveyResponded?.('My5wdWxzZXN1cnZleXM')) {
+                } else if (win.PulseSurvey?.surveyResponded?.(PULSES_TOKEN)) {
                     console.log('User has answered the survey');
                 } else if (win.PulseSurvey?.showSurvey) {
                     // Show survey directly
-                    win.PulseSurvey.showSurvey('My5wdWxzZXN1cnZleXM');
+                    win.PulseSurvey.showSurvey(PULSES_TOKEN);
                 }
             } else {
                 Toast.error(response.data.message || 'Có lỗi xảy ra');

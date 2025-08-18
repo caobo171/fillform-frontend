@@ -11,7 +11,7 @@ import LoadingAbsolute from '@/components/loading';
 import { DataModel, RawForm } from '@/store/types';
 import { Helper } from '@/services/Helper';
 import { useRouter } from 'next/navigation';
-import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
+import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM, ORDER_TYPE, PULSES_TOKEN } from '@/core/Constants';
 import { FormInfoSection } from '../../../_components/FormInfoSection';
 import { ModelBuilder } from './ModelBuilder';
 import { Toast } from '@/services/Toast';
@@ -125,24 +125,24 @@ export default function BuildDataForm() {
 
                 const win = window as any;
                 //@ts-ignore
-                if (win.PulseSurvey?.surveyIgnored('My5wdWxzZXN1cnZleXM')) {
+                if (win.PulseSurvey?.surveyIgnored?.(PULSES_TOKEN)) {
                     console.log('User has ignored the survey');
-                } else if (win.PulseSurvey?.surveyResponded('My5wdWxzZXN1cnZleXM')) {
+                } else if (win.PulseSurvey?.surveyResponded?.(PULSES_TOKEN)) {
                     console.log('User has answered the survey');
                 } else {
                     // You can call to show survey directly
-                    win.PulseSurvey?.showSurvey('My5wdWxzZXN1cnZleXM');
+                    win.PulseSurvey?.showSurvey?.(PULSES_TOKEN);
                 }
             } else {
                 Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
-                console.error('Form submission failed');
+                console.error('Form submission failed', response);
             }
 
             console.log("res", response);
             setIsLoading(false);
         } catch (err) {
             Toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
-            console.error('Form submission failed');
+            console.error('Form submission failed', err);
             setIsLoading(false);
         }
 

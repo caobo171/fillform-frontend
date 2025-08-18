@@ -132,9 +132,9 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
 
 
             {/* Main Content Grid: Variables on Left, Visualization on Right */}
-            <div className="grid lg:grid-cols-2 gap-8 mb-6">
+            <div className="grid lg:grid-cols-5 gap-6 mb-6">
                 {/* Left Column: Variables Section */}
-                <div>
+                <div className="lg:col-span-2">
                     <div className="mb-3">
                         <h4 className="font-medium">Model Variables</h4>
                     </div>
@@ -147,26 +147,26 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                 <h5 className="font-medium text-green-700 text-xs">Biến phụ thuộc(Target)</h5>
                             </div>
                             {dependentVariable && (
-                                <div className="flex align-items gap-8">
+                                <div className="space-y-3">
                                     <div>
                                         <label className="block text-xs font-medium text-gray-600 mb-1">Tên biến</label>
                                         <input
                                             type="text"
                                             value={dependentVariable.name}
                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('dependent', 0, 'name', e.target.value)}
-                                            className="min-w-[200px] w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                            className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi đã chọn ({(dependentVariable.questions || []).length})</label>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi ({(dependentVariable.questions || []).length})</label>
                                         <Select
-                                            className='flex-wrap max-w-[320px]'
+                                            className='text-xs'
                                             isMulti
                                             value={(dependentVariable.questions || []).map(q => {
                                                 let question = availableQuestions.find(e => e.id === q.id);
                                                 return {
                                                     value: q.id,
-                                                    label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
+                                                    label: question?.question.substring(0, 30) + (question?.question.length > 30 ? '...' : '')
                                                 };
                                             })}
                                             onChange={(selectedOptions) => handleAddQuestionsToVariable('dependent', 0, selectedOptions || [])}
@@ -174,21 +174,22 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                                 value: q.id,
                                                 label: q.question + (q.description ? ' (' + q.description + ')' : '')
                                             }))}
-                                            placeholder="Hãy chọn các câu hỏi thuộc biến này"
+                                            placeholder="Chọn câu hỏi"
                                             styles={{
                                                 control: (provided) => ({
                                                     ...provided,
-                                                    minHeight: '32px',
-                                                    fontSize: '14px',
+                                                    minHeight: '28px',
+                                                    fontSize: '12px',
                                                     borderColor: '#d1d5db'
                                                 }),
                                                 valueContainer: (provided) => ({
                                                     ...provided,
-                                                    padding: '2px 6px'
+                                                    padding: '1px 4px'
                                                 }),
                                                 multiValue: (provided) => ({
                                                     ...provided,
-                                                    fontSize: '12px'
+                                                    fontSize: '10px',
+                                                    margin: '1px'
                                                 })
                                             }}
                                         />
@@ -209,26 +210,26 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                         Xoá biến
                                     </button>
                                 </div>
-                                <div className="flex align-items gap-8">
+                                <div className="space-y-3">
                                     <div>
                                         <label className="block text-xs font-medium text-gray-600 mb-1">Tên biến</label>
                                         <input
                                             type="text"
                                             value={variable.name}
                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('independent', index, 'name', e.target.value)}
-                                            className="min-w-[200px] w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                            className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi đã chọn ({(variable.questions || []).length})</label>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi ({(variable.questions || []).length})</label>
                                         <Select
                                             isMulti
-                                            className='flex-wrap max-w-[320px]'
+                                            className='text-xs'
                                             value={(variable.questions || []).map(q => {
                                                 let question = availableQuestions.find(e => e.id === q.id);
                                                 return {
                                                     value: q.id,
-                                                    label: question?.question + (question?.description ? ' (' + question?.description + ')' : '')
+                                                    label: question?.question.substring(0, 30) + (question?.question.length > 30 ? '...' : '')
                                                 };
                                             })}
                                             onChange={(selectedOptions) => handleAddQuestionsToVariable('independent', index, selectedOptions || [])}
@@ -236,21 +237,22 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                                 value: q.id,
                                                 label: q.question + (q.description ? ' (' + q.description + ')' : '')
                                             }))}
-                                            placeholder="Hãy chọn các câu hỏi thuộc biến này"
+                                            placeholder="Chọn câu hỏi"
                                             styles={{
                                                 control: (provided) => ({
                                                     ...provided,
-                                                    minHeight: '32px',
-                                                    fontSize: '14px',
+                                                    minHeight: '28px',
+                                                    fontSize: '12px',
                                                     borderColor: '#d1d5db'
                                                 }),
                                                 valueContainer: (provided) => ({
                                                     ...provided,
-                                                    padding: '2px 6px'
+                                                    padding: '1px 4px'
                                                 }),
                                                 multiValue: (provided) => ({
                                                     ...provided,
-                                                    fontSize: '12px'
+                                                    fontSize: '10px',
+                                                    margin: '1px'
                                                 })
                                             }}
                                         />
@@ -272,28 +274,28 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                 </div>
 
                 {/* Right Column: Model Visualization */}
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div className="lg:col-span-3 bg-gray-50 p-6 rounded-lg border border-gray-200">
                     <h4 className="font-medium mb-4">Hiển thị mô hình</h4>
                     {dependentVariable && variables.length > 0 ? (
-                        <div className="flex items-center justify-center h-full min-h-[400px] relative">
+                        <div className="flex items-center justify-center h-full min-h-[500px] relative">
                             {/* Independent Variables (Left side) */}
-                            <div className="flex flex-col space-y-6 mr-20">
+                            <div className="flex flex-col space-y-8 mr-16">
                                 {variables.map((variable, index) => (
                                     <div key={variable.code} className="flex items-center">
                                         {/* Variable Box */}
-                                        <div className="bg-white border-2 border-gray-800 px-4 py-2 text-xs font-medium min-w-[180px] text-center">
+                                        <div className="bg-white border-2 border-gray-800 px-6 py-3 text-sm font-medium min-w-[200px] text-center shadow-sm">
                                             {variable.name || `Variable ${index + 1}`}
                                         </div>
                                         {/* Hypothesis Label */}
-                                        <div className="ml-4 text-xs font-medium text-gray-700">
+                                        <div className="ml-6 text-sm font-medium text-gray-700">
                                             H{index + 1} +
                                         </div>
                                         {/* Diagonal Arrow pointing to dependent variable */}
-                                        <div className="ml-2">
-                                            <svg width="140" height="60" viewBox="0 0 140 60" className="text-gray-600">
+                                        <div className="ml-4">
+                                            <svg width="160" height="80" viewBox="0 0 160 80" className="text-gray-600">
                                                 {/* Calculate diagonal line based on position */}
                                                 <path 
-                                                    d={`M5 30 L120 ${30 + (index - (variables.length - 1) / 2) * -15} M115 ${25 + (index - (variables.length - 1) / 2) * -15} L120 ${30 + (index - (variables.length - 1) / 2) * -15} L115 ${35 + (index - (variables.length - 1) / 2) * -15}`} 
+                                                    d={`M5 40 L140 ${40 + (index - (variables.length - 1) / 2) * -20} M135 ${35 + (index - (variables.length - 1) / 2) * -20} L140 ${40 + (index - (variables.length - 1) / 2) * -20} L135 ${45 + (index - (variables.length - 1) / 2) * -20}`} 
                                                     stroke="currentColor" 
                                                     strokeWidth="2" 
                                                     fill="none" 
@@ -305,16 +307,16 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                             </div>
                             
                             {/* Dependent Variable (Right side - Ellipse) */}
-                            <div className="bg-white border-2 border-gray-800 rounded-full px-6 py-4 text-center min-w-[160px]">
-                                <div className="text-xs font-medium">
+                            <div className="bg-white border-2 border-gray-800 rounded-full px-8 py-6 text-center min-w-[180px] shadow-sm">
+                                <div className="text-sm font-medium">
                                     {dependentVariable.name || 'Biến phụ thuộc'}
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="flex items-center justify-center h-full min-h-[400px] text-gray-500">
+                        <div className="flex items-center justify-center h-full min-h-[500px] text-gray-500">
                             <div className="text-center">
-                                <p className="text-xs">Thêm biến độc lập để nhìn mô hình</p>
+                                <p className="text-sm">Thêm biến độc lập để nhìn mô hình</p>
                             </div>
                         </div>
                     )}

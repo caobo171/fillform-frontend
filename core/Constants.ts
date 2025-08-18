@@ -190,6 +190,7 @@ export const REFER_PERCENT = 15;
 export const MIN_DRAW_CREDIT = 100000;
 export const AI_PRICE = 350;
 export const MODEL_PRICE = 200;
+export const PULSES_TOKEN = 'My5wdWxzZXN1cnZleXM';
 
 
 export const AI_CASES = [

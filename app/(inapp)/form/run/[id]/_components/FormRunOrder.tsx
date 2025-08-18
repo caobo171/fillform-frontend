@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useFormById } from '@/hooks/form';
 import Fetch from '@/lib/core/fetch/Fetch';
 import { RawForm } from '@/store/types';
-import { Code } from '@/core/Constants';
+import { Code, PULSES_TOKEN } from '@/core/Constants';
 import { Toast } from '@/services/Toast';
 import { useMe, useMyBankInfo } from '@/hooks/user';
 import LoadingAbsolute from '@/components/loading';
@@ -64,13 +64,13 @@ export default function FormRateOrder() {
 
                 const win = window as any;
                 //@ts-ignore
-                if (win.PulseSurvey.surveyIgnored('My5wdWxzZXN1cnZleXM')) {
+                if (win.PulseSurvey.surveyIgnored?.(PULSES_TOKEN)) {
                     console.log('User has ignored the survey');
-                } else if (win.PulseSurvey.surveyResponded('My5wdWxzZXN1cnZleXM')) {
+                } else if (win.PulseSurvey.surveyResponded(PULSES_TOKEN)) {
                     console.log('User has answered the survey');
                 } else {
                     // You can call to show survey directly
-                    win.PulseSurvey.showSurvey('My5wdWxzZXN1cnZleXM');
+                    win.PulseSurvey.showSurvey(PULSES_TOKEN);
                 }
             } else {
                 Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
