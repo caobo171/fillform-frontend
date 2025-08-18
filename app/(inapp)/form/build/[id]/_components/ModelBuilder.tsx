@@ -275,9 +275,9 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h4 className="font-medium mb-4">Hiển thị mô hình</h4>
                     {dependentVariable && variables.length > 0 ? (
-                        <div className="flex flex-row items-center justify-center h-full min-h-[400px]">
-                            {/* Independent Variables (Rectangles) */}
-                            <div className="space-y-3">
+                        <div className="flex items-center justify-center h-full min-h-[400px] relative">
+                            {/* Independent Variables (Left side) */}
+                            <div className="flex flex-col space-y-6 mr-20">
                                 {variables.map((variable, index) => (
                                     <div key={variable.code} className="flex items-center">
                                         {/* Variable Box */}
@@ -288,17 +288,23 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                         <div className="ml-4 text-xs font-medium text-gray-700">
                                             H{index + 1} +
                                         </div>
-                                        {/* Arrow */}
+                                        {/* Diagonal Arrow pointing to dependent variable */}
                                         <div className="ml-2">
-                                            <svg width="40" height="20" viewBox="0 0 40 20" className="text-gray-600">
-                                                <path d="M5 10 L30 10 M25 5 L30 10 L25 15" stroke="currentColor" strokeWidth="2" fill="none" />
+                                            <svg width="140" height="60" viewBox="0 0 140 60" className="text-gray-600">
+                                                {/* Calculate diagonal line based on position */}
+                                                <path 
+                                                    d={`M5 30 L120 ${30 + (index - (variables.length - 1) / 2) * -15} M115 ${25 + (index - (variables.length - 1) / 2) * -15} L120 ${30 + (index - (variables.length - 1) / 2) * -15} L115 ${35 + (index - (variables.length - 1) / 2) * -15}`} 
+                                                    stroke="currentColor" 
+                                                    strokeWidth="2" 
+                                                    fill="none" 
+                                                />
                                             </svg>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-
-                            {/* Biến phụ thuộc(Ellipse) */}
+                            
+                            {/* Dependent Variable (Right side - Ellipse) */}
                             <div className="bg-white border-2 border-gray-800 rounded-full px-6 py-4 text-center min-w-[160px]">
                                 <div className="text-xs font-medium">
                                     {dependentVariable.name || 'Biến phụ thuộc'}
