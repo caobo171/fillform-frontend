@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { AI_PRICE, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
+import { AI_PRICE, MODEL_PRICE, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -149,6 +149,11 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
     if (orderType === ORDER_TYPE.AGENT) {
       currentPricePerUnit = currentPricePerUnit + AI_PRICE;
     }
+
+    if (orderType === ORDER_TYPE.DATA_MODEL) {
+      currentPricePerUnit = currentPricePerUnit + MODEL_PRICE;
+    }
+
     setPricePerUnit(currentPricePerUnit);
     setDelayInfo(delayMessage);
   }, [delayType, localScheduleEnabled, orderType]);

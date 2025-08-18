@@ -11,7 +11,7 @@ import LoadingAbsolute from '@/components/loading';
 import { DataModel, RawForm } from '@/store/types';
 import { Helper } from '@/services/Helper';
 import { useRouter } from 'next/navigation';
-import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM } from '@/core/Constants';
+import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
 import { FormInfoSection } from '../../../_components/FormInfoSection';
 import { ModelBuilder } from './ModelBuilder';
 import { Toast } from '@/services/Toast';
@@ -25,7 +25,7 @@ interface ChatError {
 }
 
 
-export default function FormRate() {
+export default function BuildDataForm() {
 
     const params = useParams();
     const { data: dataForm, isLoading: isLoadingForm, mutate: mutateForm } = useFormById(params.id as string);
@@ -499,7 +499,7 @@ export default function FormRate() {
 
                     {(isLoading) && <LoadingAbsolute />}
                     <div className="container mx-auto mb-8">
-                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Xây dựng data đẹp</h1>
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Xây dựng data chuẩn SPSS</h1>
 
                         <FormTypeNavigation formId={dataForm?.form?.id} type={'build'} />
 
@@ -509,7 +509,13 @@ export default function FormRate() {
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p>Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi</p>
+                                    <p>Bạn có thể tự xây dụng mô hình hồi quy tuyến tính, sau đó với mỗi biến, bạn có thể chọn danh sách các câu hỏi thuộc biến trong mô hình</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p>Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi với những câu hỏi còn lại không thuộc mô hình</p>
                                 </div>
                                 <div className="flex items-start gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -675,6 +681,7 @@ export default function FormRate() {
 
 
                                     <CreateOrderForm
+                                        orderType={ORDER_TYPE.DATA_MODEL}
                                         disabledDays={disabledDays}
                                         scheduleEnabled={scheduleEnabled}
                                         startTime={startTime}
