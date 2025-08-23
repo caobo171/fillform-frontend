@@ -28,7 +28,7 @@ type Variable = {
     mean: number;
     standard_deviation: number;
     effect_direction: 'positive' | 'negative';
-    non_effect: 0 | 1;
+    non_effect?: 0 | 1;
     questions?: { id: string, question: string, answers?: string[] }[];
 };
 
@@ -259,7 +259,7 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                         <div className='flex-1'>
                                             <label className="block text-xs font-medium text-gray-600 mb-1">Có tác động</label>
                                             <select
-                                                value={variable.non_effect ? 1 : 0}
+                                                value={variable.non_effect ? '1' : '0'}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleUpdateVariable('independent', index, 'non_effect', e.target.value === '1' ? 1 : 0)}
                                                 className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
                                             >
