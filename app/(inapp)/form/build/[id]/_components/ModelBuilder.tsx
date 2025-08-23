@@ -27,6 +27,8 @@ type Variable = {
     coefficient: number;
     mean: number;
     standard_deviation: number;
+    effect_direction: 'positive' | 'negative';
+    non_effect: 0 | 1;
     questions?: { id: string, question: string, answers?: string[] }[];
 };
 
@@ -48,6 +50,8 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
             coefficient: 0,
             mean: 0,
             standard_deviation: 0,
+            effect_direction: 'positive',
+            non_effect: 0,
             questions: []
         };
 
@@ -72,7 +76,7 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
         setModel(updatedModel);
     };
 
-    const handleUpdateVariable = (variableType: 'dependent' | 'independent', index: number, field: keyof Variable, value: string | number) => {
+    const handleUpdateVariable = (variableType: 'dependent' | 'independent', index: number, field: keyof Variable, value: string | number | boolean) => {
         if (!model || !setModel) return;
 
         let updateVars: any = {};
@@ -82,7 +86,7 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
         }
 
 
-        if (variableType === 'dependent'){
+        if (variableType === 'dependent') {
             const updatedModel = {
                 ...model,
                 model: {
@@ -229,14 +233,40 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                     </button>
                                 </div>
                                 <div className="space-y-3">
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Tên biến</label>
-                                        <input
-                                            type="text"
-                                            value={variable.name}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('independent', index, 'name', e.target.value)}
-                                            className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
-                                        />
+
+
+                                    <div className='flex flex-row space-x-2'>
+                                        <div className='flex-1'>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Tên biến</label>
+                                            <input
+                                                type="text"
+                                                value={variable.name}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateVariable('independent', index, 'name', e.target.value)}
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                            />
+                                        </div>
+                                        <div className='flex-1'>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Hướng tác động</label>
+                                            <select
+                                                value={variable.effect_direction}
+                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleUpdateVariable('independent', index, 'effect_direction', e.target.value)}
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                            >
+                                                <option value="positive">Tích cực (+)</option>
+                                                <option value="negative">Tiêu cực (-)</option>
+                                            </select>
+                                        </div>
+                                        <div className='flex-1'>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Có tác động</label>
+                                            <select
+                                                value={variable.non_effect ? 1 : 0}
+                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleUpdateVariable('independent', index, 'non_effect', e.target.value === '1' ? 1 : 0)}
+                                                className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+                                            >
+                                                <option value='1'>Không</option>
+                                                <option value='0'>Có</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-xs font-medium text-gray-600 mb-1">Câu hỏi ({(variable.questions || []).length})</label>
@@ -312,18 +342,18 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                         <div className="ml-4">
                                             <svg width="160" height="80" viewBox="0 0 160 80" className="text-gray-600">
                                                 {/* Calculate diagonal line based on position */}
-                                                <path 
-                                                    d={`M5 40 L140 ${40 + (index - (variables.length - 1) / 2) * -20} M135 ${35 + (index - (variables.length - 1) / 2) * -20} L140 ${40 + (index - (variables.length - 1) / 2) * -20} L135 ${45 + (index - (variables.length - 1) / 2) * -20}`} 
-                                                    stroke="currentColor" 
-                                                    strokeWidth="2" 
-                                                    fill="none" 
+                                                <path
+                                                    d={`M5 40 L140 ${40 + (index - (variables.length - 1) / 2) * -20} M135 ${35 + (index - (variables.length - 1) / 2) * -20} L140 ${40 + (index - (variables.length - 1) / 2) * -20} L135 ${45 + (index - (variables.length - 1) / 2) * -20}`}
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    fill="none"
                                                 />
                                             </svg>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                            
+
                             {/* Dependent Variable (Right side - Ellipse) */}
                             <div className="bg-white border-2 border-gray-800 rounded-full px-8 py-6 text-center min-w-[180px] shadow-sm">
                                 <div className="text-sm font-medium">

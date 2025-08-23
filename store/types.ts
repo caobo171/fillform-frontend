@@ -199,6 +199,8 @@ export const DataModelSchema = z.object({
     coefficient: z.number(),
     mean: z.number(),
     standard_deviation: z.number(),
+    effect_direction: z.enum(["positive", "negative"]),
+    non_effect: z.enum([0, 1]),
     questions: z.array(z.object({
       id: z.string(),
       question: z.string(),
