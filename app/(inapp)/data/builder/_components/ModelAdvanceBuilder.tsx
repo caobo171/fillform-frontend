@@ -30,7 +30,7 @@ interface ModelAdvanceBuilderProps {
 // Node Edit Form Component
 const NodeEditForm = ({ node, onSave, onCancel }: { 
   node: Node; 
-  onSave: (data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number }) => void;
+  onSave: (data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number }) => void;
   onCancel: () => void;
 }) => {
   const [label, setLabel] = useState((node.data?.label as string) || '');
@@ -38,11 +38,12 @@ const NodeEditForm = ({ node, onSave, onCancel }: {
     (node.data?.variableType as 'normal' | 'mediate' | 'moderate') || 'normal'
   );
   const [observableQuestions, setObservableQuestions] = useState((node.data?.observableQuestions as number) || 1);
+  const [likertScale, setLikertScale] = useState((node.data?.likertScale as number) || 5);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (label.trim()) {
-      onSave({ label: label.trim(), variableType, observableQuestions });
+      onSave({ label: label.trim(), variableType, observableQuestions, likertScale });
     }
   };
 
@@ -98,6 +99,26 @@ const NodeEditForm = ({ node, onSave, onCancel }: {
             </select>
           </div>
 
+          {/* Likert Scale Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Likert Scale Points
+            </label>
+            <select
+              value={likertScale}
+              onChange={(e) => setLikertScale(parseInt(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value={3}>3-point scale</option>
+              <option value={4}>4-point scale</option>
+              <option value={5}>5-point scale</option>
+              <option value={6}>6-point scale</option>
+              <option value={7}>7-point scale</option>
+              <option value={8}>8-point scale</option>
+              <option value={9}>9-point scale</option>
+              <option value={10}>10-point scale</option>
+            </select>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
@@ -304,7 +325,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   const [nodeLabel, setNodeLabel] = useState('');
 
   // Handle node data update from form
-  const handleNodeUpdate = useCallback((nodeId: string, data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number }) => {
+  const handleNodeUpdate = useCallback((nodeId: string, data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number }) => {
     setNodes((nds) =>
       nds.map((node) =>
         node.id === nodeId
@@ -315,7 +336,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   }, [setNodes]);
 
   // Handle form save
-  const handleFormSave = useCallback((data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number }) => {
+  const handleFormSave = useCallback((data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number }) => {
     if (editingNode) {
       handleNodeUpdate(editingNode.id, data);
       setEditingNode(null);
@@ -542,9 +563,16 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
           nodeTypes={nodeTypes}
           fitView
           attributionPosition="top-right"
+          panOnDrag={true}
+          panOnScroll={true}
+          zoomOnScroll={true}
+          zoomOnPinch={true}
+          zoomOnDoubleClick={true}
+          minZoom={0.1}
+          maxZoom={4}
         >
           <MiniMap />
-          <Controls />
+          <Controls showZoom={true} showFitView={true} showInteractive={true} />
           <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
         </ReactFlow>
       </div>

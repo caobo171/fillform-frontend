@@ -15,6 +15,7 @@ import { Toast } from '@/services/Toast'
 import { AnyObject } from '@/store/interface'
 import { ModelAdvanceBuilder } from './ModelAdvanceBuilder'
 import { DagModeType } from '@/store/types';
+import { Code } from '@/core/Constants'
 
 export default function DataBuilder() {
     const [loading, setLoading] = useState<boolean>(false);
@@ -22,6 +23,25 @@ export default function DataBuilder() {
 
     const [model, setModel] = useState<DagModeType | null>(null);
 
+    const onSubmitHandle = async () => {
+        if (!model) return;
+        setLoading(true);
+        try {
+            const res = await Fetch.postWithAccessToken<{
+                code: number;
+            }>('/api/data.advance/generate', {
+                model: JSON.stringify(model)
+            });
+
+            if (res.data.code == Code.SUCCESS) {
+                Toast.success('Generate data successfully');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
@@ -45,7 +65,7 @@ export default function DataBuilder() {
                             <ModelAdvanceBuilder model={model} setModel={setModel} />
 
                             <Button
-                                onClick={() => { }}
+                                onClick={onSubmitHandle}
                                 className="w-full font-bold"
                                 size="large"
                                 loading={loading}
