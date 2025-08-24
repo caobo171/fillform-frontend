@@ -27,41 +27,99 @@ interface ModelAdvanceBuilderProps {
     setModel: (model: DagModeType) => void,
 }
 
+// Node Edit Form Component
+const NodeEditForm = ({ node, onSave, onCancel }: { 
+  node: Node; 
+  onSave: (data: { label: string; isModerator: boolean; observableQuestions: number }) => void;
+  onCancel: () => void;
+}) => {
+  const [label, setLabel] = useState((node.data?.label as string) || '');
+  const [isModerator, setIsModerator] = useState((node.data?.isModerator as boolean) || false);
+  const [observableQuestions, setObservableQuestions] = useState((node.data?.observableQuestions as number) || 1);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (label.trim()) {
+      onSave({ label: label.trim(), isModerator, observableQuestions });
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-96 max-w-md">
+        <h3 className="text-lg font-bold mb-4">Edit Variable</h3>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Variable Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Variable Name
+            </label>
+            <input
+              type="text"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter variable name"
+              autoFocus
+            />
+          </div>
+
+          {/* Observable Questions Count */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Number of Observable Questions
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="50"
+              value={observableQuestions}
+              onChange={(e) => setObservableQuestions(parseInt(e.target.value) || 1)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Moderator Toggle */}
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="moderator-checkbox"
+              checked={isModerator}
+              onChange={(e) => setIsModerator(e.target.checked)}
+              className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
+            />
+            <label htmlFor="moderator-checkbox" className="text-sm font-medium text-gray-700">
+              Mark as Moderator Variable
+            </label>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // Custom Node Component
 const CustomNode = ({ data, id }: { data: any; id: string }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(data.label);
-
-  const handleDoubleClick = () => {
-    setIsEditing(true);
-    setEditValue(data.label);
-  };
-
-  const handleSave = () => {
-    if (editValue.trim()) {
-      data.onLabelChange?.(id, editValue.trim());
-      setIsEditing(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setEditValue(data.label);
-    setIsEditing(false);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      handleCancel();
-    }
-  };
-
-  const handleModeratorToggle = () => {
-    data.onModeratorChange?.(id, !data.isModerator);
-  };
-
   const isModerator = data.isModerator || false;
+  const observableQuestions = data.observableQuestions || 1;
 
   return (
     <div className={`px-6 py-4 shadow-md rounded-lg bg-white border-2 relative min-w-[140px] ${
@@ -74,6 +132,11 @@ const CustomNode = ({ data, id }: { data: any; id: string }) => {
         </div>
       )}
 
+      {/* Observable Questions Badge */}
+      <div className="absolute -top-2 -left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+        Q{observableQuestions}
+      </div>
+
       {/* Left Handle (Input) */}
       <Handle 
         type="target" 
@@ -83,60 +146,9 @@ const CustomNode = ({ data, id }: { data: any; id: string }) => {
       
       {/* Node Content */}
       <div className="text-center">
-        {isEditing ? (
-          <div className="flex flex-col gap-2">
-            <input
-              type="text"
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              onBlur={handleSave}
-              className="text-lg font-bold text-gray-800 bg-transparent border-b-2 border-blue-500 outline-none text-center"
-              autoFocus
-            />
-            <div className="flex gap-1 justify-center">
-              <button
-                onClick={handleSave}
-                className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                ✓
-              </button>
-              <button
-                onClick={handleCancel}
-                className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <div 
-              className="text-lg font-bold text-gray-800 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded"
-              onDoubleClick={handleDoubleClick}
-              title="Double-click to edit"
-            >
-              {data.label}
-            </div>
-            
-            {/* Moderator Toggle */}
-            <div className="flex items-center justify-center gap-2">
-              <input
-                type="checkbox"
-                id={`moderator-${id}`}
-                checked={isModerator}
-                onChange={handleModeratorToggle}
-                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
-              />
-              <label 
-                htmlFor={`moderator-${id}`}
-                className="text-sm text-gray-600 cursor-pointer select-none"
-              >
-                Moderator
-              </label>
-            </div>
-          </div>
-        )}
+        <div className="text-lg font-bold text-gray-800 px-2 py-1">
+          {data.label}
+        </div>
       </div>
       
       {/* Right Handle (Output) */}
@@ -154,6 +166,7 @@ const nodeTypes: NodeTypes = {
 };
 
 export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProps) => {
+  const [editingNode, setEditingNode] = useState<Node | null>(null);
   // Cycle detection function
   const hasCycle = useCallback((edges: Edge[], newEdge: { source: string; target: string }) => {
     const allEdges = [...edges, newEdge];
@@ -249,41 +262,42 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   const [nodeLabel, setNodeLabel] = useState('');
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-  // Handle node label changes
-  const handleLabelChange = useCallback((nodeId: string, newLabel: string) => {
+  // Handle node data update from form
+  const handleNodeUpdate = useCallback((nodeId: string, data: { label: string; isModerator: boolean; observableQuestions: number }) => {
     setNodes((nds) =>
       nds.map((node) =>
         node.id === nodeId
-          ? { ...node, data: { ...node.data, label: newLabel } }
+          ? { ...node, data: { ...node.data, ...data } }
           : node
       )
     );
   }, [setNodes]);
 
-  // Handle moderator variable toggle
-  const handleModeratorChange = useCallback((nodeId: string, isModerator: boolean) => {
-    setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, isModerator } }
-          : node
-      )
-    );
-  }, [setNodes]);
+  // Handle form save
+  const handleFormSave = useCallback((data: { label: string; isModerator: boolean; observableQuestions: number }) => {
+    if (editingNode) {
+      handleNodeUpdate(editingNode.id, data);
+      setEditingNode(null);
+    }
+  }, [editingNode, handleNodeUpdate]);
 
-  // Update node data to include the label change and moderator change handlers
+  // Handle form cancel
+  const handleFormCancel = useCallback(() => {
+    setEditingNode(null);
+  }, []);
+
+  // Initialize node data with default values
   useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => ({
         ...node,
         data: { 
-          ...node.data, 
-          onLabelChange: handleLabelChange,
-          onModeratorChange: handleModeratorChange 
+          ...node.data,
+          observableQuestions: node.data.observableQuestions || 1
         },
       }))
     );
-  }, [handleLabelChange, handleModeratorChange, setNodes]);
+  }, [setNodes]);
 
   // Handle connection between nodes with cycle detection
   const onConnect = useCallback(
@@ -325,14 +339,13 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
       data: { 
         label: nodeLabel, 
         isModerator: false,
-        onLabelChange: handleLabelChange,
-        onModeratorChange: handleModeratorChange
+        observableQuestions: 1
       },
     };
     
     setNodes((nds) => [...nds, newNode]);
     setNodeLabel('');
-  }, [nodeLabel, setNodes, handleLabelChange, handleModeratorChange]);
+  }, [nodeLabel, setNodes]);
 
   // Delete selected node
   const deleteNode = useCallback(() => {
@@ -345,10 +358,20 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
     setSelectedNode(null);
   }, [selectedNode, setNodes, setEdges]);
 
-  // Handle node selection
+  // Handle node selection only
   const onNodeClick = useCallback((_: any, node: Node) => {
     setSelectedNode(node.id);
   }, []);
+
+  // Handle edit node button click
+  const handleEditNode = useCallback(() => {
+    if (selectedNode) {
+      const nodeToEdit = nodes.find(node => node.id === selectedNode);
+      if (nodeToEdit) {
+        setEditingNode(nodeToEdit);
+      }
+    }
+  }, [selectedNode, nodes]);
 
   // Update model when nodes or edges change and save to localStorage
   useEffect(() => {
@@ -399,12 +422,20 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
           </div>
           
           {selectedNode && (
-            <button
-              onClick={deleteNode}
-              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-            >
-              Delete Selected Node
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleEditNode}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Edit Node
+              </button>
+              <button
+                onClick={deleteNode}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Delete Selected Node
+              </button>
+            </div>
           )}
           
           <div className="flex gap-4 items-center">
@@ -448,6 +479,15 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
           <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
         </ReactFlow>
       </div>
+
+      {/* Node Edit Form Modal */}
+      {editingNode && (
+        <NodeEditForm
+          node={editingNode}
+          onSave={handleFormSave}
+          onCancel={handleFormCancel}
+        />
+      )}
     </div>
   );
 };
