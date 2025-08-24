@@ -237,3 +237,49 @@ export const DataModelSchema = z.object({
 });
 
 export type DataModel = z.infer<typeof DataModelSchema>;
+
+
+
+// Schema for a single node in the graph
+export const NodeSchema = z.object({
+  id: z.string().min(1, 'Node ID must be a non-empty string.'),
+  data: z.object({
+    label: z.string().min(1, 'Node label must be a non-empty string.'),
+    // You can add more data properties here as needed
+  }),
+  position: z.object({
+    x: z.number(),
+    y: z.number(),
+  }),
+  // Optional properties from the React Flow example
+  type: z.string().optional(),
+  sourcePosition: z.string().optional(),
+  targetPosition: z.string().optional(),
+});
+
+// Schema for a directed edge connecting two nodes
+export const EdgeSchema = z.object({
+  id: z.string().min(1, 'Edge ID must be a non-empty string.'),
+  source: z.string().min(1, 'Source node ID must be a non-empty string.'),
+  target: z.string().min(1, 'Target node ID must be a non-empty string.'),
+  // Optional properties for styling or animation
+  animated: z.boolean().optional(),
+  style: z.object({
+    stroke: z.string(),
+  }).optional(),
+});
+
+export type NodeSchemaType = z.infer<typeof NodeSchema>;
+export type EdgeSchemaType = z.infer<typeof EdgeSchema>;
+
+// The main schema for the entire DAG model
+export const DagModelSchema = z.object({
+  name: z.string().min(1, 'Graph name must be a non-empty string.'),
+  nodes: z.array(NodeSchema).min(1, 'The graph must contain at least one node.'),
+  edges: z.array(EdgeSchema),
+  version: z.string().optional(),
+  createdAt: z.string().datetime().optional(),
+});
+
+
+export type DagModeType = z.infer<typeof DagModelSchema>;
