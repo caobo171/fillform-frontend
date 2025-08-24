@@ -30,17 +30,19 @@ interface ModelAdvanceBuilderProps {
 // Node Edit Form Component
 const NodeEditForm = ({ node, onSave, onCancel }: { 
   node: Node; 
-  onSave: (data: { label: string; isModerator: boolean; observableQuestions: number }) => void;
+  onSave: (data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number }) => void;
   onCancel: () => void;
 }) => {
   const [label, setLabel] = useState((node.data?.label as string) || '');
-  const [isModerator, setIsModerator] = useState((node.data?.isModerator as boolean) || false);
+  const [variableType, setVariableType] = useState<'normal' | 'mediate' | 'moderate'>(
+    (node.data?.variableType as 'normal' | 'mediate' | 'moderate') || 'normal'
+  );
   const [observableQuestions, setObservableQuestions] = useState((node.data?.observableQuestions as number) || 1);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (label.trim()) {
-      onSave({ label: label.trim(), isModerator, observableQuestions });
+      onSave({ label: label.trim(), variableType, observableQuestions });
     }
   };
 
@@ -80,19 +82,22 @@ const NodeEditForm = ({ node, onSave, onCancel }: {
             />
           </div>
 
-          {/* Moderator Toggle */}
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="moderator-checkbox"
-              checked={isModerator}
-              onChange={(e) => setIsModerator(e.target.checked)}
-              className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
-            />
-            <label htmlFor="moderator-checkbox" className="text-sm font-medium text-gray-700">
-              Mark as Moderator Variable
+          {/* Variable Type Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Variable Type
             </label>
+            <select
+              value={variableType}
+              onChange={(e) => setVariableType(e.target.value as 'normal' | 'mediate' | 'moderate')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="normal">Normal Variable</option>
+              <option value="mediate">Mediate Variable</option>
+              <option value="moderate">Moderate Variable</option>
+            </select>
           </div>
+
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
@@ -117,39 +122,74 @@ const NodeEditForm = ({ node, onSave, onCancel }: {
 };
 
 // Custom Node Component
-const CustomNode = ({ data, id }: { data: any; id: string }) => {
-  const isModerator = data.isModerator || false;
-  const observableQuestions = data.observableQuestions || 1;
+const CustomNode = ({ data, selected }: { data: any; selected?: boolean }) => {
+  const variableType = data?.variableType || 'normal';
+  const observableQuestions = data?.observableQuestions || 1;
+  
+  // Define colors and styles based on variable type
+  const getVariableStyles = (type: string) => {
+    switch (type) {
+      case 'moderate':
+        return {
+          border: 'border-purple-500',
+          bg: 'bg-purple-100',
+          text: 'text-purple-800',
+          badge: 'bg-purple-600',
+          count: 'bg-purple-200 text-purple-800',
+          label: 'MODERATE'
+        };
+      case 'mediate':
+        return {
+          border: 'border-orange-500',
+          bg: 'bg-orange-100',
+          text: 'text-orange-800',
+          badge: 'bg-orange-600',
+          count: 'bg-orange-200 text-orange-800',
+          label: 'MEDIATE'
+        };
+      default: // normal
+        return {
+          border: 'border-gray-200',
+          bg: 'bg-white',
+          text: 'text-gray-900',
+          badge: 'bg-gray-600',
+          count: 'bg-blue-100 text-blue-800',
+          label: 'NORMAL'
+        };
+    }
+  };
 
+  const styles = getVariableStyles(variableType);
+  
   return (
-    <div className={`px-6 py-4 shadow-md rounded-lg bg-white border-2 relative min-w-[140px] ${
-      isModerator ? 'border-purple-500 bg-purple-50' : 'border-stone-400'
-    }`}>
-      {/* Moderator Badge */}
-      {isModerator && (
-        <div className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-          MOD
+    <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] ${
+      selected ? 'border-blue-500' : styles.border
+    } ${styles.bg}`}>
+      <div className="flex flex-col items-center text-center">
+        {/* Variable Name */}
+        <div className={`text-sm font-bold mb-1 ${styles.text}`}>
+          {data?.label}
         </div>
-      )}
-
-      {/* Observable Questions Badge */}
-      <div className="absolute -top-2 -left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-        Q{observableQuestions}
+        
+        {/* Status and Count Display */}
+        <div className="flex flex-col items-center gap-1">
+          {variableType !== 'normal' && (
+            <div className={`${styles.badge} text-white text-xs px-2 py-1 rounded-full font-bold`}>
+              {styles.label}
+            </div>
+          )}
+          <div className={`text-xs px-2 py-1 rounded-full font-medium ${styles.count}`}>
+            {observableQuestions} Observable{observableQuestions !== 1 ? 's' : ''}
+          </div>
+        </div>
       </div>
-
+      
       {/* Left Handle (Input) */}
       <Handle 
         type="target" 
         position={Position.Left} 
         className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white hover:!bg-blue-600 !left-[-8px]" 
       />
-      
-      {/* Node Content */}
-      <div className="text-center">
-        <div className="text-lg font-bold text-gray-800 px-2 py-1">
-          {data.label}
-        </div>
-      </div>
       
       {/* Right Handle (Output) */}
       <Handle 
@@ -166,7 +206,6 @@ const nodeTypes: NodeTypes = {
 };
 
 export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProps) => {
-  const [editingNode, setEditingNode] = useState<Node | null>(null);
   // Cycle detection function
   const hasCycle = useCallback((edges: Edge[], newEdge: { source: string; target: string }) => {
     const allEdges = [...edges, newEdge];
@@ -259,11 +298,13 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [nodeLabel, setNodeLabel] = useState('');
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
+  const [editingNode, setEditingNode] = useState<Node | null>(null);
+  const [nodeLabel, setNodeLabel] = useState('');
 
   // Handle node data update from form
-  const handleNodeUpdate = useCallback((nodeId: string, data: { label: string; isModerator: boolean; observableQuestions: number }) => {
+  const handleNodeUpdate = useCallback((nodeId: string, data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number }) => {
     setNodes((nds) =>
       nds.map((node) =>
         node.id === nodeId
@@ -274,7 +315,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   }, [setNodes]);
 
   // Handle form save
-  const handleFormSave = useCallback((data: { label: string; isModerator: boolean; observableQuestions: number }) => {
+  const handleFormSave = useCallback((data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number }) => {
     if (editingNode) {
       handleNodeUpdate(editingNode.id, data);
       setEditingNode(null);
@@ -361,6 +402,13 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   // Handle node selection only
   const onNodeClick = useCallback((_: any, node: Node) => {
     setSelectedNode(node.id);
+    setSelectedEdge(null); // Clear edge selection when selecting node
+  }, []);
+
+  // Handle edge selection
+  const onEdgeClick = useCallback((_: any, edge: Edge) => {
+    setSelectedEdge(edge.id);
+    setSelectedNode(null); // Clear node selection when selecting edge
   }, []);
 
   // Handle edit node button click
@@ -372,6 +420,14 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
       }
     }
   }, [selectedNode, nodes]);
+
+  // Handle delete edge
+  const deleteEdge = useCallback(() => {
+    if (!selectedEdge) return;
+    
+    setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdge));
+    setSelectedEdge(null);
+  }, [selectedEdge, setEdges]);
 
   // Update model when nodes or edges change and save to localStorage
   useEffect(() => {
@@ -437,11 +493,23 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
               </button>
             </div>
           )}
+
+          {selectedEdge && (
+            <div className="flex gap-2">
+              <button
+                onClick={deleteEdge}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Delete Selected Connection
+              </button>
+            </div>
+          )}
           
           <div className="flex gap-4 items-center">
             <div className="text-sm text-gray-600">
               Nodes: {nodes.length} | Edges: {edges.length}
-              {selectedNode && ` | Selected: ${selectedNode}`}
+              {selectedNode && ` | Selected Node: ${selectedNode}`}
+              {selectedEdge && ` | Selected Edge: ${selectedEdge}`}
             </div>
             
             <button
@@ -470,6 +538,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={onNodeClick}
+          onEdgeClick={onEdgeClick}
           nodeTypes={nodeTypes}
           fitView
           attributionPosition="top-right"
