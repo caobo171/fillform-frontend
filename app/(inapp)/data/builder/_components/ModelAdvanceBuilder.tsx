@@ -154,25 +154,95 @@ const nodeTypes: NodeTypes = {
 };
 
 export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProps) => {
-  // Initialize nodes and edges from the model
-  const initialNodes: Node[] = model?.nodes?.map(node => ({
-    id: node.id,
-    type: 'customNode',
-    position: node.position,
-    data: node.data,
-  })) || [];
+  // Cycle detection function
+  const hasCycle = useCallback((edges: Edge[], newEdge: { source: string; target: string }) => {
+    const allEdges = [...edges, newEdge];
+    const graph: { [key: string]: string[] } = {};
+    
+    // Build adjacency list
+    allEdges.forEach(edge => {
+      if (!graph[edge.source]) graph[edge.source] = [];
+      graph[edge.source].push(edge.target);
+    });
+    
+    // DFS to detect cycle
+    const visited = new Set<string>();
+    const recursionStack = new Set<string>();
+    
+    const dfs = (node: string): boolean => {
+      if (recursionStack.has(node)) return true; // Cycle found
+      if (visited.has(node)) return false;
+      
+      visited.add(node);
+      recursionStack.add(node);
+      
+      const neighbors = graph[node] || [];
+      for (const neighbor of neighbors) {
+        if (dfs(neighbor)) return true;
+      }
+      
+      recursionStack.delete(node);
+      return false;
+    };
+    
+    // Check all nodes
+    for (const node in graph) {
+      if (!visited.has(node)) {
+        if (dfs(node)) return true;
+      }
+    }
+    
+    return false;
+  }, []);
 
-  const initialEdges: Edge[] = model?.edges?.map(edge => ({
-    id: edge.id,
-    source: edge.source,
-    target: edge.target,
-    animated: edge.animated || false,
-    style: edge.style || { stroke: '#3b82f6', strokeWidth: 2 },
-    markerEnd: {
-      type: 'arrowclosed',
-      color: '#3b82f6',
-    },
-  })) || [];
+  // Local storage functions
+  const saveToLocalStorage = useCallback((dagModel: DagModeType) => {
+    try {
+      localStorage.setItem('dagModel', JSON.stringify(dagModel));
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error);
+    }
+  }, []);
+
+  const loadFromLocalStorage = useCallback((): DagModeType | null => {
+    try {
+      const saved = localStorage.getItem('dagModel');
+      return saved ? JSON.parse(saved) : null;
+    } catch (error) {
+      console.error('Failed to load from localStorage:', error);
+      return null;
+    }
+  }, []);
+
+  // Initialize nodes and edges from the model or localStorage
+  const getInitialData = useCallback(() => {
+    const savedModel = loadFromLocalStorage();
+    const sourceModel = model || savedModel;
+    
+    return {
+      nodes: sourceModel?.nodes?.map(node => ({
+        id: node.id,
+        type: 'customNode',
+        position: node.position,
+        data: node.data,
+      })) || [],
+      edges: sourceModel?.edges?.map(edge => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        animated: edge.animated || false,
+        style: edge.style || { stroke: '#3b82f6', strokeWidth: 2 },
+        markerEnd: {
+          type: 'arrowclosed' as const,
+          color: '#3b82f6',
+        },
+      })) || []
+    };
+  }, [model, loadFromLocalStorage]);
+
+  const initialData = getInitialData();
+  const initialNodes: Node[] = initialData.nodes;
+  const initialEdges: Edge[] = initialData.edges;
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -215,22 +285,30 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
     );
   }, [handleLabelChange, handleModeratorChange, setNodes]);
 
-  // Handle connection between nodes
+  // Handle connection between nodes with cycle detection
   const onConnect = useCallback(
     (params: Connection) => {
+      if (!params.source || !params.target) return;
+      
+      // Check for cycle before adding edge
+      if (hasCycle(edges, { source: params.source, target: params.target })) {
+        alert('Cannot create this connection as it would create a cycle in the graph.');
+        return;
+      }
+      
       const newEdge: Edge = {
         ...params,
         id: `edge-${params.source}-${params.target}`,
         animated: true,
         style: { stroke: '#3b82f6', strokeWidth: 2 },
         markerEnd: {
-          type: 'arrowclosed',
+          type: 'arrowclosed' as const,
           color: '#3b82f6',
         },
       } as Edge;
       setEdges((eds) => addEdge(newEdge, eds));
     },
-    [setEdges],
+    [setEdges, edges, hasCycle],
   );
 
   // Add new node
@@ -272,7 +350,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
     setSelectedNode(node.id);
   }, []);
 
-  // Update model when nodes or edges change
+  // Update model when nodes or edges change and save to localStorage
   useEffect(() => {
     const dagModel: DagModeType = {
       name: model?.name || 'Untitled Graph',
@@ -294,7 +372,8 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
     };
     
     setModel(dagModel);
-  }, [nodes, edges, model?.name, model?.version, model?.createdAt, setModel]);
+    saveToLocalStorage(dagModel);
+  }, [nodes, edges, model?.name, model?.version, model?.createdAt, setModel, saveToLocalStorage]);
 
   return (
     <div className="w-full h-full">
@@ -328,9 +407,25 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
             </button>
           )}
           
-          <div className="text-sm text-gray-600">
-            Nodes: {nodes.length} | Edges: {edges.length}
-            {selectedNode && ` | Selected: ${selectedNode}`}
+          <div className="flex gap-4 items-center">
+            <div className="text-sm text-gray-600">
+              Nodes: {nodes.length} | Edges: {edges.length}
+              {selectedNode && ` | Selected: ${selectedNode}`}
+            </div>
+            
+            <button
+              onClick={() => {
+                const confirmed = confirm('Are you sure you want to clear the graph?');
+                if (confirmed) {
+                  setNodes([]);
+                  setEdges([]);
+                  localStorage.removeItem('dagModel');
+                }
+              }}
+              className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Clear Graph
+            </button>
           </div>
         </div>
       </div>
