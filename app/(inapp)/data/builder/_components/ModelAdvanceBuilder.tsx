@@ -27,23 +27,52 @@ interface ModelAdvanceBuilderProps {
     setModel: (model: DagModeType) => void,
 }
 
+interface NodeData {
+  label: string;
+  variableType: 'normal' | 'mediate' | 'moderate';
+  observableQuestions: number;
+  likertScale: number;
+  moderationTargets?: string[];
+  moderationTargetLabels?: string[];
+}
+
 // Node Edit Form Component
-const NodeEditForm = ({ node, onSave, onCancel }: { 
+const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: { 
   node: Node; 
-  onSave: (data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number }) => void;
+  onSave: (data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number; moderationTargets?: string[] }) => void;
   onCancel: () => void;
+  availableNodes: Node[];
 }) => {
   const [label, setLabel] = useState((node.data?.label as string) || '');
   const [variableType, setVariableType] = useState<'normal' | 'mediate' | 'moderate'>(
     (node.data?.variableType as 'normal' | 'mediate' | 'moderate') || 'normal'
   );
-  const [observableQuestions, setObservableQuestions] = useState((node.data?.observableQuestions as number) || 1);
-  const [likertScale, setLikertScale] = useState((node.data?.likertScale as number) || 5);
+  const [observableQuestions, setObservableQuestions] = useState(
+    (node.data?.observableQuestions as number) || 1
+  );
+  const [likertScale, setLikertScale] = useState(
+    (node.data?.likertScale as number) || 5
+  );
+  const [moderationTargets, setModerationTargets] = useState<MultiValue<{ value: string; label: string }>>(
+    (node.data?.moderationTargets as string[] || []).map(id => {
+      const targetNode = availableNodes.find(n => n.id === id);
+      return { value: id, label: (targetNode?.data?.label as string) || id };
+    })
+  );
+
+  // Filter available nodes (exclude current node)
+  const targetOptions = availableNodes.filter(n => n.id !== node.id);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (label.trim()) {
-      onSave({ label: label.trim(), variableType, observableQuestions, likertScale });
+      onSave({ 
+        label: label.trim(), 
+        variableType, 
+        observableQuestions, 
+        likertScale,
+        moderationTargets: variableType === 'moderate' ? moderationTargets.map(t => t.value) : undefined
+      });
     }
   };
 
@@ -120,6 +149,27 @@ const NodeEditForm = ({ node, onSave, onCancel }: {
             </select>
           </div>
 
+          {/* Moderation Target Selection (only for moderate variables) */}
+          {variableType === 'moderate' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Moderates Effect On
+              </label>
+              <Select
+                isMulti
+                value={moderationTargets}
+                onChange={setModerationTargets}
+                options={targetOptions.map(targetNode => ({
+                  value: targetNode.id,
+                  label: (targetNode.data?.label as string) || targetNode.id
+                }))}
+                placeholder="Select target variables..."
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <button
@@ -146,6 +196,8 @@ const NodeEditForm = ({ node, onSave, onCancel }: {
 const CustomNode = ({ data, selected }: { data: any; selected?: boolean }) => {
   const variableType = data?.variableType || 'normal';
   const observableQuestions = data?.observableQuestions || 1;
+  const moderationTargets = data?.moderationTargets || [];
+  const moderationTargetLabels = data?.moderationTargetLabels || [];
   
   // Define colors and styles based on variable type
   const getVariableStyles = (type: string) => {
@@ -199,6 +251,14 @@ const CustomNode = ({ data, selected }: { data: any; selected?: boolean }) => {
               {styles.label}
             </div>
           )}
+          
+          {/* Show moderation targets for moderate variables */}
+          {variableType === 'moderate' && moderationTargets.length > 0 && (
+            <div className="bg-purple-300 text-purple-900 text-xs px-2 py-1 rounded-full font-medium">
+              Moderates: {moderationTargetLabels.join(', ')}
+            </div>
+          )}
+          
           <div className={`text-xs px-2 py-1 rounded-full font-medium ${styles.count}`}>
             {observableQuestions} Observable{observableQuestions !== 1 ? 's' : ''}
           </div>
@@ -325,18 +385,53 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   const [nodeLabel, setNodeLabel] = useState('');
 
   // Handle node data update from form
-  const handleNodeUpdate = useCallback((nodeId: string, data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number }) => {
-    setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, ...data } }
-          : node
-      )
-    );
+  const handleNodeUpdate = useCallback((nodeId: string, data: NodeData) => {
+    setNodes((nds) => {
+      const updatedNodes = nds.map((node) => {
+        if (node.id === nodeId) {
+          // Find the moderation target labels if it's a moderate variable
+          let moderationTargetLabels = undefined;
+          if (data.variableType === 'moderate' && data.moderationTargets) {
+            moderationTargetLabels = data.moderationTargets.map(targetId => {
+              const targetNode = nds.find(n => n.id === targetId);
+              return targetNode?.data?.label || targetId;
+            });
+          }
+          
+          return { 
+            ...node, 
+            data: { 
+              ...node.data, 
+              ...data,
+              moderationTargetLabels
+            } 
+          };
+        }
+        return node;
+      });
+      
+      // Update all moderate nodes' target labels in case the target node's label changed
+      return updatedNodes.map((node) => {
+        if (node.data.variableType === 'moderate' && node.data.moderationTargets && Array.isArray(node.data.moderationTargets)) {
+          const moderationTargetLabels = node.data.moderationTargets.map((targetId: string) => {
+            const targetNode = updatedNodes.find(n => n.id === targetId);
+            return targetNode?.data?.label || targetId;
+          });
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              moderationTargetLabels
+            }
+          };
+        }
+        return node;
+      });
+    });
   }, [setNodes]);
 
   // Handle form save
-  const handleFormSave = useCallback((data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number }) => {
+  const handleFormSave = useCallback((data: NodeData) => {
     if (editingNode) {
       handleNodeUpdate(editingNode.id, data);
       setEditingNode(null);
@@ -583,6 +678,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
           node={editingNode}
           onSave={handleFormSave}
           onCancel={handleFormCancel}
+          availableNodes={nodes}
         />
       )}
     </div>
