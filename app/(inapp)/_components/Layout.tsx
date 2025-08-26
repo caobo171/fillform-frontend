@@ -11,6 +11,7 @@ import { MeHook } from '@/store/me/hooks';
 export default function NormalLayout({ children }: PropsWithChildren) {
   const router = useRouter();
 
+  const me = MeHook.useMe();
 
   return (
     <div className="min-h-full js-main-layout overflow-x-hidden">
