@@ -23,8 +23,8 @@ import {
 import '@xyflow/react/dist/style.css';
 
 interface ModelAdvanceBuilderProps {
-    model?: DagModeType | null,
-    setModel: (model: DagModeType) => void,
+  model?: DagModeType | null,
+  setModel: (model: DagModeType) => void,
 }
 
 interface NodeData {
@@ -34,12 +34,14 @@ interface NodeData {
   likertScale: number;
   moderationTargets?: string[];
   moderationTargetLabels?: string[];
+  average?: number;
+  standardDeviation?: number;
 }
 
 // Node Edit Form Component
-const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: { 
-  node: Node; 
-  onSave: (data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number; moderationTargets?: string[] }) => void;
+const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
+  node: Node;
+  onSave: (data: { label: string; variableType: 'normal' | 'mediate' | 'moderate'; observableQuestions: number; likertScale: number; moderationTargets?: string[]; average?: number; standardDeviation?: number }) => void;
   onCancel: () => void;
   availableNodes: Node[];
 }) => {
@@ -59,6 +61,12 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
       return { value: id, label: (targetNode?.data?.label as string) || id };
     })
   );
+  const [average, setAverage] = useState<string>(
+    (node.data?.average as string) || '0'
+  );
+  const [standardDeviation, setStandardDeviation] = useState<string>(
+    (node.data?.standardDeviation as string) || '1'
+  );
 
   // Filter available nodes (exclude current node)
   const targetOptions = availableNodes.filter(n => n.id !== node.id);
@@ -66,12 +74,14 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (label.trim()) {
-      onSave({ 
-        label: label.trim(), 
-        variableType, 
-        observableQuestions, 
+      onSave({
+        label: label.trim(),
+        variableType,
+        observableQuestions,
         likertScale,
-        moderationTargets: variableType === 'moderate' ? moderationTargets.map(t => t.value) : undefined
+        moderationTargets: variableType === 'moderate' ? moderationTargets.map(t => t.value) : undefined,
+        average: parseFloat(average),
+        standardDeviation: parseFloat(standardDeviation)
       });
     }
   };
@@ -80,7 +90,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-96 max-w-md">
         <h3 className="text-lg font-bold mb-4">Edit Variable</h3>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Variable Name */}
           <div>
@@ -149,6 +159,41 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
             </select>
           </div>
 
+          {/* Average and Standard Deviation (for independent variables) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Average (Mean)
+              </label>
+              <input
+                type="text"
+                value={average}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setAverage(value);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="0.00"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Standard Deviation
+              </label>
+              <input
+                type="text"
+                value={standardDeviation}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow empty string, positive numbers and decimal points
+                  setStandardDeviation(value);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="1.00"
+              />
+            </div>
+          </div>
+
           {/* Moderation Target Selection (only for moderate variables) */}
           {variableType === 'moderate' && (
             <div>
@@ -198,7 +243,9 @@ const CustomNode = ({ data, selected }: { data: any; selected?: boolean }) => {
   const observableQuestions = data?.observableQuestions || 1;
   const moderationTargets = data?.moderationTargets || [];
   const moderationTargetLabels = data?.moderationTargetLabels || [];
-  
+  const average = data?.average;
+  const standardDeviation = data?.standardDeviation;
+
   // Define colors and styles based on variable type
   const getVariableStyles = (type: string) => {
     switch (type) {
@@ -233,17 +280,16 @@ const CustomNode = ({ data, selected }: { data: any; selected?: boolean }) => {
   };
 
   const styles = getVariableStyles(variableType);
-  
+
   return (
-    <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] ${
-      selected ? 'border-blue-500' : styles.border
-    } ${styles.bg}`}>
+    <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] ${selected ? 'border-blue-500' : styles.border
+      } ${styles.bg}`}>
       <div className="flex flex-col items-center text-center">
         {/* Variable Name */}
         <div className={`text-sm font-bold mb-1 ${styles.text}`}>
           {data?.label}
         </div>
-        
+
         {/* Status and Count Display */}
         <div className="flex flex-col items-center gap-1">
           {variableType !== 'normal' && (
@@ -251,32 +297,39 @@ const CustomNode = ({ data, selected }: { data: any; selected?: boolean }) => {
               {styles.label}
             </div>
           )}
-          
+
           {/* Show moderation targets for moderate variables */}
           {variableType === 'moderate' && moderationTargets.length > 0 && (
             <div className="bg-purple-300 text-purple-900 text-xs px-2 py-1 rounded-full font-medium">
               Moderates: {moderationTargetLabels.join(', ')}
             </div>
           )}
-          
+
           <div className={`text-xs px-2 py-1 rounded-full font-medium ${styles.count}`}>
             {observableQuestions} Observable{observableQuestions !== 1 ? 's' : ''}
           </div>
+
+          {/* Show average and standard deviation if they exist */}
+          {(average !== undefined && average !== 0) || (standardDeviation !== undefined && standardDeviation !== 1) ? (
+            <div className="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full font-medium">
+              μ={average?.toFixed(2) || '0.00'}, σ={standardDeviation?.toFixed(2) || '1.00'}
+            </div>
+          ) : null}
         </div>
       </div>
-      
+
       {/* Left Handle (Input) */}
-      <Handle 
-        type="target" 
-        position={Position.Left} 
-        className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white hover:!bg-blue-600 !left-[-8px]" 
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white hover:!bg-blue-600 !left-[-8px]"
       />
-      
+
       {/* Right Handle (Output) */}
-      <Handle 
-        type="source" 
-        position={Position.Right} 
-        className="!w-4 !h-4 !bg-green-500 !border-2 !border-white hover:!bg-green-600 !right-[-8px]" 
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="!w-4 !h-4 !bg-green-500 !border-2 !border-white hover:!bg-green-600 !right-[-8px]"
       />
     </div>
   );
@@ -291,40 +344,40 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   const hasCycle = useCallback((edges: Edge[], newEdge: { source: string; target: string }) => {
     const allEdges = [...edges, newEdge];
     const graph: { [key: string]: string[] } = {};
-    
+
     // Build adjacency list
     allEdges.forEach(edge => {
       if (!graph[edge.source]) graph[edge.source] = [];
       graph[edge.source].push(edge.target);
     });
-    
+
     // DFS to detect cycle
     const visited = new Set<string>();
     const recursionStack = new Set<string>();
-    
+
     const dfs = (node: string): boolean => {
       if (recursionStack.has(node)) return true; // Cycle found
       if (visited.has(node)) return false;
-      
+
       visited.add(node);
       recursionStack.add(node);
-      
+
       const neighbors = graph[node] || [];
       for (const neighbor of neighbors) {
         if (dfs(neighbor)) return true;
       }
-      
+
       recursionStack.delete(node);
       return false;
     };
-    
+
     // Check all nodes
     for (const node in graph) {
       if (!visited.has(node)) {
         if (dfs(node)) return true;
       }
     }
-    
+
     return false;
   }, []);
 
@@ -351,7 +404,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   const getInitialData = useCallback(() => {
     const savedModel = loadFromLocalStorage();
     const sourceModel = model || savedModel;
-    
+
     return {
       nodes: sourceModel?.nodes?.map(node => ({
         id: node.id,
@@ -397,19 +450,19 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
               return targetNode?.data?.label || targetId;
             });
           }
-          
-          return { 
-            ...node, 
-            data: { 
-              ...node.data, 
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
               ...data,
               moderationTargetLabels
-            } 
+            }
           };
         }
         return node;
       });
-      
+
       // Update all moderate nodes' target labels in case the target node's label changed
       return updatedNodes.map((node) => {
         if (node.data.variableType === 'moderate' && node.data.moderationTargets && Array.isArray(node.data.moderationTargets)) {
@@ -448,7 +501,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
     setNodes((nds) =>
       nds.map((node) => ({
         ...node,
-        data: { 
+        data: {
           ...node.data,
           observableQuestions: node.data.observableQuestions || 1
         },
@@ -460,13 +513,13 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   const onConnect = useCallback(
     (params: Connection) => {
       if (!params.source || !params.target) return;
-      
+
       // Check for cycle before adding edge
       if (hasCycle(edges, { source: params.source, target: params.target })) {
         alert('Cannot create this connection as it would create a cycle in the graph.');
         return;
       }
-      
+
       const newEdge: Edge = {
         ...params,
         id: `edge-${params.source}-${params.target}`,
@@ -485,7 +538,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   // Add new node
   const addNode = useCallback(() => {
     if (!nodeLabel.trim()) return;
-    
+
     const newNode: Node = {
       id: `node-${Date.now()}`,
       type: 'customNode',
@@ -493,13 +546,13 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
         x: Math.random() * 400,
         y: Math.random() * 400,
       },
-      data: { 
-        label: nodeLabel, 
+      data: {
+        label: nodeLabel,
         isModerator: false,
         observableQuestions: 1
       },
     };
-    
+
     setNodes((nds) => [...nds, newNode]);
     setNodeLabel('');
   }, [nodeLabel, setNodes]);
@@ -507,9 +560,9 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   // Delete selected node
   const deleteNode = useCallback(() => {
     if (!selectedNode) return;
-    
+
     setNodes((nds) => nds.filter((node) => node.id !== selectedNode));
-    setEdges((eds) => eds.filter((edge) => 
+    setEdges((eds) => eds.filter((edge) =>
       edge.source !== selectedNode && edge.target !== selectedNode
     ));
     setSelectedNode(null);
@@ -540,7 +593,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
   // Handle delete edge
   const deleteEdge = useCallback(() => {
     if (!selectedEdge) return;
-    
+
     setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdge));
     setSelectedEdge(null);
   }, [selectedEdge, setEdges]);
@@ -565,7 +618,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
       version: model?.version,
       createdAt: model?.createdAt,
     };
-    
+
     setModel(dagModel);
     saveToLocalStorage(dagModel);
   }, [nodes, edges, model?.name, model?.version, model?.createdAt, setModel, saveToLocalStorage]);
@@ -592,7 +645,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
               Add Node
             </button>
           </div>
-          
+
           {selectedNode && (
             <div className="flex gap-2">
               <button
@@ -620,14 +673,14 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
               </button>
             </div>
           )}
-          
+
           <div className="flex gap-4 items-center">
             <div className="text-sm text-gray-600">
               Nodes: {nodes.length} | Edges: {edges.length}
               {selectedNode && ` | Selected Node: ${selectedNode}`}
               {selectedEdge && ` | Selected Edge: ${selectedEdge}`}
             </div>
-            
+
             <button
               onClick={() => {
                 const confirmed = confirm('Are you sure you want to clear the graph?');
