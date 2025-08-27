@@ -7,25 +7,35 @@ import { LayoutFooter } from '@/components/layout/footer/footer';
 import { Header } from '@/components/layout/header/Header';
 import { SubscriptionBannerTop } from '@/components/subscription/BannerTop';
 import { MeHook } from '@/store/me/hooks';
+import { useMe } from '@/hooks/user';
 
 export default function NormalLayout({ children }: PropsWithChildren) {
   const router = useRouter();
 
-  const me = MeHook.useMe();
+  const me = useMe();
+
+
+  let tabs = [
+    { name: 'Tài khoản', href: '/' },
+    { name: 'Tạo form ngay', href: '/form/create' },
+    { name: 'Mã hoá data', href: '/data/encode' },
+    { name: 'Build dữ liệu đẹp', href: '/data/builder', id: 'build_data' },
+    { name: 'Nạp tiền', href: '/credit' },
+    { name: 'Về fillform', href: 'https://fillform.info' },
+  ];
+
+  if (!me?.data || !me.data.is_super_admin) {
+    tabs = tabs.filter(e => e.id !== 'build_data');
+  }
+
+
 
   return (
     <div className="min-h-full js-main-layout overflow-x-hidden">
       <Header
         searchUrl="podcasts"
         menu={{
-          main: [
-            { name: 'Tài khoản', href: '/' },
-            { name: 'Tạo form ngay', href: '/form/create' },
-            { name: 'Mã hoá data', href: '/data/encode' },
-            { name: 'Build dữ liệu đẹp', href: '/data/builder' },
-            { name: 'Nạp tiền', href: '/credit' },
-            { name: 'Về fillform', href: 'https://fillform.info' },
-          ],
+          main: tabs,
           subs: []
         }}
       />
