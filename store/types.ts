@@ -264,8 +264,8 @@ export const EdgeSchema = z.object({
   target: z.string().min(1, 'Target node ID must be a non-empty string.'),
   // Optional properties for styling or animation
   animated: z.boolean().optional(),
-  style: z.object({
-    stroke: z.string(),
+  data: z.object({
+    effectType: z.enum(['positive', 'negative']),
   }).optional(),
 });
 
