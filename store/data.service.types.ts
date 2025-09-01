@@ -51,3 +51,5 @@ const AdvanceModelSchema = z.object({
 });
 
 export type AdvanceModelType = z.infer<typeof AdvanceModelSchema>;
+export type NodeDataType = z.infer<typeof NodeDataType>;
+export type EdgeDataType = z.infer<typeof EdgeDataType>;

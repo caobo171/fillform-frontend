@@ -1,7 +1,3 @@
-import { useMe } from '@/hooks/user';
-import { Helper } from '@/services/Helper';
-import { DataModel, RawForm, DagModeType, NodeSchemaType, EdgeSchemaType } from '@/store/types';
-import Link from 'next/link';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Select, { MultiValue } from 'react-select';
 import {
@@ -21,10 +17,12 @@ import {
   Position,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { AdvanceModelType, EdgeDataType, NodeDataType } from '@/store/data.service.types';
 
 interface ModelAdvanceBuilderProps {
-  model?: DagModeType | null,
-  setModel: (model: DagModeType) => void,
+  model?: AdvanceModelType | null,
+  setModel: (model: AdvanceModelType) => void,
+  useLocalStorage?: boolean,
 }
 
 interface NodeData extends Record<string, unknown> {
@@ -622,10 +620,10 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
   );
 };
 
-export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProps) => {
+export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }: ModelAdvanceBuilderProps) => {
 
   // Local storage functions
-  const saveToLocalStorage = useCallback((dagModel: DagModeType) => {
+  const saveToLocalStorage = useCallback((dagModel: AdvanceModelType) => {
     try {
       localStorage.setItem('dagModel', JSON.stringify(dagModel));
     } catch (error) {
@@ -633,7 +631,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
     }
   }, []);
 
-  const loadFromLocalStorage = useCallback((): DagModeType | null => {
+  const loadFromLocalStorage = useCallback((): AdvanceModelType | null => {
     try {
       const saved = localStorage.getItem('dagModel');
       return saved ? JSON.parse(saved) : null;
@@ -645,6 +643,13 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
 
   // Initialize nodes and edges from the model or localStorage
   const getInitialData = useCallback(() => {
+    if (!useLocalStorage) {
+      return {
+        nodes: [],
+        edges: [],
+      };
+    }
+
     const savedModel = loadFromLocalStorage();
     const sourceModel = model || savedModel;
 
@@ -663,7 +668,7 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
           id: edge.id,
           source: edge.source,
           target: edge.target,
-          animated: edge.animated || false,
+          animated: false,
           data: edge.data,
           style: { 
             stroke: color, 
@@ -1015,26 +1020,27 @@ export const ModelAdvanceBuilder = ({ model, setModel }: ModelAdvanceBuilderProp
 
   // Update model when nodes or edges change and save to localStorage
   useEffect(() => {
-    const dagModel: DagModeType = {
+    const dagModel: AdvanceModelType = {
       name: model?.name || 'Untitled Graph',
       nodes: nodes.map(node => ({
         id: node.id,
-        data: node.data,
+        data: node.data as NodeDataType,
         position: node.position,
-      })) as NodeSchemaType[],
+      })),
       edges: edges.map(edge => ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
-        data: edge.data,
-      })) as EdgeSchemaType[],
-      version: model?.version,
-      createdAt: model?.createdAt,
+        data: edge.data as EdgeDataType,
+      }))
     };
 
     setModel(dagModel);
-    saveToLocalStorage(dagModel);
-  }, [nodes, edges, model?.name, model?.version, model?.createdAt, setModel, saveToLocalStorage]);
+
+    if (useLocalStorage) {
+      saveToLocalStorage(dagModel);
+    }
+  }, [nodes, edges, model?.name, setModel, saveToLocalStorage]);
 
   return (
     <div className="w-full h-full">

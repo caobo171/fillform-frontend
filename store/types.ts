@@ -137,6 +137,7 @@ export type RawOrder = {
       name: string;
       url: string;
     };
+    error?: string;
     status: string;
     report_file: {
       name: string;
@@ -181,115 +182,24 @@ export type RawPagination = {
 export type RawDataModel = {
     id: string;
     name: string;
-    model: AdvanceModelType;
+    data_model: AdvanceModelType;
    
     owner_id: string; 
     owner: string;
+
+    version: string;
+    createdAt: string;
 }
 
-
-
-// The full Zod schema for the data model
-export const DataModelSchema = z.object({
-  model: z.object({
-    code: z.string(),
-    name: z.string(),
-    model: z.enum(["second_order_SEM", "first_order_SEM", "third_order_SEM", "linear_regression"]),
-    questions: z.array(z.object({
-      id: z.string(),
-      question: z.string(),
-      answers: z.array(z.string()).optional(),
-    })).describe('List questions that measure the dependent variable'),
-    residual: z.number().optional().describe('Residual of the model'),
-  }),
-  observedItems: z.array(z.object({
-    code: z.string(),
-    name: z.string(),
-    metatype: z.enum(["observed_variable", "dependent_variable"]),
-    coefficient: z.number(),
-    mean: z.number(),
-    standard_deviation: z.number(),
-    effect_direction: z.enum(["positive", "negative"]),
-    non_effect: z.number(),
-    questions: z.array(z.object({
-      id: z.string(),
-      question: z.string(),
-      answers: z.array(z.string()).optional(),
-    })).optional().describe('List questions that measure the dependent variable, it required if the model has only one level'),
-    observedItems: z.array(z.object({
-      code: z.string(),
-      name: z.string(),
-      metatype: z.enum(["observed_variable", "dependent_variable"]),
-      coefficient: z.number(),
-      mean: z.number(),
-      standard_deviation: z.number(),
-      questions: z.array(z.object({
-        id: z.string(),
-        question: z.string(),
-        answers: z.array(z.string()).optional(),
-      })).optional().describe('List questions that measure the dependent variable, it required if the model has two level'),
-      observedItems: z.array(z.object({
-        code: z.string(),
-        name: z.string(),
-        metatype: z.enum(["observed_variable", "dependent_variable"]),
-        coefficient: z.number(),
-        mean: z.number(),
-        standard_deviation: z.number(),
-        questions: z.array(z.object({
-          id: z.string(),
-          question: z.string(),
-          answers: z.array(z.string()).optional(),
-        })).describe('List of questions').optional().describe('List questions that measure the dependent variable, it required if the model has three level'),
-        observedItems: z.array(z.any()).describe('List of observable variables again').optional()
-      })).optional()
-    })).optional()
-  }))
-});
-
-export type DataModel = z.infer<typeof DataModelSchema>;
-
-
-
-// Schema for a single node in the graph
-export const NodeSchema = z.object({
-  id: z.string().min(1, 'Node ID must be a non-empty string.'),
-  data: z.object({
-    label: z.string().min(1, 'Node label must be a non-empty string.'),
-    // You can add more data properties here as needed
-  }),
-  position: z.object({
-    x: z.number(),
-    y: z.number(),
-  }),
-  // Optional properties from the React Flow example
-  type: z.string().optional(),
-  sourcePosition: z.string().optional(),
-  targetPosition: z.string().optional(),
-});
-
-// Schema for a directed edge connecting two nodes
-export const EdgeSchema = z.object({
-  id: z.string().min(1, 'Edge ID must be a non-empty string.'),
-  source: z.string().min(1, 'Source node ID must be a non-empty string.'),
-  target: z.string().min(1, 'Target node ID must be a non-empty string.'),
-  // Optional properties for styling or animation
-  animated: z.boolean().optional(),
-  data: z.object({
-    effectType: z.enum(['positive', 'negative']),
-  }).optional(),
-});
-
-export type NodeSchemaType = z.infer<typeof NodeSchema>;
-export type EdgeSchemaType = z.infer<typeof EdgeSchema>;
-
-// The main schema for the entire DAG model
-export const DagModelSchema = z.object({
-  name: z.string().min(1, 'Graph name must be a non-empty string.'),
-  nodes: z.array(NodeSchema).min(1, 'The graph must contain at least one node.'),
-  edges: z.array(EdgeSchema),
-  version: z.string().optional(),
-  createdAt: z.string().datetime().optional(),
-});
-
-
-export type DagModeType = z.infer<typeof DagModelSchema>;
+export type RawDataOrderModel = {
+    id: string;
+    data_model_id: string;
+    name: string;
+    data_model: any,
+    owner_id: string;
+    data: any,
+    owner: string;
+    version: string;
+    status: string;
+    createdAt: string;
+};

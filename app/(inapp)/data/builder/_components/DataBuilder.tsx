@@ -14,15 +14,18 @@ import LoadingAbsolute from '@/components/loading'
 import { Toast } from '@/services/Toast'
 import { AnyObject } from '@/store/interface'
 import { ModelAdvanceBuilder } from './ModelAdvanceBuilder'
-import { DagModeType, RawDataModel } from '@/store/types';
+import { RawDataModel } from '@/store/types';
 import { Code } from '@/core/Constants'
+import DataModelLists from '../_sections/DataModelLists'
+import DataOrderLists from '../_sections/DataOrderLists'
+import { AdvanceModelType } from '@/store/data.service.types'
 
 export default function DataBuilder() {
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [name, setName] = useState<string>('');
 
-    const [model, setModel] = useState<DagModeType | null>(null);
+    const [model, setModel] = useState<AdvanceModelType | null>(null);
 
     const onSubmitHandle = async () => {
         if (!model) return;
@@ -77,11 +80,12 @@ export default function DataBuilder() {
     }
 
     return (
-        <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
+        <>
+                <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
             <div className="relative isolate overflow-hidden py-12">
                 {loading && <LoadingAbsolute />}
 
-                <div className="container mx-auto" data-aos="fade-up">
+                <div className="container mx-auto space-y-8" data-aos="fade-up">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <h2 className="text-3xl font-bold mb-3">Build dữ liệu đẹp</h2>
@@ -95,7 +99,7 @@ export default function DataBuilder() {
                         <div
                             className="p-6 flex flex-col gap-6"
                         >
-                            <ModelAdvanceBuilder model={model} setModel={setModel} />
+                            <ModelAdvanceBuilder model={model} setModel={setModel} useLocalStorage={true} />
 
                             {/* Sample Size Input */}
                             <FormItem label="Tên của model">
@@ -135,8 +139,19 @@ export default function DataBuilder() {
 
 
                     </div>
+
+
+                    
+                    {/* Forms Table */}
+                    <DataModelLists />
+    
+    
+                    {/* Orders Table */}
+                    <DataOrderLists />
                 </div>
             </div>
         </section>
+        </>
+
     )
 }
