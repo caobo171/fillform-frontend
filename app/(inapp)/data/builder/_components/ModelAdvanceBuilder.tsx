@@ -643,14 +643,11 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
 
   // Initialize nodes and edges from the model or localStorage
   const getInitialData = useCallback(() => {
-    if (!useLocalStorage) {
-      return {
-        nodes: [],
-        edges: [],
-      };
-    }
 
-    const savedModel = loadFromLocalStorage();
+    let savedModel: AdvanceModelType | null = null;
+    if (useLocalStorage) {
+      savedModel = loadFromLocalStorage();
+    }
     const sourceModel = model || savedModel;
 
     return {
@@ -681,7 +678,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
         };
       }) || []
     };
-  }, [model, loadFromLocalStorage]);
+  }, [model, loadFromLocalStorage, useLocalStorage]);
 
   const initialData = getInitialData();
   const initialNodes: Node[] = initialData.nodes;

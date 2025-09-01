@@ -13,7 +13,7 @@ import { CSVLink } from 'react-csv'
 import LoadingAbsolute from '@/components/loading'
 import { Toast } from '@/services/Toast'
 import { AnyObject } from '@/store/interface'
-import { DagModeType, RawDataModel } from '@/store/types';
+import { RawDataModel } from '@/store/types';
 import { Code } from '@/core/Constants'
 import { ModelAdvanceBuilder } from '../../_components/ModelAdvanceBuilder'
 import { useDataModelById } from '@/hooks/data.model'
@@ -33,9 +33,8 @@ export default function DataModelBuilder() {
     const [sample, setSample] = useState<number>(0);
 
     const [model, setModel] = useState<AdvanceModelType | null>(null);
-
     useEffect(() => {
-        if (dataModel) {
+        if (dataModel?.data_model?.data_model) {
             setModel(dataModel.data_model?.data_model as AdvanceModelType);
         }
     }, [dataModel]);
