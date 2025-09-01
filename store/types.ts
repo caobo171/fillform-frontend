@@ -2,6 +2,7 @@ import { AnyObject } from '@/store/interface';
 
 import rootReducer from './rootReducer';
 import { z } from 'zod';
+import { AdvanceModelType } from './data.service.types';
 
 export type RootState = ReturnType<typeof rootReducer>;
 
@@ -176,6 +177,15 @@ export type RawPagination = {
   total: number;
 };
 
+
+export type RawDataModel = {
+    id: string;
+    name: string;
+    model: AdvanceModelType;
+   
+    owner_id: string; 
+    owner: string;
+}
 
 
 

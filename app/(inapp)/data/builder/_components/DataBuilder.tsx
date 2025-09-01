@@ -14,13 +14,13 @@ import LoadingAbsolute from '@/components/loading'
 import { Toast } from '@/services/Toast'
 import { AnyObject } from '@/store/interface'
 import { ModelAdvanceBuilder } from './ModelAdvanceBuilder'
-import { DagModeType } from '@/store/types';
+import { DagModeType, RawDataModel } from '@/store/types';
 import { Code } from '@/core/Constants'
 
 export default function DataBuilder() {
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
-    const [sampleSize, setSampleSize] = useState<number>(100);
+    const [name, setName] = useState<string>('');
 
     const [model, setModel] = useState<DagModeType | null>(null);
 
@@ -30,44 +30,43 @@ export default function DataBuilder() {
         try {
             const res = await Fetch.postWithAccessToken<{
                 code: number,
-                result: {
-                    finalData: any[]
-                }
-            }>('/api/data.service/advance.generate', {
+                data_model: RawDataModel,
+                message: string,
+            }>('/api/data.model/create', {
                 model: JSON.stringify(model),
-                sample_size: sampleSize,
+                name: name,
             });
 
             if (res.data.code == Code.SUCCESS) {
                 Toast.success('Generate data successfully');
             } else {
-                return Toast.error('Generate data failed');
+                return Toast.error(res.data.message || 'Generate data failed');
             }
 
-            console.log(res.data);
+            // console.log(res.data);
 
-            let data = res.data.result.finalData;
+            // let data = res.data.result.finalData;
 
-            let headers: AnyObject = {};
-            let header_keys = Object.keys(data[0]);
-            for (let i = 0; i < header_keys.length; i++) {
-                headers[header_keys[i]] = header_keys[i];
-            }
+            // let headers: AnyObject = {};
+            // let header_keys = Object.keys(data[0]);
+            // for (let i = 0; i < header_keys.length; i++) {
+            //     headers[header_keys[i]] = header_keys[i];
+            // }
 
-            console.log(data)
+            // console.log(data)
 
 
-            let rows: AnyObject[] = [];
-            for (let row_index = 1; row_index < data.length; row_index++) {
-                let row: AnyObject = {};
-                for (let col_index = 0; col_index < Object.keys(headers).length; col_index++) {
-                    let header_key = Object.keys(headers)[col_index];
-                    row[header_key] = data[row_index][header_key];
-                }
-                rows.push(row);
-            }
+            // let rows: AnyObject[] = [];
+            // for (let row_index = 1; row_index < data.length; row_index++) {
+            //     let row: AnyObject = {};
+            //     for (let col_index = 0; col_index < Object.keys(headers).length; col_index++) {
+            //         let header_key = Object.keys(headers)[col_index];
+            //         row[header_key] = data[row_index][header_key];
+            //     }
+            //     rows.push(row);
+            // }
 
-            Helper.exportCSVFile(headers, rows, Helper.purify('data_builder'));
+            // Helper.exportCSVFile(headers, rows, Helper.purify('data_builder'));
 
 
         } catch (error) {
@@ -99,12 +98,12 @@ export default function DataBuilder() {
                             <ModelAdvanceBuilder model={model} setModel={setModel} />
 
                             {/* Sample Size Input */}
-                            <FormItem label="Số lượng mẫu dữ liệu">
+                            <FormItem label="Tên của model">
                                 <Input
-                                    type="number"
-                                    value={sampleSize}
-                                    onChange={(e) => setSampleSize(Number(e.target.value))}
-                                    placeholder="Nhập số lượng mẫu dữ liệu cần tạo"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Nhập Tên model để lưu"
                                 />
                             </FormItem>
 
@@ -118,7 +117,7 @@ export default function DataBuilder() {
                                     <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                     </svg>
-                                    Download dữ liệu
+                                    Tạo model mới
                                 </div>
                             </Button>
 
