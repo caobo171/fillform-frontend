@@ -1,6 +1,6 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { MetaData } from '@/core/Metadata';
-import OrderPage from './_components/OrderPage';
+import DataOrderPage from './_components/DataOrderPage';
 
 type Props = {
   params: { id: string };
@@ -27,8 +27,8 @@ export async function generateMetadata(
     },
   };
 }
-export default function OrderDetail() {
+export default function DataOrderDetail() {
   return (
-    <OrderPage />
+    <DataOrderPage />
   );
 }

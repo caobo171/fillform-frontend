@@ -17,15 +17,19 @@ import { RawDataModel } from '@/store/types';
 import { Code } from '@/core/Constants'
 import { ModelAdvanceBuilder } from '../../_components/ModelAdvanceBuilder'
 import { useDataModelById } from '@/hooks/data.model'
-import { useParams } from 'next/navigation';
-import { DataModelInfoSection } from '../../_components/DataModelInfoSection'
+import { useParams, useRouter } from 'next/navigation';
 import { AdvanceModelType } from '@/store/data.service.types'
+import CreateDownloadOrderForm from '@/components/form/CreateDownloadOrderForm'
+import { useMe, useMyBankInfo } from '@/hooks/user'
 
 export default function DataModelBuilder() {
 
 
     const params = useParams();
+    const router = useRouter();
     const { data: dataModel, isLoading: isLoadingModel, mutate: mutateModel } = useDataModelById(params.id as string);
+    const me = useMe();
+    const bankInfo = useMyBankInfo();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
@@ -33,9 +37,15 @@ export default function DataModelBuilder() {
     const [sample, setSample] = useState<number>(0);
 
     const [model, setModel] = useState<AdvanceModelType | null>(null);
+    
+    // State for showing download order form after model is saved
+    const [showDownloadForm, setShowDownloadForm] = useState<boolean>(false);
+    const [numRequest, setNumRequest] = useState<number>(0);
+    const [submitDisabled, setSubmitDisabled] = useState<boolean>(false);
     useEffect(() => {
         if (dataModel?.data_model?.data_model) {
             setModel(dataModel.data_model?.data_model as AdvanceModelType);
+            setName(dataModel.data_model?.name || '');
         }
     }, [dataModel]);
 
@@ -45,49 +55,84 @@ export default function DataModelBuilder() {
         try {
             const res = await Fetch.postWithAccessToken<{
                 code: number,
-                data_model: RawDataModel,
+                data_model: RawDataModel & { _id: string },
                 message: string,
-            }>('/api/data.model/create', {
+            }>('/api/data.model/save.model', {
+                id: dataModel?.data_model?.id,
                 model: JSON.stringify(model),
                 name: name,
             });
 
             if (res.data.code == Code.SUCCESS) {
-                Toast.success('Generate data successfully');
+                Toast.success('Model saved successfully! Now you can create a download order.');
+                // Show the download order form after successful model save
+                setShowDownloadForm(true);
             } else {
                 return Toast.error(res.data.message || 'Generate data failed');
             }
-
-            // console.log(res.data);
-
-            // let data = res.data.result.finalData;
-
-            // let headers: AnyObject = {};
-            // let header_keys = Object.keys(data[0]);
-            // for (let i = 0; i < header_keys.length; i++) {
-            //     headers[header_keys[i]] = header_keys[i];
-            // }
-
-            // console.log(data)
-
-
-            // let rows: AnyObject[] = [];
-            // for (let row_index = 1; row_index < data.length; row_index++) {
-            //     let row: AnyObject = {};
-            //     for (let col_index = 0; col_index < Object.keys(headers).length; col_index++) {
-            //         let header_key = Object.keys(headers)[col_index];
-            //         row[header_key] = data[row_index][header_key];
-            //     }
-            //     rows.push(row);
-            // }
-
-            // Helper.exportCSVFile(headers, rows, Helper.purify('data_builder'));
-
 
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    const handleDownloadOrderSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!numRequest || numRequest <= 0) {
+            Toast.error('Please enter a valid number of requests');
+            return;
+        }
+
+        setLoading(true);
+        setSubmitDisabled(true);
+
+        try {
+            const response = await Fetch.postWithAccessToken<{
+                code: number,
+                message?: string,
+                result: {
+                    finalData: any[]
+                }
+            }>('/api/data.model/order.run', {
+                model_id: dataModel?.data_model?.id,
+                num_request: numRequest,
+            });
+
+
+            let data = response.data.result.finalData;
+
+            let headers: AnyObject = {};
+            let header_keys = Object.keys(data[0]);
+            for (let i = 0; i < header_keys.length; i++) {
+                headers[header_keys[i]] = header_keys[i];
+            }
+
+            let rows: AnyObject[] = [];
+            for (let row_index = 1; row_index < data.length; row_index++) {
+                let row: AnyObject = {};
+                for (let col_index = 0; col_index < Object.keys(headers).length; col_index++) {
+                    let header_key = Object.keys(headers)[col_index];
+                    row[header_key] = data[row_index][header_key];
+                }
+                rows.push(row);
+            }
+
+            Helper.exportCSVFile(headers, rows, Helper.purify('data_builder_' + name));
+
+            if (response.data.code === Code.SUCCESS) {
+                Toast.success('Download order created successfully!');
+                router.push('/data/builder');
+            } else {
+                Toast.error(response.data.message || 'Failed to create download order');
+            }
+        } catch (error) {
+            console.error('Error creating download order:', error);
+            Toast.error('Failed to create download order');
+        } finally {
+            setLoading(false);
+            setSubmitDisabled(false);
         }
     }
 
@@ -154,28 +199,56 @@ export default function DataModelBuilder() {
                                 />
                             </FormItem>
 
-                            <FormItem label="Sample Size">
-                                <Input
-                                    type="number"
-                                    value={sample}
-                                    onChange={(e) => setSample(Number(e.target.value))}
-                                    placeholder="Nhập Sample Size"
-                                />
-                            </FormItem>
-
-                            <Button
-                                onClick={onSubmitHandle}
-                                className="w-full font-bold"
-                                size="large"
-                                loading={loading}
-                            >
-                                <div className="flex items-center justify-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Lưu model
+                            {!showDownloadForm ? (
+                                <Button
+                                    onClick={onSubmitHandle}
+                                    className="w-full font-bold"
+                                    size="large"
+                                    loading={loading}
+                                >
+                                    <div className="flex items-center justify-center">
+                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Lưu mô hình
+                                    </div>
+                                </Button>
+                            ) : (
+                                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU TẢI DỮ LIỆU</h3>
+                                    </div>
+                                    
+                                    <form onSubmit={handleDownloadOrderSubmit}>
+                                        <CreateDownloadOrderForm
+                                            userCredit={me.data?.credit || 0}
+                                            numRequest={numRequest}
+                                            modelId={dataModel?.data_model?.id || undefined}
+                                            modelName={name}
+                                            bankInfo={bankInfo}
+                                            onNumRequestChange={(value) => setNumRequest(value)}
+                                            className="max-w-full"
+                                            showTitle={false}
+                                            showBackButton={false}
+                                        />
+                                        
+                                        <button
+                                            type="submit"
+                                            disabled={submitDisabled || loading || numRequest <= 0}
+                                            className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                                ${submitDisabled || numRequest <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        >
+                                            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                            {loading ? 'Đang xử lý...' : 'Tạo yêu cầu tải dữ liệu'}
+                                        </button>
+                                    </form>
                                 </div>
-                            </Button>
+                            )}
 
 
                             {/* Alert Message */}

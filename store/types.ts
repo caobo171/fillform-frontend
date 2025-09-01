@@ -197,6 +197,7 @@ export type RawDataOrderModel = {
     name: string;
     data_model: any,
     owner_id: string;
+    num: number,
     data: any,
     owner: string;
     version: string;

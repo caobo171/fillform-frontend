@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { OPTIONS_DELAY, OPTIONS_DELAY_ENUM } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -8,8 +7,8 @@ import { useMe } from '@/hooks/user';
 interface CreateDownloadOrderFormProps {
     userCredit: number;
     numRequest: number;
-    formId?: string;
-    formName?: string;
+    modelId?: string;
+    modelName?: string;
     bankInfo?: any;
     onNumRequestChange: (value: number) => void;
     className?: string;
@@ -21,21 +20,21 @@ interface CreateDownloadOrderFormProps {
 const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
     userCredit,
     numRequest,
-    formId,
-    formName,
     bankInfo,
+    modelId,
+    modelName,
     onNumRequestChange,
     className = '',
     showTitle = true,
     showBackButton = true,
 }) => {
     const user = useMe();
-    const [pricePerUnit, setPricePerUnit] = useState<number>(OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price);
+    const [pricePerUnit, setPricePerUnit] = useState<number>(0);
     const [total, setTotal] = useState<number>(0);
 
     // Calculate price based on delay type
     useEffect(() => {
-        let currentPricePerUnit = 300;
+        let currentPricePerUnit = 700;
         setPricePerUnit(currentPricePerUnit);
     }, []);
 
@@ -53,9 +52,9 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
 
     return (
         <div className={`${className} relative px-3`}>
-            {formId && showBackButton && (
+            {modelId && showBackButton && (
                 <Link
-                    href={`/form/${formId}`}
+                    href={`/data/builder/${modelId}`}
                     className="absolute top-0 left-0 text-gray-600 hover:text-gray-800 p-2"
                     aria-label="Back"
                 >
@@ -64,8 +63,8 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
             )}
             {showTitle && (
                 <>
-                    <h3 className="text-xl sm:text-2xl font-bold mb-2 mt-2 sm:mt-0 text-right sm:text-center">TẠO YÊU CẦU ĐIỀN FORM</h3>
-                    {formName && <h6 className="text-sm text-gray-500 mb-4 text-center">{formName}</h6>}
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2 mt-2 sm:mt-0 text-right sm:text-center">TẢI DỮ LIỆU ĐẸP CHO MÔ HÌNH</h3>
+                    {modelName && <h6 className="text-sm text-gray-500 mb-4 text-center">{modelName}</h6>}
                 </>
             )}
             <div className="text-left">

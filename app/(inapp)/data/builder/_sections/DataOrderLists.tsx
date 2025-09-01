@@ -84,12 +84,12 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
         const searchQuery = searchParams.get('q') || '';
         setQuery(searchQuery);
         setCurrentPage(page);
-        
+
         // Only mutate once after state updates are complete
         const timeoutId = setTimeout(() => {
             dataOrder.mutate();
         }, 0);
-        
+
         return () => clearTimeout(timeoutId);
     }, [searchParams, page]);
 
@@ -250,12 +250,14 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                         <div className="">
                                                             <div className="font-medium text-gray-900 truncate w-[120px] md:w-[300px] lg:w-[600px]">{order?.name || 'Unknown'}</div>
                                                             <div className="mt-1 text-gray-500">
-                                                                &nbsp;-&nbsp;
-                                                                &nbsp; {me.data?.is_super_admin ? `- v${order.version} - ${order.owner}` : ''}
+                                                                {me.data?.is_super_admin ? `v${order.version} - ${order.owner}` : ''}
 
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                                    {order.num}
                                                 </td>
                                                 <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
                                                     <span className={clsx(
@@ -304,7 +306,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                         </button>
                                                     </>}
                                                     <Link
-                                                        href={`/order/detail/${order.id}`}
+                                                        href={`/data.order/detail/${order.id}`}
                                                         className="inline-flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded"
                                                         title="Xem chi tiết Order"
                                                     >

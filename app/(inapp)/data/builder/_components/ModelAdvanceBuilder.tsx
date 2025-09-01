@@ -23,6 +23,7 @@ interface ModelAdvanceBuilderProps {
   model?: AdvanceModelType | null,
   setModel: (model: AdvanceModelType) => void,
   useLocalStorage?: boolean,
+  isReadOnly?: boolean,
 }
 
 interface NodeData extends Record<string, unknown> {
@@ -620,7 +621,7 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
   );
 };
 
-export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }: ModelAdvanceBuilderProps) => {
+export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, isReadOnly = false }: ModelAdvanceBuilderProps) => {
 
   // Local storage functions
   const saveToLocalStorage = useCallback((dagModel: AdvanceModelType) => {
@@ -786,7 +787,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
   // Handle connection between nodes with cycle detection
   const onConnect = useCallback(
     (params: Connection) => {
-      if (!params.source || !params.target) return;
+      if (isReadOnly || !params.source || !params.target) return;
 
       // Check for cycle before adding edge
       if (hasCycle(edges, { source: params.source, target: params.target })) {
@@ -807,12 +808,12 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
       } as Edge;
       setEdges((eds) => addEdge(newEdge, eds));
     },
-    [setEdges, edges, hasCycle],
+    [setEdges, edges, hasCycle, isReadOnly],
   );
 
   // Add new variable node
   const addNode = useCallback(() => {
-    if (!nodeLabel.trim()) return;
+    if (isReadOnly || !nodeLabel.trim()) return;
 
     const newNode: Node = {
       id: `node-${Date.now()}`,
@@ -833,7 +834,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
 
     setNodes((nds) => [...nds, newNode]);
     setNodeLabel('');
-  }, [nodeLabel, setNodes]);
+  }, [nodeLabel, setNodes, isReadOnly]);
 
   // Handle moderate effect form save
   const handleModerateEffectSave = useCallback((data: { label: string; moderateVariable: string; independentVariable: string; effectType: 'positive' | 'negative' }) => {
@@ -937,14 +938,14 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
 
   // Delete selected node
   const deleteNode = useCallback(() => {
-    if (!selectedNode) return;
+    if (isReadOnly || !selectedNode) return;
 
     setNodes((nds) => nds.filter((node) => node.id !== selectedNode));
     setEdges((eds) => eds.filter((edge) =>
       edge.source !== selectedNode && edge.target !== selectedNode
     ));
     setSelectedNode(null);
-  }, [selectedNode, setNodes, setEdges]);
+  }, [selectedNode, setNodes, setEdges, isReadOnly]);
 
   // Handle node selection only
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
@@ -960,24 +961,24 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
 
   // Handle edit node button click
   const handleEditNode = useCallback(() => {
-    if (selectedNode) {
-      const nodeToEdit = nodes.find(node => node.id === selectedNode);
-      if (nodeToEdit) {
-        if (nodeToEdit.data?.nodeType === 'moderate_effect') {
-          // Use the unified moderate effect form for editing
-          setEditingNode(nodeToEdit);
-          setShowModerateEffectForm(true);
-        } else {
-          // Use the regular node edit form for variable nodes
-          setEditingNode(nodeToEdit);
-        }
+    if (isReadOnly || !selectedNode) return;
+    
+    const nodeToEdit = nodes.find(node => node.id === selectedNode);
+    if (nodeToEdit) {
+      if (nodeToEdit.data?.nodeType === 'moderate_effect') {
+        // Use the unified moderate effect form for editing
+        setEditingNode(nodeToEdit);
+        setShowModerateEffectForm(true);
+      } else {
+        // Use the regular node edit form for variable nodes
+        setEditingNode(nodeToEdit);
       }
     }
-  }, [selectedNode, nodes]);
+  }, [selectedNode, nodes, isReadOnly]);
 
   // Handle delete edge
   const deleteEdge = useCallback(() => {
-    if (!selectedEdge) return;
+    if (isReadOnly || !selectedEdge) return;
 
     // Check if the source node is a moderate effect node
     const sourceNode = nodes.find(node => node.id === selectedEdge.source);
@@ -988,7 +989,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
 
     setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdge.id));
     setSelectedEdge(null);
-  }, [selectedEdge, setEdges, nodes]);
+  }, [selectedEdge, setEdges, nodes, isReadOnly]);
 
   // Handle edge update from form
   const handleEdgeUpdate = useCallback((edgeData: { effectType: 'positive' | 'negative' }) => {
@@ -1044,25 +1045,27 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
       {/* Controls Panel */}
       <div className="mb-4 p-4 bg-gray-50 rounded-lg">
         <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={nodeLabel}
-              onChange={(e) => setNodeLabel(e.target.value)}
-              placeholder="Enter node label"
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onKeyPress={(e) => e.key === 'Enter' && addNode()}
-            />
-            <button
-              onClick={addNode}
-              disabled={!nodeLabel.trim()}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-              Add Variable
-            </button>
-          </div>
+          {!isReadOnly && (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={nodeLabel}
+                onChange={(e) => setNodeLabel(e.target.value)}
+                placeholder="Enter node label"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyPress={(e) => e.key === 'Enter' && addNode()}
+              />
+              <button
+                onClick={addNode}
+                disabled={!nodeLabel.trim()}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                Add Variable
+              </button>
+            </div>
+          )}
 
-          {selectedNode && (
+          {selectedNode && !isReadOnly && (
             <div className="flex gap-2">
               <button
                 onClick={handleEditNode}
@@ -1088,7 +1091,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
             </div>
           )}
 
-          {selectedEdge && (() => {
+          {selectedEdge && !isReadOnly && (() => {
             // Check if the selected edge is from a moderate effect node
             const sourceNode = nodes.find(node => node.id === selectedEdge.source);
             const isModerateEffectEdge = sourceNode?.data?.nodeType === 'moderate_effect';
@@ -1118,19 +1121,21 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
               {selectedEdge && ` | Selected Edge: ${selectedEdge.id}`}
             </div>
 
-            <button
-              onClick={() => {
-                const confirmed = confirm('Are you sure you want to clear the graph?');
-                if (confirmed) {
-                  setNodes([]);
-                  setEdges([]);
-                  localStorage.removeItem('dagModel');
-                }
-              }}
-              className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              Clear Graph
-            </button>
+            {!isReadOnly && (
+              <button
+                onClick={() => {
+                  const confirmed = confirm('Are you sure you want to clear the graph?');
+                  if (confirmed) {
+                    setNodes([]);
+                    setEdges([]);
+                    localStorage.removeItem('dagModel');
+                  }
+                }}
+                className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Clear Graph
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -1140,9 +1145,9 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
+          onNodesChange={isReadOnly ? undefined : onNodesChange}
+          onEdgesChange={isReadOnly ? undefined : onEdgesChange}
+          onConnect={isReadOnly ? undefined : onConnect}
           onNodeClick={onNodeClick}
           onEdgeClick={onEdgeClick}
           nodeTypes={nodeTypes}
@@ -1155,6 +1160,9 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
           zoomOnDoubleClick={true}
           minZoom={0.1}
           maxZoom={4}
+          nodesDraggable={!isReadOnly}
+          nodesConnectable={!isReadOnly}
+          elementsSelectable={true}
         >
           <MiniMap />
           <Controls showZoom={true} showFitView={true} showInteractive={true} />
@@ -1163,7 +1171,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
       </div>
 
       {/* Node Edit Form Modal - Only for variable nodes */}
-      {editingNode && editingNode.data?.nodeType === 'variable' && (
+      {!isReadOnly && editingNode && editingNode.data?.nodeType === 'variable' && (
         <NodeEditForm
           node={editingNode}
           onSave={handleFormSave}
@@ -1173,7 +1181,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
       )}
 
       {/* Moderate Effect Form Modal - For creating new or editing existing moderate effects */}
-      {showModerateEffectForm && (
+      {!isReadOnly && showModerateEffectForm && (
         <ModerateEffectForm
           selectedNodeId={selectedNode || undefined}
           editingNode={editingNode?.data?.nodeType === 'moderate_effect' ? editingNode : null}
@@ -1184,7 +1192,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false }
       )}
 
       {/* Edge Edit Form Modal */}
-      {editingEdge && (
+      {!isReadOnly && editingEdge && (
         <EdgeEditForm
           edge={editingEdge}
           onSave={handleEdgeUpdate}
