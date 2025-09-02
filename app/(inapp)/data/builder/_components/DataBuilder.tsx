@@ -46,32 +46,6 @@ export default function DataBuilder() {
                 return Toast.error(res.data.message || 'Generate data failed');
             }
 
-            // console.log(res.data);
-
-            // let data = res.data.result.finalData;
-
-            // let headers: AnyObject = {};
-            // let header_keys = Object.keys(data[0]);
-            // for (let i = 0; i < header_keys.length; i++) {
-            //     headers[header_keys[i]] = header_keys[i];
-            // }
-
-            // console.log(data)
-
-
-            // let rows: AnyObject[] = [];
-            // for (let row_index = 1; row_index < data.length; row_index++) {
-            //     let row: AnyObject = {};
-            //     for (let col_index = 0; col_index < Object.keys(headers).length; col_index++) {
-            //         let header_key = Object.keys(headers)[col_index];
-            //         row[header_key] = data[row_index][header_key];
-            //     }
-            //     rows.push(row);
-            // }
-
-            // Helper.exportCSVFile(headers, rows, Helper.purify('data_builder'));
-
-
         } catch (error) {
             console.error(error);
         } finally {

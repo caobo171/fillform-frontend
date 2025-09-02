@@ -180,27 +180,87 @@ export type RawPagination = {
 
 
 export type RawDataModel = {
-    id: string;
-    name: string;
-    data_model: AdvanceModelType;
-   
-    owner_id: string; 
-    owner: string;
+  id: string;
+  name: string;
+  data_model: AdvanceModelType;
 
-    version: string;
-    createdAt: string;
+  owner_id: string;
+  owner: string;
+
+  version: string;
+  createdAt: string;
 }
 
 export type RawDataOrderModel = {
-    id: string;
-    data_model_id: string;
-    name: string;
-    data_model: any,
-    owner_id: string;
-    num: number,
-    data: any,
-    owner: string;
-    version: string;
-    status: string;
-    createdAt: string;
+  id: string;
+  data_model_id: string;
+  name: string;
+  data_model: any,
+  owner_id: string;
+  num: number,
+  data: any,
+  owner: string;
+  version: string;
+  status: string;
+  createdAt: string;
 };
+
+
+// The full Zod schema for the data model
+export const DataModelSchema = z.object({
+  model: z.object({
+    code: z.string(),
+    name: z.string(),
+    model: z.enum(["second_order_SEM", "first_order_SEM", "third_order_SEM", "linear_regression"]),
+    questions: z.array(z.object({
+      id: z.string(),
+      question: z.string(),
+      answers: z.array(z.string()).optional(),
+    })).describe('List questions that measure the dependent variable'),
+    residual: z.number().optional().describe('Residual of the model'),
+  }),
+  observedItems: z.array(z.object({
+    code: z.string(),
+    name: z.string(),
+    metatype: z.enum(["observed_variable", "dependent_variable"]),
+    coefficient: z.number(),
+    mean: z.number(),
+    standard_deviation: z.number(),
+    effect_direction: z.enum(["positive", "negative"]),
+    non_effect: z.number(),
+    questions: z.array(z.object({
+      id: z.string(),
+      question: z.string(),
+      answers: z.array(z.string()).optional(),
+    })).optional().describe('List questions that measure the dependent variable, it required if the model has only one level'),
+    observedItems: z.array(z.object({
+      code: z.string(),
+      name: z.string(),
+      metatype: z.enum(["observed_variable", "dependent_variable"]),
+      coefficient: z.number(),
+      mean: z.number(),
+      standard_deviation: z.number(),
+      questions: z.array(z.object({
+        id: z.string(),
+        question: z.string(),
+        answers: z.array(z.string()).optional(),
+      })).optional().describe('List questions that measure the dependent variable, it required if the model has two level'),
+      observedItems: z.array(z.object({
+        code: z.string(),
+        name: z.string(),
+        metatype: z.enum(["observed_variable", "dependent_variable"]),
+        coefficient: z.number(),
+        mean: z.number(),
+        standard_deviation: z.number(),
+        questions: z.array(z.object({
+          id: z.string(),
+          question: z.string(),
+          answers: z.array(z.string()).optional(),
+        })).describe('List of questions').optional().describe('List questions that measure the dependent variable, it required if the model has three level'),
+        observedItems: z.array(z.any()).describe('List of observable variables again').optional()
+      })).optional()
+    })).optional()
+  }))
+});
+
+export type DataModel = z.infer<typeof DataModelSchema>;

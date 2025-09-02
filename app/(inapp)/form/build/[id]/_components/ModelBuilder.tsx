@@ -28,7 +28,7 @@ type Variable = {
     mean: number;
     standard_deviation: number;
     effect_direction: 'positive' | 'negative';
-    non_effect?: 0 | 1;
+    non_effect: number;
     questions?: { id: string, question: string, answers?: string[] }[];
 };
 
