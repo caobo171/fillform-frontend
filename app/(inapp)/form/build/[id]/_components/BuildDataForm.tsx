@@ -90,7 +90,8 @@ export default function BuildDataForm() {
 
     const onSubmit = async (data: any) => {
         // Handle form submission
-        setIsSaved(true);
+        setIsSaved(false);
+        setIsLoading(true);
         try {
             await Fetch.postWithAccessToken('/api/form/save.model', {
                 id: dataForm?.form.id,
@@ -415,6 +416,17 @@ export default function BuildDataForm() {
         }
     };
 
+
+    useEffect(() => {
+        if (dataForm?.form && dataForm?.form.advance_model_config?.data_model_id && modelsData?.data?.data_models) {
+            const model = modelsData?.data?.data_models?.find((model) => model.id === dataForm?.form.advance_model_config?.data_model_id);
+            if (model) {
+                setSelectedAdvanceModel(model);
+                setAdvanceModelData(model.data_model);
+            }
+        }
+    }, [modelsData, dataForm]);
+
     useEffect(() => {
         // Generate a unique ID for variables
         const generateId = () => {
@@ -441,14 +453,6 @@ export default function BuildDataForm() {
                 setModelMode('advance');
             } else {
                 setModelMode('basic');
-            }
-        }
-
-        if (dataForm?.form && dataForm?.form.advance_model_config?.data_model_id && modelsData?.data?.data_models) {
-            const model = modelsData?.data?.data_models?.find((model) => model.id === dataForm?.form.advance_model_config?.data_model_id);
-            if (model) {
-                setSelectedAdvanceModel(model);
-                setAdvanceModelData(model.data_model);
             }
         }
 
