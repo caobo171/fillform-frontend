@@ -57,7 +57,7 @@ export type RawForm = {
 };
 
 export type RawUser = {
-  id: number;
+  id: string;
   username: string;
   email: string;
   credit: number;

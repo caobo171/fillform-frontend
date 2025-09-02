@@ -8,7 +8,7 @@ import { useFormById } from '@/hooks/form';
 import { useParams } from 'next/navigation';
 import Fetch from '@/lib/core/fetch/Fetch';
 import LoadingAbsolute from '@/components/loading';
-import { DataModel, RawForm } from '@/store/types';
+import { DataModel, RawDataModel, RawForm } from '@/store/types';
 import { Helper } from '@/services/Helper';
 import { useRouter } from 'next/navigation';
 import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM, ORDER_TYPE, PULSES_TOKEN } from '@/core/Constants';
@@ -17,6 +17,7 @@ import { ModelBuilder } from './ModelBuilder';
 import { Toast } from '@/services/Toast';
 import { CreateOrderForm } from "@/components/form";
 import { useMe, useMyBankInfo } from '@/hooks/user';
+import { useMyDataModels, useUserDataModels } from '@/hooks/data.model';
 
 interface ChatError {
     id: string;
@@ -53,6 +54,10 @@ export default function BuildDataForm() {
     const [specificStartDate, setSpecificStartDate] = useState('');
     const [specificEndDate, setSpecificEndDate] = useState('');
     const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);
+
+    const modelsData = useMyDataModels(1, 200, {});
+    const [modelMode, setModelMode] = useState<'basic' | 'advance'>('basic');
+    const [selectedModel, setSelectedModel] = useState<RawDataModel | null>(null);
 
     const [numRequest, setNumRequest] = useState<number>(1);
 
@@ -567,7 +572,112 @@ export default function BuildDataForm() {
                     </div>
 
                     <div className="container mx-auto mb-2">
-                        <ModelBuilder dataForm={dataForm} model={model} setModel={setModel} />
+                        {/* Model Mode Selector */}
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-4">
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn phương thức tạo Model</h3>
+                            <div className="flex space-x-4 mb-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setModelMode('basic')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'basic'
+                                        ? 'bg-primary text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    🔧 Basic - Xây dựng Model cơ bản
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setModelMode('advance')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'advance'
+                                        ? 'bg-primary text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    📋 Advance - Sử dụng Model có sẵn
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Conditional Rendering Based on Mode */}
+                        {modelMode === 'basic' ? (
+                            <ModelBuilder dataForm={dataForm} model={model} setModel={setModel} />
+                        ) : (
+                            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                                <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn Model từ danh sách có sẵn</h3>
+                                {modelsData.isLoading ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                        <span className="ml-2 text-gray-600">Đang tải danh sách model...</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {
+                                            modelsData.error ? (
+                                                <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+                                                    <p>Lỗi khi tải danh sách model: {modelsData.error?.message || 'Có lỗi xảy ra'}</p>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    <>
+                                                        {modelsData.data?.data_models && modelsData.data.data_models.length > 0 ? (
+                                                            <>
+                                                                <div className="grid gap-3">
+                                                                    {modelsData.data.data_models.map((dataModel: RawDataModel) => (
+                                                                        <div
+                                                                            key={dataModel.id}
+                                                                            onClick={() => {
+                                                                                setSelectedModel(dataModel);
+                                                                                // Don't set model for advance mode - it uses different structure
+                                                                            }}
+                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${selectedModel?.id === dataModel.id
+                                                                                ? 'border-primary bg-primary/5'
+                                                                                : 'border-gray-200 hover:border-gray-300'
+                                                                                }`}
+                                                                        >
+                                                                            <div className="flex items-center justify-between">
+                                                                                <div>
+                                                                                    <h4 className="font-medium text-gray-900">{dataModel.name}</h4>
+                                                                                    <p className="text-sm text-gray-600 mt-1">
+                                                                                        Biến: {(dataModel.data_model?.nodes || []).length} |
+                                                                                        Tạo: {new Date(dataModel.createdAt).toLocaleDateString('vi-VN')}
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div className="flex items-center space-x-2">
+                                                                                    {selectedModel?.id === dataModel.id && (
+                                                                                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                                                                                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                {selectedModel && (
+                                                                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                                                        <p className="text-green-800 text-sm">
+                                                                            ✅ Đã chọn model. Model sẽ được sử dụng để tạo dữ liệu.
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <div className="text-center py-8 text-gray-500">
+                                                                <p>Không có model nào được tìm thấy.</p>
+                                                                <p className="text-sm mt-2">Hãy tạo model mới bằng cách chọn "Basic - Tự xây dựng Model".</p>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                </div>
+                                            )
+                                        }
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-1 rounded-lg container mx-auto">
