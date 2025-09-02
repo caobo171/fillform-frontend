@@ -13,11 +13,12 @@ import { Helper } from '@/services/Helper';
 import { useRouter } from 'next/navigation';
 import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM, ORDER_TYPE, PULSES_TOKEN } from '@/core/Constants';
 import { FormInfoSection } from '../../../_components/FormInfoSection';
-import { ModelBuilder } from './ModelBuilder';
+import { BasicModelBuilder } from './BasicModelBuilder'
 import { Toast } from '@/services/Toast';
 import { CreateOrderForm } from "@/components/form";
 import { useMe, useMyBankInfo } from '@/hooks/user';
 import { useMyDataModels, useUserDataModels } from '@/hooks/data.model';
+import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
 
 interface ChatError {
     id: string;
@@ -39,6 +40,8 @@ export default function BuildDataForm() {
     const [chatOpen, setChatOpen] = useState<boolean>(true);
     const [chatErrors, setChatErrors] = useState<ChatError[]>([]);
 
+    const availableQuestions = dataForm?.form.loaddata || [];
+
     const [model, setModel] = useState<DataModel | null>(null);
 
     // CreateOrderForm state variables
@@ -55,9 +58,14 @@ export default function BuildDataForm() {
     const [specificEndDate, setSpecificEndDate] = useState('');
     const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);
 
+
+
     const modelsData = useMyDataModels(1, 200, {});
     const [modelMode, setModelMode] = useState<'basic' | 'advance'>('basic');
-    const [selectedModel, setSelectedModel] = useState<RawDataModel | null>(null);
+
+
+    const [selectedAdvanceModel, setSelectedAdvanceModel] = useState<RawDataModel | null>(null);
+    const [advanceModelData, setAdvanceModelData] = useState<any>(null);
 
     const [numRequest, setNumRequest] = useState<number>(1);
 
@@ -77,6 +85,9 @@ export default function BuildDataForm() {
         return res;
     }, [model]);
 
+
+    const [mappingQuestionToVariable, setMappingQuestionToVariable] = useState<{ [key: string]: string }>({});
+
     const onSubmit = async (data: any) => {
         // Handle form submission
         setIsSaved(true);
@@ -84,7 +95,12 @@ export default function BuildDataForm() {
             await Fetch.postWithAccessToken('/api/form/save.model', {
                 id: dataForm?.form.id,
                 ...data,
+                advance_model: JSON.stringify(advanceModelData),
                 model: JSON.stringify(model),
+
+                data_model_id: selectedAdvanceModel?.id,
+                mapping_question_to_variable: JSON.stringify(mappingQuestionToVariable),
+                model_mode: modelMode,
             });
 
             Toast.success('Lưu model thành công');
@@ -420,6 +436,27 @@ export default function BuildDataForm() {
             setModel(initialModel);
         }
 
+        if (dataForm?.form && dataForm?.form.model_mode) {
+            if (dataForm?.form.model_mode === 'advance') {
+                setModelMode('advance');
+            } else {
+                setModelMode('basic');
+            }
+        }
+
+        if (dataForm?.form && dataForm?.form.advance_model_config?.data_model_id && modelsData?.data?.data_models) {
+            const model = modelsData?.data?.data_models?.find((model) => model.id === dataForm?.form.advance_model_config?.data_model_id);
+            if (model) {
+                setSelectedAdvanceModel(model);
+                setAdvanceModelData(model.data_model);
+            }
+        }
+
+
+        if (dataForm?.form && dataForm?.form.advance_model_config?.mapping_question_to_variable) {
+            setMappingQuestionToVariable(dataForm?.form.advance_model_config?.mapping_question_to_variable)
+        }
+
         if (dataForm?.form && dataForm?.form.loaddata) {
             const validateAll = () => {
                 let chatErrors: ChatError[] = [];
@@ -601,7 +638,7 @@ export default function BuildDataForm() {
 
                         {/* Conditional Rendering Based on Mode */}
                         {modelMode === 'basic' ? (
-                            <ModelBuilder dataForm={dataForm} model={model} setModel={setModel} />
+                            <BasicModelBuilder dataForm={dataForm} model={model} setModel={setModel} />
                         ) : (
                             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                                 <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn Model từ danh sách có sẵn</h3>
@@ -610,71 +647,74 @@ export default function BuildDataForm() {
                                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                                         <span className="ml-2 text-gray-600">Đang tải danh sách model...</span>
                                     </div>
+                                ) : modelsData.error ? (
+                                    <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+                                        <p>Lỗi khi tải danh sách model: {modelsData.error?.message || 'Có lỗi xảy ra'}</p>
+                                    </div>
                                 ) : (
-                                    <>
-                                        {
-                                            modelsData.error ? (
-                                                <div className="text-red-600 p-4 bg-red-50 rounded-lg">
-                                                    <p>Lỗi khi tải danh sách model: {modelsData.error?.message || 'Có lỗi xảy ra'}</p>
+                                    <div className="space-y-4">
+                                        {/* Model Selection Dropdown */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Chọn Model có sẵn
+                                            </label>
+                                            <select
+                                                value={selectedAdvanceModel?.id || ''}
+                                                onChange={(e) => {
+                                                    const modelId = e.target.value;
+                                                    if (modelId) {
+                                                        const model = modelsData.data?.data_models.find(m => m.id === modelId);
+                                                        if (model) {
+                                                            setSelectedAdvanceModel(model);
+                                                            setAdvanceModelData(model.data_model);
+                                                        }
+                                                    } else {
+                                                        setSelectedAdvanceModel(null);
+                                                        setAdvanceModelData(null);
+                                                    }
+                                                }}
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            >
+                                                <option value="">-- Chọn một model --</option>
+                                                {modelsData.data?.data_models?.map((dataModel: RawDataModel) => (
+                                                    <option key={dataModel.id} value={dataModel.id}>
+                                                        {dataModel.name} - {(dataModel.data_model?.nodes || []).length} biến - {new Date(dataModel.createdAt).toLocaleDateString('vi-VN')}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Model Editor */}
+                                        {selectedAdvanceModel && advanceModelData && (
+                                            <div className="mt-6">
+                                                <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                                    <div className="flex items-center gap-2">
+                                                        <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        <p className="text-blue-800 text-sm font-medium">
+                                                            Đang chỉnh sửa model: <strong>{selectedAdvanceModel.name}</strong>
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            ) : (
-                                                <div className="space-y-3">
-                                                    <>
-                                                        {modelsData.data?.data_models && modelsData.data.data_models.length > 0 ? (
-                                                            <>
-                                                                <div className="grid gap-3">
-                                                                    {modelsData.data.data_models.map((dataModel: RawDataModel) => (
-                                                                        <div
-                                                                            key={dataModel.id}
-                                                                            onClick={() => {
-                                                                                setSelectedModel(dataModel);
-                                                                                // Don't set model for advance mode - it uses different structure
-                                                                            }}
-                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${selectedModel?.id === dataModel.id
-                                                                                ? 'border-primary bg-primary/5'
-                                                                                : 'border-gray-200 hover:border-gray-300'
-                                                                                }`}
-                                                                        >
-                                                                            <div className="flex items-center justify-between">
-                                                                                <div>
-                                                                                    <h4 className="font-medium text-gray-900">{dataModel.name}</h4>
-                                                                                    <p className="text-sm text-gray-600 mt-1">
-                                                                                        Biến: {(dataModel.data_model?.nodes || []).length} |
-                                                                                        Tạo: {new Date(dataModel.createdAt).toLocaleDateString('vi-VN')}
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div className="flex items-center space-x-2">
-                                                                                    {selectedModel?.id === dataModel.id && (
-                                                                                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                                                                                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                                {selectedModel && (
-                                                                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                                                        <p className="text-green-800 text-sm">
-                                                                            ✅ Đã chọn model. Model sẽ được sử dụng để tạo dữ liệu.
-                                                                        </p>
-                                                                    </div>
-                                                                )}
-                                                            </>
-                                                        ) : (
-                                                            <div className="text-center py-8 text-gray-500">
-                                                                <p>Không có model nào được tìm thấy.</p>
-                                                                <p className="text-sm mt-2">Hãy tạo model mới bằng cách chọn "Basic - Tự xây dựng Model".</p>
-                                                            </div>
-                                                        )}
-                                                    </>
-                                                </div>
-                                            )
-                                        }
-                                    </>
+                                                <ModelAdvanceBuilder
+                                                    mappingQuestionToVariable={mappingQuestionToVariable}
+                                                    setMappingQuestionToVariable={setMappingQuestionToVariable}
+                                                    questions={availableQuestions}
+                                                    model={advanceModelData}
+                                                    setModel={setAdvanceModelData}
+                                                    useLocalStorage={false}
+                                                />
+                                            </div>
+                                        )}
+
+                                        {!modelsData.data?.data_models?.length && (
+                                            <div className="text-center py-8 text-gray-500">
+                                                <p>Không có model nào được tìm thấy.</p>
+                                                <p className="text-sm mt-2">Hãy tạo model mới bằng cách chọn "Basic - Tự xây dựng Model".</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         )}
@@ -682,7 +722,14 @@ export default function BuildDataForm() {
 
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-1 rounded-lg container mx-auto">
                         <div className="space-y-2">
-                            {dataForm?.form.loaddata && dataForm?.form.loaddata.filter(e => !modelQuestions.find(modelQuestion => modelQuestion.id == e.id)).map((question, questionIndex) => (
+                            {dataForm?.form.loaddata && dataForm?.form.loaddata.filter(e => {
+                                if (modelMode == 'advance') {
+                                    return !mappingQuestionToVariable[e.id]
+                                } else {
+                                    return !modelQuestions.find(modelQuestion => modelQuestion.id == e.id)
+                                }
+
+                            }).map((question, questionIndex) => (
                                 <div key={questionIndex} id={`question-${question.id}`} className="js-question p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
                                         <div className="md:w-1/4 md:max-w-1/4 md:min-w-1/4 mb-1 md:mb-0 flex-shrink-0">
@@ -802,6 +849,7 @@ export default function BuildDataForm() {
                                         formName={dataForm?.form?.name}
                                         bankInfo={bankInfo}
                                         showBackButton={false}
+                                        modelMode={modelMode}
                                         specificStartDate={specificStartDate}
                                         specificEndDate={specificEndDate}
                                         specificDailySchedules={specificDailySchedules}

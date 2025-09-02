@@ -37,7 +37,6 @@ export default function DataModelBuilder() {
     const [sample, setSample] = useState<number>(0);
 
     const [model, setModel] = useState<AdvanceModelType | null>(null);
-    
     // State for showing download order form after model is saved
     const [showDownloadForm, setShowDownloadForm] = useState<boolean>(false);
     const [numRequest, setNumRequest] = useState<number>(0);
@@ -140,7 +139,7 @@ export default function DataModelBuilder() {
         <>
             <section className="bg-gradient-to-b from-primary-50 to-white">
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
-                {(loading) && <LoadingAbsolute />}
+                    {(loading) && <LoadingAbsolute />}
                     <div className="container mx-auto mb-8">
                         <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Build dữ liệu đẹp</h1>
 
@@ -174,96 +173,100 @@ export default function DataModelBuilder() {
                         </div>
 
 
-                    {/* Form Section */}
-                    <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
-                        <div
-                            className="p-6 flex flex-col gap-6"
-                        >
+                        {/* Form Section */}
+                        <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
+                            <div
+                                className="p-6 flex flex-col gap-6"
+                            >
 
 
-                            {
-                                model ? (
-                                    <ModelAdvanceBuilder model={model} setModel={setModel} useLocalStorage={false} />
-                                ) : (
-                                    <></>
-                                )
-                            }
-
-                            {/* Sample Size Input */}
-                            <FormItem label="Tên của model">
-                                <Input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Nhập Tên model để lưu"
-                                />
-                            </FormItem>
-
-                            {!showDownloadForm ? (
-                                <Button
-                                    onClick={onSubmitHandle}
-                                    className="w-full font-bold"
-                                    size="large"
-                                    loading={loading}
-                                >
-                                    <div className="flex items-center justify-center">
-                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Lưu mô hình
-                                    </div>
-                                </Button>
-                            ) : (
-                                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU TẢI DỮ LIỆU</h3>
-                                    </div>
-                                    
-                                    <form onSubmit={handleDownloadOrderSubmit}>
-                                        <CreateDownloadOrderForm
-                                            userCredit={me.data?.credit || 0}
-                                            numRequest={numRequest}
-                                            modelId={dataModel?.data_model?.id || undefined}
-                                            modelName={name}
-                                            bankInfo={bankInfo}
-                                            onNumRequestChange={(value) => setNumRequest(value)}
-                                            className="max-w-full"
-                                            showTitle={false}
-                                            showBackButton={false}
+                                {
+                                    model ? (
+                                        <ModelAdvanceBuilder
+                                            model={model}
+                                            setModel={setModel}
+                                            useLocalStorage={false}
                                         />
-                                        
-                                        <button
-                                            type="submit"
-                                            disabled={submitDisabled || loading || numRequest <= 0}
-                                            className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
-                                                ${submitDisabled || numRequest <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        >
+                                    ) : (
+                                        <></>
+                                    )
+                                }
+
+                                {/* Sample Size Input */}
+                                <FormItem label="Tên của model">
+                                    <Input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Nhập Tên model để lưu"
+                                    />
+                                </FormItem>
+
+                                {!showDownloadForm ? (
+                                    <Button
+                                        onClick={onSubmitHandle}
+                                        className="w-full font-bold"
+                                        size="large"
+                                        loading={loading}
+                                    >
+                                        <div className="flex items-center justify-center">
                                             <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            {loading ? 'Đang xử lý...' : 'Tạo yêu cầu tải dữ liệu'}
-                                        </button>
-                                    </form>
-                                </div>
-                            )}
+                                            Lưu mô hình
+                                        </div>
+                                    </Button>
+                                ) : (
+                                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU TẢI DỮ LIỆU</h3>
+                                        </div>
 
+                                        <form onSubmit={handleDownloadOrderSubmit}>
+                                            <CreateDownloadOrderForm
+                                                userCredit={me.data?.credit || 0}
+                                                numRequest={numRequest}
+                                                modelId={dataModel?.data_model?.id || undefined}
+                                                modelName={name}
+                                                bankInfo={bankInfo}
+                                                onNumRequestChange={(value) => setNumRequest(value)}
+                                                className="max-w-full"
+                                                showTitle={false}
+                                                showBackButton={false}
+                                            />
 
-                            {/* Alert Message */}
-                            {errorMessage && (
-                                <div className="px-6">
-                                    <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
-                                        <XCircle className="w-5 h-5 flex-shrink-0" />
-                                        <span>{errorMessage}</span>
+                                            <button
+                                                type="submit"
+                                                disabled={submitDisabled || loading || numRequest <= 0}
+                                                className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                                ${submitDisabled || numRequest <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+                                                {loading ? 'Đang xử lý...' : 'Tạo yêu cầu tải dữ liệu'}
+                                            </button>
+                                        </form>
                                     </div>
-                                </div>
-                            )}
+                                )}
+
+
+                                {/* Alert Message */}
+                                {errorMessage && (
+                                    <div className="px-6">
+                                        <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
+                                            <XCircle className="w-5 h-5 flex-shrink-0" />
+                                            <span>{errorMessage}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+
                         </div>
-
-
-                    </div>
                     </div>
                 </div>
             </section>

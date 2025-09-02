@@ -54,6 +54,12 @@ export type RawForm = {
   version: string,
   sections: any,
   data_model: any,
+
+  model_mode?: string,
+  advance_model_config?: {
+    data_model_id: string,
+    mapping_question_to_variable: { [key: string]: string },
+  }
 };
 
 export type RawUser = {

@@ -32,7 +32,7 @@ type Variable = {
     questions?: { id: string, question: string, answers?: string[] }[];
 };
 
-export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) => {
+export const BasicModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) => {
     const availableQuestions = dataForm?.form?.loaddata || [];
 
     // Get dependent and independent variables from model
@@ -194,7 +194,7 @@ export const ModelBuilder = ({ dataForm, model, setModel }: ModelBuilderProps) =
                                             onChange={(selectedOptions) => handleAddQuestionsToVariable('dependent', 0, selectedOptions || [])}
                                             options={availableQuestions.map(q => ({
                                                 value: q.id,
-                                                label: q.question + (q.description ? ' (' + q.description + ')' : '')
+                                                label: q.question.substring(0, 30) + (q.question.length > 30 ? '...' : '') + (q.description ? ' (' + q.description + ')' : '')
                                             }))}
                                             placeholder="Chọn câu hỏi"
                                             styles={{

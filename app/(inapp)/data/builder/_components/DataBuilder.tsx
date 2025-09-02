@@ -55,76 +55,76 @@ export default function DataBuilder() {
 
     return (
         <>
-                <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
-            <div className="relative isolate overflow-hidden py-12">
-                {loading && <LoadingAbsolute />}
+            <section className="bg-gradient-to-b from-primary-50 to-white mx-auto px-4 sm:px-6">
+                <div className="relative isolate overflow-hidden py-12">
+                    {loading && <LoadingAbsolute />}
 
-                <div className="container mx-auto space-y-8" data-aos="fade-up">
-                    {/* Header */}
-                    <div className="mb-8 text-center">
-                        <h2 className="text-3xl font-bold mb-3">Build dữ liệu đẹp</h2>
-                        <p className="text-gray-600">
-                            Build dữ liệu đẹp chuẩn SPSS, SmartPLS, có tính chất nghiên cứu khoá học cao
-                        </p>
-                    </div>
+                    <div className="container mx-auto space-y-8" data-aos="fade-up">
+                        {/* Header */}
+                        <div className="mb-8 text-center">
+                            <h2 className="text-3xl font-bold mb-3">Build dữ liệu đẹp</h2>
+                            <p className="text-gray-600">
+                                Build dữ liệu đẹp chuẩn SPSS, SmartPLS, có tính chất nghiên cứu khoá học cao
+                            </p>
+                        </div>
 
-                    {/* Form Section */}
-                    <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
-                        <div
-                            className="p-6 flex flex-col gap-6"
-                        >
-                            <ModelAdvanceBuilder model={model} setModel={setModel} useLocalStorage={true} />
-
-                            {/* Sample Size Input */}
-                            <FormItem label="Tên của model">
-                                <Input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Nhập Tên model để lưu"
-                                />
-                            </FormItem>
-
-                            <Button
-                                onClick={onSubmitHandle}
-                                className="w-full font-bold"
-                                size="large"
-                                loading={loading}
+                        {/* Form Section */}
+                        <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
+                            <div
+                                className="p-6 flex flex-col gap-6"
                             >
-                                <div className="flex items-center justify-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Tạo model mới
-                                </div>
-                            </Button>
+                                <ModelAdvanceBuilder model={model} setModel={setModel} useLocalStorage={true} />
 
+                                {/* Sample Size Input */}
+                                <FormItem label="Tên của model">
+                                    <Input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Nhập Tên model để lưu"
+                                    />
+                                </FormItem>
 
-                            {/* Alert Message */}
-                            {errorMessage && (
-                                <div className="px-6">
-                                    <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
-                                        <XCircle className="w-5 h-5 flex-shrink-0" />
-                                        <span>{errorMessage}</span>
+                                <Button
+                                    onClick={onSubmitHandle}
+                                    className="w-full font-bold"
+                                    size="large"
+                                    loading={loading}
+                                >
+                                    <div className="flex items-center justify-center">
+                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Tạo model mới
                                     </div>
-                                </div>
-                            )}
+                                </Button>
+
+
+                                {/* Alert Message */}
+                                {errorMessage && (
+                                    <div className="px-6">
+                                        <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
+                                            <XCircle className="w-5 h-5 flex-shrink-0" />
+                                            <span>{errorMessage}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+
                         </div>
 
 
+
+                        {/* Forms Table */}
+                        <DataModelLists />
+
+
+                        {/* Orders Table */}
+                        <DataOrderLists />
                     </div>
-
-
-                    
-                    {/* Forms Table */}
-                    <DataModelLists />
-    
-    
-                    {/* Orders Table */}
-                    <DataOrderLists />
                 </div>
-            </div>
-        </section>
+            </section>
         </>
 
     )

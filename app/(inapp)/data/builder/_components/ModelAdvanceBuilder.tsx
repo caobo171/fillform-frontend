@@ -24,6 +24,9 @@ interface ModelAdvanceBuilderProps {
   setModel: (model: AdvanceModelType) => void,
   useLocalStorage?: boolean,
   isReadOnly?: boolean,
+  mappingQuestionToVariable?: { [key: string]: string },
+  setMappingQuestionToVariable?: (mapping: { [key: string]: string }) => void,
+  questions?: any[],
 }
 
 interface NodeData extends Record<string, unknown> {
@@ -42,11 +45,14 @@ interface NodeData extends Record<string, unknown> {
 }
 
 // Node Edit Form Component
-const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
+const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappingQuestionToVariable, setMappingQuestionToVariable }: {
   node: Node;
   onSave: (data: NodeData) => void;
   onCancel: () => void;
   availableNodes: Node[];
+  questions?: any[];
+  mappingQuestionToVariable?: { [key: string]: string };
+  setMappingQuestionToVariable?: (mapping: { [key: string]: string }) => void;
 }) => {
   const [label, setLabel] = useState((node.data?.label as string) || '');
   const nodeType = (node.data?.nodeType as 'variable' | 'moderate_effect') || 'variable';
@@ -69,12 +75,53 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
     (node.data?.independentVariable as string) || ''
   );
 
-  // Filter available nodes (exclude current node)
-  const targetOptions = availableNodes.filter(n => n.id !== node.id);
+  // State for selected questions
+  const selectedQuestions = useMemo(() => {
+
+
+
+    // Find questions that are mapped to this node
+    const mappedQuestions = Object.entries(mappingQuestionToVariable || {})
+      .filter(([questionId, variableId]) => variableId == node.id)
+      .map(([questionId]) => {
+        const question = questions?.find(q => q.id == questionId);
+        return question ? {
+          value: question.id,
+          label: question.question || question.name || questionId
+        } : null;
+      })
+      .filter(Boolean) as { value: string; label: string; }[];
+
+    return mappedQuestions;
+  }, [questions, mappingQuestionToVariable, node.id]);
+
+
+  const handleQuestionChange = (selectedOptions: MultiValue<{ value: string; label: string; }>) => {
+    // Update question mapping if questions are provided
+    if (questions && mappingQuestionToVariable && setMappingQuestionToVariable) {
+      const newMapping = { ...mappingQuestionToVariable };
+
+      // Remove existing mappings for this variable
+      Object.keys(newMapping).forEach(questionId => {
+        if (newMapping[questionId] == node.id) {
+          delete newMapping[questionId];
+        }
+      });
+
+      // Add new mappings for selected questions
+      selectedOptions.forEach(question => {
+        newMapping[question.value] = node.id;
+      });
+
+      setMappingQuestionToVariable(newMapping);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (label.trim()) {
+
+
       const baseData: NodeData = {
         label: label.trim(),
         nodeType,
@@ -89,9 +136,12 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
     }
   };
 
+
+
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96 max-w-md">
+      <div className="bg-white rounded-lg p-6 w-200 max-w-md">
         <h3 className="text-lg font-bold mb-4">Edit Variable</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -186,6 +236,44 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes }: {
                   placeholder="1.00"
                 />
               </div>
+            </div>
+          )}
+
+          {/* Question Mapping - Only for Variable type and when questions are available */}
+          {nodeType === 'variable' && questions && questions.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Map Questions to Variable
+              </label>
+              <Select
+                isMulti
+                value={selectedQuestions}
+                onChange={(selectedOptions) => handleQuestionChange(selectedOptions || [])}
+                options={questions.map(q => ({
+                  value: q.id,
+                  label: q.question.substring(0, 30) + (q.question.length > 30 ? '...' : '') + (q.description ? ' (' + q.description + ')' : '')
+                }))}
+                placeholder="Select questions to map to this variable..."
+                className="text-sm"
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    minHeight: '38px',
+                    fontSize: '14px',
+                  }),
+                  multiValue: (provided) => ({
+                    ...provided,
+                    fontSize: '12px',
+                  }),
+                  option: (provided) => ({
+                    ...provided,
+                    fontSize: '14px',
+                  })
+                }}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Select which questions should be associated with this variable for data generation.
+              </p>
             </div>
           )}
 
@@ -632,7 +720,15 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
   );
 };
 
-export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, isReadOnly = false }: ModelAdvanceBuilderProps) => {
+export const ModelAdvanceBuilder = ({
+  model,
+  setModel,
+  useLocalStorage = false,
+  isReadOnly = false,
+  mappingQuestionToVariable,
+  setMappingQuestionToVariable,
+  questions
+}: ModelAdvanceBuilderProps) => {
 
   // Local storage functions
   const saveToLocalStorage = useCallback((dagModel: AdvanceModelType) => {
@@ -1188,6 +1284,9 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, 
           onSave={handleFormSave}
           onCancel={handleFormCancel}
           availableNodes={nodes}
+          questions={questions}
+          mappingQuestionToVariable={mappingQuestionToVariable}
+          setMappingQuestionToVariable={setMappingQuestionToVariable}
         />
       )}
 

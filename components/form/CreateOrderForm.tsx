@@ -23,6 +23,7 @@ interface CreateOrderFormProps {
   endTime?: string;
   disabledDays?: number[];
   orderType?: string;
+  modelMode?: string;
   onScheduleEnabledChange?: (value: boolean) => void;
   onStartTimeChange?: (value: string) => void;
   onEndTimeChange?: (value: string) => void;
@@ -79,6 +80,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   endTime = '20:00',
   disabledDays = [],
   orderType = ORDER_TYPE.AUTOFILL,
+  modelMode = 'basic',
   onScheduleEnabledChange = () => { },
   onStartTimeChange = () => { },
   onEndTimeChange = () => { },
@@ -152,6 +154,9 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
     if (orderType === ORDER_TYPE.DATA_MODEL) {
       currentPricePerUnit = currentPricePerUnit + MODEL_PRICE;
+      if (modelMode === 'advance') {
+        currentPricePerUnit = currentPricePerUnit + (MODEL_PRICE + 250);
+      }
     }
 
     setPricePerUnit(currentPricePerUnit);
