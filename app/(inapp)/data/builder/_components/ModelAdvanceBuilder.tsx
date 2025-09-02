@@ -18,6 +18,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { AdvanceModelType, EdgeDataType, NodeDataType } from '@/store/data.service.types';
+import { forwardRef, useImperativeHandle } from 'react';
 
 interface ModelAdvanceBuilderProps {
   model?: AdvanceModelType | null,
@@ -27,6 +28,10 @@ interface ModelAdvanceBuilderProps {
   mappingQuestionToVariable?: { [key: string]: string },
   setMappingQuestionToVariable?: (mapping: { [key: string]: string }) => void,
   questions?: any[],
+}
+
+export interface ModelAdvanceBuilderRef {
+  refresh: () => void;
 }
 
 interface NodeData extends Record<string, unknown> {
@@ -651,7 +656,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
   const styles = getNodeStyles(nodeType);
 
   //@ts-ignore
-  const mappedQuestions = Object.keys(mappingQuestionToVariable).filter((item: any) => mappingQuestionToVariable[item] == props?.id);
+  const mappedQuestions = Object.keys(mappingQuestionToVariable || {}).filter((item: any) => mappingQuestionToVariable[item] == props?.id);
 
   return (
     <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] ${selected ? 'border-green-500' : styles.border
@@ -731,7 +736,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
   );
 };
 
-export const ModelAdvanceBuilder = ({
+export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvanceBuilderProps>(({
   model,
   setModel,
   useLocalStorage = false,
@@ -739,7 +744,7 @@ export const ModelAdvanceBuilder = ({
   mappingQuestionToVariable,
   setMappingQuestionToVariable,
   questions
-}: ModelAdvanceBuilderProps) => {
+}, ref) => {
 
   // Local storage functions
   const saveToLocalStorage = useCallback((dagModel: AdvanceModelType) => {
@@ -811,6 +816,24 @@ export const ModelAdvanceBuilder = ({
   const [nodeLabel, setNodeLabel] = useState('');
   const [showModerateEffectForm, setShowModerateEffectForm] = useState(false);
   const [editingEdge, setEditingEdge] = useState<Edge | null>(null);
+
+  // Refresh function to reinitialize with new data
+  const refresh = useCallback(() => {
+    const newData = getInitialData();
+    setNodes(newData.nodes);
+    setEdges(newData.edges);
+    setSelectedNode(null);
+    setSelectedEdge(null);
+    setEditingNode(null);
+    setNodeLabel('');
+    setShowModerateEffectForm(false);
+    setEditingEdge(null);
+  }, [getInitialData, setNodes, setEdges]);
+
+  // Expose refresh function through ref
+  useImperativeHandle(ref, () => ({
+    refresh
+  }), [refresh]);
 
   // Create nodeTypes with access to current nodes
   const nodeTypes: NodeTypes = useMemo(() => ({
@@ -1323,4 +1346,4 @@ export const ModelAdvanceBuilder = ({
       )}
     </div>
   );
-};
+});

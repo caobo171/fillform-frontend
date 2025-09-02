@@ -525,7 +525,7 @@ export default function FormAIOrder() {
                                             <div className="space-y-5 flex flex-col">
                                                 <div className="relative flex-1">
                                                     <label htmlFor="spssGoal" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-600">
-                                                        Yêu cầu về dữ liệu & đánh giá
+                                                        Yêu cầu về mô hình SPSS
                                                     </label>
                                                     <textarea
                                                         id="spssGoal"
@@ -552,7 +552,7 @@ Xác định các yếu tố này tác động trực tiếp hay gián tiếp đ
                                         <div className="w-full lg:w-1/2 flex flex-col">
                                             <div className="bg-gray-50 p-3 flex-grow flex-1 rounded-md border border-gray-200">
                                                 <div className="flex items-center mb-4">
-                                                    <span className="font-medium text-xs">Yêu cầu về dữ liệu & đánh giá</span>
+                                                    <span className="font-medium text-xs">Yêu cầu về mô hình SPSS</span>
                                                 </div>
                                                 <div className="bg-white p-3 rounded border border-gray-200 overflow-y-auto text-xs">
                                                     <div className="text-gray-700">
