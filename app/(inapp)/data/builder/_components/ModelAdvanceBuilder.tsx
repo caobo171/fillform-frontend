@@ -261,22 +261,22 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
 }) => {
   const isEditing = !!editingNode;
   const selectedNode = selectedNodeId ? availableNodes.find(n => n.id === selectedNodeId) : null;
-  
+
   const [label, setLabel] = useState(() => {
     if (isEditing) return (editingNode.data?.label as string) || '';
     return `Moderate Effect on ${selectedNode?.data?.label || 'Variable'}`;
   });
-  
+
   const [moderateVariable, setModerateVariable] = useState(() => {
     if (isEditing) return (editingNode.data?.moderateVariable as string) || '';
     return '';
   });
-  
+
   const [independentVariable, setIndependentVariable] = useState(() => {
     if (isEditing) return (editingNode.data?.independentVariable as string) || '';
     return '';
   });
-  
+
   const [effectType, setEffectType] = useState<'positive' | 'negative'>(() => {
     if (isEditing) return (editingNode.data?.effectType as 'positive' | 'negative') || 'positive';
     return 'positive';
@@ -344,9 +344,9 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
               required
             >
               <option value="">Select moderate variable...</option>
-              {availableNodes.filter(n => 
-                n.data?.nodeType === 'variable' && 
-                n.id !== selectedNodeId && 
+              {availableNodes.filter(n =>
+                n.data?.nodeType === 'variable' &&
+                n.id !== selectedNodeId &&
                 n.id !== editingNode?.id
               ).map(node => (
                 <option key={node.id} value={node.id}>
@@ -368,10 +368,10 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
               required
             >
               <option value="">Select independent variable...</option>
-              {availableNodes.filter(n => 
-                n.data?.nodeType === 'variable' && 
-                n.id !== selectedNodeId && 
-                n.id !== moderateVariable && 
+              {availableNodes.filter(n =>
+                n.data?.nodeType === 'variable' &&
+                n.id !== selectedNodeId &&
+                n.id !== moderateVariable &&
                 n.id !== editingNode?.id
               ).map(node => (
                 <option key={node.id} value={node.id}>
@@ -531,9 +531,9 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
   const standardDeviation = data?.standardDeviation;
 
   // Get node labels for moderate effect display
-  const moderateVariableLabel = moderateVariable && nodes ? 
+  const moderateVariableLabel = moderateVariable && nodes ?
     nodes.find(n => n.id === moderateVariable)?.data?.label || moderateVariable : moderateVariable;
-  const independentVariableLabel = independentVariable && nodes ? 
+  const independentVariableLabel = independentVariable && nodes ?
     nodes.find(n => n.id === independentVariable)?.data?.label || independentVariable : independentVariable;
 
   // Define colors and styles based on node type
@@ -573,16 +573,27 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
 
         {/* Status and Count Display */}
         <div className="flex flex-col items-center gap-1">
-          <div className={`${styles.badge} text-white text-xs px-2 py-1 rounded-full font-bold`}>
-            {styles.label}
-          </div>
+          {
+            nodeType === 'variable' && (
+              <div className={`${styles.badge} text-white text-xs px-2 py-1 rounded-full font-bold`}>
+                Likert - {data.likertScale}
+              </div>
+            )
+          }
+          {
+            nodeType === 'moderate_effect' && (
+              <div className={`${styles.badge} text-white text-xs px-2 py-1 rounded-full font-bold`}>
+                {styles.label}
+              </div>
+            )
+          }
 
           {/* Show moderate effect details */}
           {nodeType === 'moderate_effect' && (moderateVariable || independentVariable) && (
             <div className="bg-purple-300 text-purple-900 text-xs px-2 py-1 rounded-full font-medium">
-              {moderateVariableLabel && independentVariableLabel ? `${moderateVariableLabel} × ${independentVariableLabel}` : 
-               moderateVariableLabel ? `Moderate: ${moderateVariableLabel}` : 
-               independentVariableLabel ? `Independent: ${independentVariableLabel}` : ''}
+              {moderateVariableLabel && independentVariableLabel ? `${moderateVariableLabel} × ${independentVariableLabel}` :
+                moderateVariableLabel ? `Moderate: ${moderateVariableLabel}` :
+                  independentVariableLabel ? `Independent: ${independentVariableLabel}` : ''}
             </div>
           )}
 
@@ -661,16 +672,16 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, 
       edges: sourceModel?.edges?.map(edge => {
         const effectType = (edge as any).data?.effectType || 'positive';
         const color = effectType === 'negative' ? '#ef4444' : '#10b981';
-        
+
         return {
           id: edge.id,
           source: edge.source,
           target: edge.target,
           animated: false,
           data: edge.data,
-          style: { 
-            stroke: color, 
-            strokeWidth: 2 
+          style: {
+            stroke: color,
+            strokeWidth: 2
           },
           markerEnd: {
             type: 'arrowclosed' as const,
@@ -841,39 +852,39 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, 
     // Check if we're editing an existing moderate effect node
     if (editingNode && editingNode.data?.nodeType === 'moderate_effect') {
       // Update existing moderate effect node
-      setNodes((nds) => 
-        nds.map((node) => 
-          node.id === editingNode.id 
-            ? { 
-                ...node, 
-                data: { 
-                  ...node.data, 
-                  label: data.label,
-                  moderateVariable: data.moderateVariable,
-                  independentVariable: data.independentVariable,
-                  effectType: data.effectType
-                } 
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === editingNode.id
+            ? {
+              ...node,
+              data: {
+                ...node.data,
+                label: data.label,
+                moderateVariable: data.moderateVariable,
+                independentVariable: data.independentVariable,
+                effectType: data.effectType
               }
+            }
             : node
         )
       );
 
       // Update the edge connected to this moderate effect node
-      setEdges((eds) => 
-        eds.map((edge) => 
-          edge.source === editingNode.id 
-            ? { 
-                ...edge, 
-                data: { ...edge.data, effectType: data.effectType },
-                style: { 
-                  stroke: data.effectType === 'positive' ? '#10b981' : '#ef4444', 
-                  strokeWidth: 2 
-                },
-                markerEnd: {
-                  type: 'arrowclosed' as const,
-                  color: data.effectType === 'positive' ? '#10b981' : '#ef4444',
-                }
+      setEdges((eds) =>
+        eds.map((edge) =>
+          edge.source === editingNode.id
+            ? {
+              ...edge,
+              data: { ...edge.data, effectType: data.effectType },
+              style: {
+                stroke: data.effectType === 'positive' ? '#10b981' : '#ef4444',
+                strokeWidth: 2
+              },
+              markerEnd: {
+                type: 'arrowclosed' as const,
+                color: data.effectType === 'positive' ? '#10b981' : '#ef4444',
               }
+            }
             : edge
         )
       );
@@ -915,9 +926,9 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, 
       target: selectedNode,
       animated: true,
       data: { effectType: data.effectType },
-      style: { 
-        stroke: data.effectType === 'positive' ? '#10b981' : '#ef4444', 
-        strokeWidth: 2 
+      style: {
+        stroke: data.effectType === 'positive' ? '#10b981' : '#ef4444',
+        strokeWidth: 2
       },
       markerEnd: {
         type: 'arrowclosed' as const,
@@ -962,7 +973,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, 
   // Handle edit node button click
   const handleEditNode = useCallback(() => {
     if (isReadOnly || !selectedNode) return;
-    
+
     const nodeToEdit = nodes.find(node => node.id === selectedNode);
     if (nodeToEdit) {
       if (nodeToEdit.data?.nodeType === 'moderate_effect') {
@@ -995,21 +1006,21 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, 
   const handleEdgeUpdate = useCallback((edgeData: { effectType: 'positive' | 'negative' }) => {
     if (!editingEdge) return;
 
-    setEdges((eds) => 
-      eds.map((edge) => 
-        edge.id === editingEdge.id 
-          ? { 
-              ...edge, 
-              data: { 
-                ...edge.data, 
-                effectType: edgeData.effectType 
-              },
-              style: {
-                ...edge.style,
-                stroke: edgeData.effectType === 'positive' ? '#10b981' : '#ef4444',
-                strokeWidth: 2
-              }
+    setEdges((eds) =>
+      eds.map((edge) =>
+        edge.id === editingEdge.id
+          ? {
+            ...edge,
+            data: {
+              ...edge.data,
+              effectType: edgeData.effectType
+            },
+            style: {
+              ...edge.style,
+              stroke: edgeData.effectType === 'positive' ? '#10b981' : '#ef4444',
+              strokeWidth: 2
             }
+          }
           : edge
       )
     );
@@ -1095,7 +1106,7 @@ export const ModelAdvanceBuilder = ({ model, setModel, useLocalStorage = false, 
             // Check if the selected edge is from a moderate effect node
             const sourceNode = nodes.find(node => node.id === selectedEdge.source);
             const isModerateEffectEdge = sourceNode?.data?.nodeType === 'moderate_effect';
-            
+
             return !isModerateEffectEdge ? (
               <div className="flex gap-2">
                 <button
