@@ -249,7 +249,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
                 isMulti
                 value={selectedQuestions}
                 onChange={(selectedOptions) => handleQuestionChange(selectedOptions || [])}
-                options={questions.map(q => ({
+                options={questions.filter(q => !mappingQuestionToVariable?.[q.id]).map(q => ({
                   value: q.id,
                   label: q.question.substring(0, 30) + (q.question.length > 30 ? '...' : '') + (q.description ? ' (' + q.description + ')' : '')
                 }))}
@@ -610,7 +610,7 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
 };
 
 // Custom Node Component
-const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: boolean; nodes?: Node[] }) => {
+const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, questions, ...props }: { data: NodeData; selected?: boolean; nodes?: Node[]; mappingQuestionToVariable?: any; questions?: any }) => {
   const nodeType = data?.nodeType || 'variable';
   const observableQuestions = data?.observableQuestions || 1;
   const moderateVariable = data?.moderateVariable;
@@ -650,6 +650,9 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
 
   const styles = getNodeStyles(nodeType);
 
+  //@ts-ignore
+  const mappedQuestions = Object.keys(mappingQuestionToVariable).filter((item: any) => mappingQuestionToVariable[item] == props?.id);
+
   return (
     <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] ${selected ? 'border-green-500' : styles.border
       } ${styles.bg}`}>
@@ -668,6 +671,7 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
               </div>
             )
           }
+
           {
             nodeType === 'moderate_effect' && (
               <div className={`${styles.badge} text-white text-xs px-2 py-1 rounded-full font-bold`}>
@@ -684,6 +688,13 @@ const CustomNode = ({ data, selected, nodes }: { data: NodeData; selected?: bool
                   independentVariableLabel ? `Independent: ${independentVariableLabel}` : ''}
             </div>
           )}
+          {
+            nodeType === 'variable' && mappedQuestions.length > 0 && (
+              <div className={`text-xs px-2 py-1 rounded-full font-medium ${styles.count}`}>
+                {mappedQuestions.length} mapped questions
+              </div>
+            )
+          }
 
           {/* Show observable count for variable type */}
           {nodeType === 'variable' && (
@@ -803,7 +814,7 @@ export const ModelAdvanceBuilder = ({
 
   // Create nodeTypes with access to current nodes
   const nodeTypes: NodeTypes = useMemo(() => ({
-    customNode: (props: any) => <CustomNode {...props} nodes={nodes} />
+    customNode: (props: any) => <CustomNode {...props} nodes={nodes} mappingQuestionToVariable={mappingQuestionToVariable} questions={questions} />
   }), [nodes]);
 
   // Handle node data update from form
@@ -1158,7 +1169,7 @@ export const ModelAdvanceBuilder = ({
                 type="text"
                 value={nodeLabel}
                 onChange={(e) => setNodeLabel(e.target.value)}
-                placeholder="Enter node label"
+                placeholder="Enter tên biến"
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onKeyPress={(e) => e.key === 'Enter' && addNode()}
               />
@@ -1240,7 +1251,7 @@ export const ModelAdvanceBuilder = ({
                 }}
                 className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
               >
-                Clear Graph
+                Clear model
               </button>
             )}
           </div>

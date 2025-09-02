@@ -19,8 +19,10 @@ import { Code } from '@/core/Constants'
 import DataModelLists from '../_sections/DataModelLists'
 import DataOrderLists from '../_sections/DataOrderLists'
 import { AdvanceModelType } from '@/store/data.service.types'
+import { useRouter } from 'next/navigation';
 
 export default function DataBuilder() {
+    const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [name, setName] = useState<string>('');
@@ -33,7 +35,7 @@ export default function DataBuilder() {
         try {
             const res = await Fetch.postWithAccessToken<{
                 code: number,
-                data_model: RawDataModel,
+                model: RawDataModel,
                 message: string,
             }>('/api/data.model/create', {
                 model: JSON.stringify(model),
@@ -42,6 +44,7 @@ export default function DataBuilder() {
 
             if (res.data.code == Code.SUCCESS) {
                 Toast.success('Generate data successfully');
+                router.push(`/data/builder/${res.data.model.id}`);
             } else {
                 return Toast.error(res.data.message || 'Generate data failed');
             }

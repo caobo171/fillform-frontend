@@ -20,6 +20,7 @@ import { useMe, useMyBankInfo } from '@/hooks/user';
 import { useMyDataModels, useUserDataModels } from '@/hooks/data.model';
 import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
 import ACL from '@/services/ACL';
+import Select from 'react-select';
 
 interface ChatError {
     id: string;
@@ -427,7 +428,7 @@ export default function BuildDataForm() {
                 setAdvanceModelData(model.data_model);
             }
         }
-    }, [modelsData, dataForm]);
+    }, [modelsData?.data?.data_models?.length, dataForm]);
 
     useEffect(() => {
         // Generate a unique ID for variables
@@ -666,30 +667,57 @@ export default function BuildDataForm() {
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 Chọn Model có sẵn
                                             </label>
-                                            <select
-                                                value={selectedAdvanceModel?.id || ''}
-                                                onChange={(e) => {
-                                                    const modelId = e.target.value;
-                                                    if (modelId) {
-                                                        const model = modelsData.data?.data_models.find(m => m.id === modelId);
+                                            <Select
+                                                value={selectedAdvanceModel ? {
+                                                    value: selectedAdvanceModel.id,
+                                                    label: `${selectedAdvanceModel.name} - ${(selectedAdvanceModel.data_model?.nodes || []).length} biến - ${new Date(selectedAdvanceModel.createdAt).toLocaleDateString('vi-VN')}`
+                                                } : null}
+                                                onChange={(selectedOption: { value: string; label: string } | null) => {
+                                                    if (selectedOption) {
+                                                        const model = modelsData.data?.data_models.find(m => m.id === selectedOption.value);
                                                         if (model) {
                                                             setSelectedAdvanceModel(model);
                                                             setAdvanceModelData(model.data_model);
                                                         }
                                                     } else {
+                                                        console.log('Selected option is null');
                                                         setSelectedAdvanceModel(null);
                                                         setAdvanceModelData(null);
                                                     }
                                                 }}
-                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                            >
-                                                <option value="">-- Chọn một model --</option>
-                                                {modelsData.data?.data_models?.map((dataModel: RawDataModel) => (
-                                                    <option key={dataModel.id} value={dataModel.id}>
-                                                        {dataModel.name} - {(dataModel.data_model?.nodes || []).length} biến - {new Date(dataModel.createdAt).toLocaleDateString('vi-VN')}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                options={modelsData.data?.data_models?.map((dataModel: RawDataModel) => ({
+                                                    value: dataModel.id,
+                                                    label: `${dataModel.name} - ${(dataModel.data_model?.nodes || []).length} biến - ${new Date(dataModel.createdAt).toLocaleDateString('vi-VN')}`
+                                                })) || []}
+                                                placeholder="-- Tìm kiếm và chọn model --"
+                                                isClearable
+                                                isSearchable
+                                                className="text-sm"
+                                                styles={{
+                                                    control: (provided: any) => ({
+                                                        ...provided,
+                                                        minHeight: '48px',
+                                                        fontSize: '14px',
+                                                        borderColor: '#d1d5db',
+                                                        '&:hover': {
+                                                            borderColor: '#9ca3af'
+                                                        },
+                                                        '&:focus-within': {
+                                                            borderColor: 'var(--primary)',
+                                                            boxShadow: '0 0 0 2px rgba(var(--primary-rgb), 0.2)'
+                                                        }
+                                                    }),
+                                                    option: (provided: any, state: any) => ({
+                                                        ...provided,
+                                                        fontSize: '14px',
+                                                        backgroundColor: state.isSelected ? 'var(--primary)' : state.isFocused ? '#f3f4f6' : 'white'
+                                                    }),
+                                                    singleValue: (provided: any) => ({
+                                                        ...provided,
+                                                        fontSize: '14px'
+                                                    })
+                                                }}
+                                            />
                                         </div>
 
                                         {/* Model Editor */}
