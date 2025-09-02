@@ -309,7 +309,7 @@ export const BasicModelBuilder = ({ dataForm, model, setModel }: ModelBuilderPro
                             </div>
                         ))}
 
-                        {/* Add Variable Button */}
+                        {/* Thêm biến Button */}
                         <div className="mt-3">
                             <button
                                 onClick={handleAddVariable}
