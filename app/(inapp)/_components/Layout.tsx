@@ -8,6 +8,7 @@ import { Header } from '@/components/layout/header/Header';
 import { SubscriptionBannerTop } from '@/components/subscription/BannerTop';
 import { MeHook } from '@/store/me/hooks';
 import { useMe } from '@/hooks/user';
+import ACL from '@/services/ACL';
 
 export default function NormalLayout({ children }: PropsWithChildren) {
   const router = useRouter();
@@ -24,7 +25,9 @@ export default function NormalLayout({ children }: PropsWithChildren) {
     { name: 'Về fillform', href: 'https://fillform.info' },
   ];
 
-  if (!me?.data || !me.data.is_super_admin) {
+
+  // If not super admin and not beta tester
+  if (!me?.data || (!me.data.is_super_admin && !ACL.isBetaTester(me.data))) {
     tabs = tabs.filter(e => e.id !== 'build_data');
   }
 

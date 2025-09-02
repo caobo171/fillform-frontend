@@ -94,7 +94,7 @@ export default function DataModelBuilder() {
                 result: {
                     finalData: any[]
                 }
-            }>('/api/data.model/order.run', {
+            }>('/api/data.order/create.run', {
                 model_id: dataModel?.data_model?.id,
                 num_request: numRequest,
             });

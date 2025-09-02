@@ -19,6 +19,7 @@ import { CreateOrderForm } from "@/components/form";
 import { useMe, useMyBankInfo } from '@/hooks/user';
 import { useMyDataModels, useUserDataModels } from '@/hooks/data.model';
 import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
+import ACL from '@/services/ACL';
 
 interface ChatError {
     id: string;
@@ -30,6 +31,7 @@ interface ChatError {
 export default function BuildDataForm() {
 
     const params = useParams();
+    const me = useMe();
     const { data: dataForm, isLoading: isLoadingForm, mutate: mutateForm } = useFormById(params.id as string);
     const { register, handleSubmit, watch, setValue } = useForm();
     const [isLoading, setIsLoading] = useState(false);
@@ -614,31 +616,33 @@ export default function BuildDataForm() {
 
                     <div className="container mx-auto mb-2">
                         {/* Model Mode Selector */}
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-4">
-                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn phương thức tạo Model</h3>
-                            <div className="flex space-x-4 mb-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setModelMode('basic')}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'basic'
-                                        ? 'bg-primary text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    🔧 Basic - Xây dựng Model cơ bản
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setModelMode('advance')}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'advance'
-                                        ? 'bg-primary text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    📋 Advance - Sử dụng Model có sẵn
-                                </button>
+                        {(ACL.isBetaTester(me.data) || ACL.isAdmin(me.data)) ? (
+                            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-4">
+                                <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn phương thức tạo Model</h3>
+                                <div className="flex space-x-4 mb-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setModelMode('basic')}
+                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'basic'
+                                            ? 'bg-primary text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        🔧 Basic - Xây dựng Model cơ bản
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setModelMode('advance')}
+                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'advance'
+                                            ? 'bg-primary text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        📋 Advance - Sử dụng Model có sẵn
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        ) : (<></>)}
 
                         {/* Conditional Rendering Based on Mode */}
                         {modelMode === 'basic' ? (

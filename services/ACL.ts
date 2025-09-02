@@ -13,6 +13,11 @@ class ACL {
   isSuperAdmin(user?: RawUser | null) {
     return user?.is_super_admin;
   }
+
+  isBetaTester(user?: RawUser | null) {
+    return user?.role === 'testuser';
+  }
 }
+
 
 export default new ACL();
