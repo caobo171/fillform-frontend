@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { MODEL_PRICE, MODEL_VARIABLE_PRICE, SERVICE_ADVANCE_MODEL_FEE, SERVICE_BASIC_MODEL_FEE } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -14,6 +15,9 @@ interface CreateDownloadOrderFormProps {
     className?: string;
     showTitle?: boolean;
     showBackButton?: boolean;
+    isSEM?: boolean;
+    numModerateVariables?: number;
+    numMediatorVariables?: number;
 }
 
 
@@ -24,6 +28,10 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
     modelId,
     modelName,
     onNumRequestChange,
+    isSEM,
+    numModerateVariables,
+    numMediatorVariables,
+
     className = '',
     showTitle = true,
     showBackButton = true,
@@ -32,19 +40,34 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
     const [pricePerUnit, setPricePerUnit] = useState<number>(0);
     const [total, setTotal] = useState<number>(0);
 
-    // Calculate price based on delay type
+    // Calculate price based on SEM and variables
     useEffect(() => {
-        let currentPricePerUnit = 700;
+        let currentPricePerUnit = MODEL_PRICE;
+        
+        // Add variable-based pricing
+        if (numModerateVariables || numMediatorVariables) {
+            const variableFeePerRequest = (numModerateVariables || 0) + (numMediatorVariables || 0);
+            currentPricePerUnit += variableFeePerRequest * MODEL_VARIABLE_PRICE;
+        }
+        
         setPricePerUnit(currentPricePerUnit);
-    }, []);
+    }, [numModerateVariables, numMediatorVariables]);
 
 
     // Calculate total cost
     useEffect(() => {
         let adjustedPricePerUnit = pricePerUnit;
-        const calculatedTotal = numRequest * adjustedPricePerUnit;
+        let calculatedTotal = numRequest * adjustedPricePerUnit;
+        
+        // Add service fee based on SEM status
+        if (isSEM) {
+            calculatedTotal += SERVICE_ADVANCE_MODEL_FEE;
+        } else {
+            calculatedTotal += SERVICE_BASIC_MODEL_FEE;
+        }
+        
         setTotal(calculatedTotal);
-    }, [numRequest, pricePerUnit]);
+    }, [numRequest, pricePerUnit, isSEM]);
 
 
 
@@ -75,7 +98,7 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
                     </div>
                 </div>
                 <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
-                    <label htmlFor="price" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi câu trả lời:</label>
+                    <label htmlFor="price" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi mẫu:</label>
                     <div className="w-full sm:w-1/2 p-2 rounded">
                         <p id="pricePerAnswer" className="sm:text-right font-bold">
                             {pricePerUnit.toLocaleString()} VND
@@ -83,7 +106,7 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
                     </div>
                 </div>
                 <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
-                    <label htmlFor="num_request" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Số lượng câu trả lời cần tăng:</label>
+                    <label htmlFor="num_request" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Số lượng mẫu:</label>
                     <div className="w-full sm:w-1/2">
                         <input
                             type="number"
@@ -104,6 +127,50 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
                 <div className="flex flex-col sm:flex-row items-center justify-between border-b border-blue-200 pb-4 mb-4">
                     <h3 className="text-lg sm:text-xl font-bold">TỔNG CỘNG:</h3>
                     <div className="text-2xl font-bold text-blue-700">{total.toLocaleString()} VND</div>
+                </div>
+
+                {/* Pricing Breakdown */}
+                <div className="bg-white rounded-lg p-4 mb-3 border border-blue-100">
+                    <h4 className="font-medium text-blue-800 mb-3">Chi tiết giá:</h4>
+                    <div className="space-y-2 text-sm">
+                        {/* Base price */}
+                        <div className="flex justify-between items-center">
+                            <span className="text-gray-700">Phí chạy mô hình trên từng mẫu:</span>
+                            <span className="font-medium text-purple-600">{MODEL_PRICE.toLocaleString()} VND</span>
+                        </div>
+                        
+                        {/* Variable-based fees per request */}
+                        {((numModerateVariables || 0) > 0 || (numMediatorVariables || 0) > 0) && (
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-700">
+                                    Phí biến số ({numModerateVariables || 0} điều tiết + {numMediatorVariables || 0} trung gian):
+                                </span>
+                                <span className="font-medium text-purple-600">
+                                    +{(((numModerateVariables || 0) + (numMediatorVariables || 0)) * MODEL_VARIABLE_PRICE).toLocaleString()} VND/yêu cầu
+                                </span>
+                            </div>
+                        )}
+                        
+                        {/* Total per unit */}
+                        <div className="border-t border-gray-200 pt-2 mt-2">
+                            <div className="flex justify-between items-center">
+                                <span className="font-medium text-gray-900">Tổng đơn giá/yêu cầu:</span>
+                                <span className="font-bold text-lg text-blue-600">{pricePerUnit.toLocaleString()} VND</span>
+                            </div>
+                        </div>
+
+                        {/* Service fee */}
+                        <div className="border-t border-gray-200 pt-2 mt-2">
+                            <div className="flex justify-between items-center">
+                                <span className="font-medium text-gray-700">
+                                    {isSEM ? 'Phí dịch vụ cố định (SEM):' : 'Phí dịch vụ cố định (Linear regression Model):'}
+                                </span>
+                                <span className="font-bold text-lg">
+                                    +{(isSEM ? SERVICE_ADVANCE_MODEL_FEE : SERVICE_BASIC_MODEL_FEE).toLocaleString()} VND
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {insufficientFunds && (

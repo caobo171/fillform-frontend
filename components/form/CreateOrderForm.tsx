@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { AI_PRICE, MODEL_PRICE, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE } from '@/core/Constants';
+import { AI_PRICE, MODEL_PRICE, MODEL_VARIABLE_PRICE, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE, SERVICE_ADVANCE_MODEL_FEE, SERVICE_BASIC_MODEL_FEE } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -24,6 +24,9 @@ interface CreateOrderFormProps {
   disabledDays?: number[];
   orderType?: string;
   modelMode?: string;
+  isSEM?: boolean;
+  numModerateVariables?: number;
+  numMediatorVariables?: number;
   onScheduleEnabledChange?: (value: boolean) => void;
   onStartTimeChange?: (value: string) => void;
   onEndTimeChange?: (value: string) => void;
@@ -81,6 +84,9 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   disabledDays = [],
   orderType = ORDER_TYPE.AUTOFILL,
   modelMode = 'basic',
+  isSEM = false,
+  numModerateVariables = 0,
+  numMediatorVariables = 0,
   onScheduleEnabledChange = () => { },
   onStartTimeChange = () => { },
   onEndTimeChange = () => { },
@@ -153,15 +159,15 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
     }
 
     if (orderType === ORDER_TYPE.DATA_MODEL) {
+      // Add variable-based pricing for Data Model
+      const variableFeePerRequest = (numModerateVariables + numMediatorVariables) * MODEL_VARIABLE_PRICE;
+      currentPricePerUnit = currentPricePerUnit + variableFeePerRequest;
       currentPricePerUnit = currentPricePerUnit + MODEL_PRICE;
-      if (modelMode === 'advance') {
-        currentPricePerUnit = currentPricePerUnit + (MODEL_PRICE + 250);
-      }
     }
 
     setPricePerUnit(currentPricePerUnit);
     setDelayInfo(delayMessage);
-  }, [delayType, localScheduleEnabled, orderType]);
+  }, [delayType, localScheduleEnabled, orderType, modelMode, numModerateVariables, numMediatorVariables]);
 
   // Sync local state with props
   useEffect(() => {
@@ -395,9 +401,19 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   // Calculate total cost
   useEffect(() => {
     let adjustedPricePerUnit = pricePerUnit + schedulePriceAdjustment;
-    const calculatedTotal = numRequest * adjustedPricePerUnit;
+    let calculatedTotal = numRequest * adjustedPricePerUnit;
+
+    // Add Data Model service fee (100,000 VND for whole order)
+    if (orderType === ORDER_TYPE.DATA_MODEL) {
+      if (isSEM) {
+        calculatedTotal += SERVICE_ADVANCE_MODEL_FEE;
+      } else {
+        calculatedTotal += SERVICE_BASIC_MODEL_FEE;
+      }
+    }
+
     setTotal(calculatedTotal);
-  }, [numRequest, pricePerUnit, schedulePriceAdjustment]);
+  }, [numRequest, pricePerUnit, schedulePriceAdjustment, orderType]);
 
 
 
@@ -770,7 +786,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
               <span className="text-gray-700">Giá cơ bản ({OPTIONS_DELAY[delayType].name}):</span>
               <span className="font-medium">{OPTIONS_DELAY[delayType].price.toLocaleString()} VND</span>
             </div>
-            
+
             {/* Agent addon */}
             {orderType === ORDER_TYPE.AGENT && (
               <div className="flex justify-between items-center">
@@ -778,25 +794,37 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                 <span className="font-medium text-blue-600">+{AI_PRICE.toLocaleString()} VND</span>
               </div>
             )}
-            
+
             {/* Data Model addon */}
             {orderType === ORDER_TYPE.DATA_MODEL && (
               <>
-      
-                {modelMode === 'advance' ? (
+                {/* Variable-based fees per request */}
+                {(numModerateVariables > 0 || numMediatorVariables > 0) && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Phụ phí Data Model (nâng cao):</span>
-                    <span className="font-medium text-purple-600">+{(MODEL_PRICE + 250).toLocaleString()} VND</span>
-                  </div>
-                ) : (
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Phụ phí Data Model (cơ bản):</span>
-                    <span className="font-medium text-purple-600">+{MODEL_PRICE.toLocaleString()} VND</span>
+                    <span className="text-gray-700">
+                      Phí biến số ({numModerateVariables} điều tiết + {numMediatorVariables} trung gian):
+                    </span>
+                    <span className="font-medium text-purple-600">
+                      +{((numModerateVariables + numMediatorVariables) * MODEL_VARIABLE_PRICE).toLocaleString()} VND/yêu cầu
+                    </span>
                   </div>
                 )}
+
+                {/* Advanced mode fee */}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">
+                    Phí chạy mô hình trên từng mẫu:
+                  </span>
+                  <span className="font-medium text-purple-600">
+                    +{(MODEL_PRICE).toLocaleString()} VND/yêu cầu
+                  </span>
+                </div>
+
+                {/* Service fee for whole order */}
+
               </>
             )}
-            
+
             {/* Schedule addon */}
             {schedulePriceAdjustment > 0 && (
               <div className="flex justify-between items-center">
@@ -806,7 +834,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                 <span className="font-medium text-green-600">+{schedulePriceAdjustment.toLocaleString()} VND</span>
               </div>
             )}
-            
+
             {/* Total per unit */}
             <div className="border-t border-gray-200 pt-2 mt-2">
               <div className="flex justify-between items-center">
@@ -814,6 +842,29 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                 <span className="font-bold text-lg text-blue-600">{(pricePerUnit + schedulePriceAdjustment).toLocaleString()} VND</span>
               </div>
             </div>
+
+            {orderType === ORDER_TYPE.DATA_MODEL && (
+
+              <>
+                {isSEM ? (
+
+                  <div className="border-t border-gray-200 pt-2 mt-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-gray-700">Phí dịch vụ cố định (SEM):</span>
+                      <span className="font-bold text-lg">+{SERVICE_ADVANCE_MODEL_FEE.toLocaleString()} VND</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-t border-gray-200 pt-2 mt-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-gray-700">Phí dịch vụ cố định (Linear regression Model):</span>
+                      <span className="font-bold text-lg">+{SERVICE_BASIC_MODEL_FEE.toLocaleString()} VND</span>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
           </div>
         </div>
 

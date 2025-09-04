@@ -69,6 +69,40 @@ export default function BuildDataForm() {
 
     const [selectedAdvanceModel, setSelectedAdvanceModel] = useState<RawDataModel | null>(null);
     const [advanceModelData, setAdvanceModelData] = useState<any>(null);
+
+    const currentModerateVariables = useMemo(() => {
+        if (!advanceModelData?.nodes) return [];
+        
+        // Filter nodes that have nodeType "moderate_effect"
+        return advanceModelData.nodes.filter((node: any) => 
+            node.data?.nodeType === "moderate_effect"
+        );
+    }, [advanceModelData]);
+
+    const currentMediatorVariables = useMemo(() => {
+        if (!advanceModelData?.nodes || !advanceModelData?.edges) return [];
+        
+        const nodes = advanceModelData.nodes;
+        const edges = advanceModelData.edges;
+        
+        // Find nodes that are mediators (have both incoming and outgoing edges)
+        // and are variable type (not moderate_effect)
+        return nodes.filter((node: any) => {
+            if (node.data?.nodeType !== "variable") return false;
+            
+            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
+            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
+            
+            return hasIncoming && hasOutgoing;
+        });
+    }, [advanceModelData]);
+
+
+    const isSEM = currentModerateVariables.length > 0 || currentMediatorVariables.length > 0;
+
+
+
+
     const [isCreatingNewModel, setIsCreatingNewModel] = useState<boolean>(false);
     const modelBuilderRef = useRef<ModelAdvanceBuilderRef>(null);
 
@@ -291,7 +325,7 @@ export default function BuildDataForm() {
         // Similar to the original but using React state
 
         // Example validation:
-        document.querySelectorAll("input[type='number']").forEach((input: Element) => {
+        document.querySelectorAll(".js-answer.input[type='number']").forEach((input: Element) => {
             if (input instanceof HTMLInputElement) {
                 const value = parseInt(input.value, 10);
                 const errorId = `error-${input.id}`;
@@ -520,7 +554,7 @@ export default function BuildDataForm() {
             }
 
             // Add event listeners for form validation
-            const numberInputs = document.querySelectorAll("input[type='number']");
+            const numberInputs = document.querySelectorAll(".js-answer.input[type='number']");
             const selects = document.querySelectorAll(".js-answer-select");
 
             const handleInputChange = () => {
@@ -901,13 +935,14 @@ export default function BuildDataForm() {
                                                                         {answer.data}
                                                                     </label>
                                                                     <input
+                                                                    
                                                                         type="number"
                                                                         min="0"
                                                                         step="any"
                                                                         id={`answer_${answer.id}`}
                                                                         {...register(`answer_${answer.id}`)}
                                                                         defaultValue={answer.count}
-                                                                        className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-xs/6"
+                                                                        className="js-answer block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 sm:text-xs/6"
                                                                     />
                                                                 </div>
                                                             )
@@ -988,6 +1023,9 @@ export default function BuildDataForm() {
                                         bankInfo={bankInfo}
                                         showBackButton={false}
                                         modelMode={modelMode}
+                                        isSEM={isSEM}
+                                        numModerateVariables={currentModerateVariables.length}
+                                        numMediatorVariables={currentMediatorVariables.length}
                                         specificStartDate={specificStartDate}
                                         specificEndDate={specificEndDate}
                                         specificDailySchedules={specificDailySchedules}

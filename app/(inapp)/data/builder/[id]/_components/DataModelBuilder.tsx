@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { XCircle } from 'lucide-react'
 import { z } from 'zod'
@@ -47,6 +47,41 @@ export default function DataModelBuilder() {
             setName(dataModel.data_model?.name || '');
         }
     }, [dataModel]);
+
+
+
+    const currentModerateVariables = useMemo(() => {
+        if (!model?.nodes) return [];
+
+        // Filter nodes that have nodeType "moderate_effect"
+        return model.nodes.filter((node: any) =>
+            node.data?.nodeType === "moderate_effect"
+        );
+    }, [model]);
+
+    const currentMediatorVariables = useMemo(() => {
+        if (!model?.nodes || !model?.edges) return [];
+
+        const nodes = model.nodes;
+        const edges = model.edges;
+
+        // Find nodes that are mediators (have both incoming and outgoing edges)
+        // and are variable type (not moderate_effect)
+        return nodes.filter((node: any) => {
+            if (node.data?.nodeType !== "variable") return false;
+
+            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
+            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
+
+            return hasIncoming && hasOutgoing;
+        });
+    }, [model]);
+
+
+    const isSEM = currentModerateVariables.length > 0 || currentMediatorVariables.length > 0;
+
+
+
 
     const onSubmitHandle = async () => {
         if (!model) return;
@@ -236,6 +271,9 @@ export default function DataModelBuilder() {
                                                 className="max-w-full"
                                                 showTitle={false}
                                                 showBackButton={false}
+                                                isSEM={isSEM}
+                                                numModerateVariables={currentModerateVariables.length}
+                                                numMediatorVariables={currentMediatorVariables.length}
                                             />
 
                                             <button
