@@ -431,11 +431,11 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
           <label htmlFor="price" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi câu trả lời:</label>
           <div className="w-full sm:w-1/2 p-2 rounded">
-            <p id="pricePerAnswer" className="sm:text-right font-bold">
-              {pricePerUnit.toLocaleString()} VND
-              {schedulePriceAdjustment > 0 && (
-                <span className="ml-1 text-sm text-green-600">(+{schedulePriceAdjustment} VND lịch trình)</span>
-              )}
+            <p id="pricePerAnswer" className="sm:text-right font-bold text-blue-600">
+              {(pricePerUnit + schedulePriceAdjustment).toLocaleString()} VND
+            </p>
+            <p className="sm:text-right text-xs text-gray-500 mt-1">
+              (Xem chi tiết bên dưới)
             </p>
           </div>
         </div>
@@ -761,14 +761,69 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
           </div>
         )}
 
+        {/* Pricing Breakdown */}
+        <div className="bg-white rounded-lg p-4 mb-3 border border-blue-100">
+          <h4 className="font-medium text-blue-800 mb-3">Chi tiết giá:</h4>
+          <div className="space-y-2 text-sm">
+            {/* Base price */}
+            <div className="flex justify-between items-center">
+              <span className="text-gray-700">Giá cơ bản ({OPTIONS_DELAY[delayType].name}):</span>
+              <span className="font-medium">{OPTIONS_DELAY[delayType].price.toLocaleString()} VND</span>
+            </div>
+            
+            {/* Agent addon */}
+            {orderType === ORDER_TYPE.AGENT && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Phụ phí Agent AI:</span>
+                <span className="font-medium text-blue-600">+{AI_PRICE.toLocaleString()} VND</span>
+              </div>
+            )}
+            
+            {/* Data Model addon */}
+            {orderType === ORDER_TYPE.DATA_MODEL && (
+              <>
+      
+                {modelMode === 'advance' ? (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">Phụ phí Data Model (nâng cao):</span>
+                    <span className="font-medium text-purple-600">+{(MODEL_PRICE + 250).toLocaleString()} VND</span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">Phụ phí Data Model (cơ bản):</span>
+                    <span className="font-medium text-purple-600">+{MODEL_PRICE.toLocaleString()} VND</span>
+                  </div>
+                )}
+              </>
+            )}
+            
+            {/* Schedule addon */}
+            {schedulePriceAdjustment > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">
+                  {delayType === OPTIONS_DELAY_ENUM.SPECIFIC_DELAY ? 'Lịch trình xác định:' : 'Phụ phí lịch trình:'}
+                </span>
+                <span className="font-medium text-green-600">+{schedulePriceAdjustment.toLocaleString()} VND</span>
+              </div>
+            )}
+            
+            {/* Total per unit */}
+            <div className="border-t border-gray-200 pt-2 mt-2">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-900">Tổng đơn giá/yêu cầu:</span>
+                <span className="font-bold text-lg text-blue-600">{(pricePerUnit + schedulePriceAdjustment).toLocaleString()} VND</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Specific Delay Schedule Summary */}
         {delayType === OPTIONS_DELAY_ENUM.SPECIFIC_DELAY && (
           <div className="bg-white rounded-lg p-3 mb-3 border border-green-100">
-            <h4 className="font-sm text-green-700 mb-2">Đặt giờ chạy xác định:</h4>
+            <h4 className="font-sm text-green-700 mb-2">Thông tin lịch trình:</h4>
             <ul className="text-sm text-gray-700 space-y-1">
               <li>• Thời gian chạy: <span className="font-sm">{new Date(localSpecificStartDate).toLocaleDateString('vi-VN')} đến {new Date(localSpecificEndDate).toLocaleDateString('vi-VN')}</span></li>
               <li>• Số ngày chạy: <span className="font-sm">{localSpecificDailySchedules.filter(s => s.enabled).length} ngày</span></li>
-              <li>• Phụ phí: <span className="font-sm text-green-600">+{schedulePriceAdjustment} VND/yêu cầu</span></li>
             </ul>
           </div>
         )}
