@@ -19,6 +19,8 @@ import {
 import '@xyflow/react/dist/style.css';
 import { AdvanceModelType, EdgeDataType, NodeDataType } from '@/store/data.service.types';
 import { forwardRef, useImperativeHandle } from 'react';
+import { PencilIcon, TrashIcon, BoltIcon } from '@heroicons/react/24/outline';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, EdgeProps } from '@xyflow/react';
 
 interface ModelAdvanceBuilderProps {
   model?: AdvanceModelType | null,
@@ -615,7 +617,18 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
 };
 
 // Custom Node Component
-const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, questions, ...props }: { data: NodeData; selected?: boolean; nodes?: Node[]; mappingQuestionToVariable?: any; questions?: any }) => {
+const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, questions, isReadOnly, onEditNode, onDeleteNode, onAddModerateEffect, id, ...props }: { 
+  data: NodeData; 
+  selected?: boolean; 
+  nodes?: Node[]; 
+  mappingQuestionToVariable?: any; 
+  questions?: any;
+  isReadOnly?: boolean;
+  onEditNode?: (nodeId: string) => void;
+  onDeleteNode?: (nodeId: string) => void;
+  onAddModerateEffect?: (nodeId: string) => void;
+  id: string;
+}) => {
   const nodeType = data?.nodeType || 'variable';
   const observableQuestions = data?.observableQuestions || 1;
   const moderateVariable = data?.moderateVariable;
@@ -656,11 +669,56 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
   const styles = getNodeStyles(nodeType);
 
   //@ts-ignore
-  const mappedQuestions = Object.keys(mappingQuestionToVariable || {}).filter((item: any) => mappingQuestionToVariable[item] == props?.id);
+  const mappedQuestions = Object.keys(mappingQuestionToVariable || {}).filter((item: any) => mappingQuestionToVariable[item] == id);
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEditNode?.(id);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDeleteNode?.(id);
+  };
+
+  const handleModerateEffectClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddModerateEffect?.(id);
+  };
 
   return (
-    <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] ${selected ? 'border-green-500' : styles.border
+    <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] relative group ${selected ? 'border-green-500' : styles.border
       } ${styles.bg}`}>
+      
+      {/* Action Buttons - Show on hover */}
+      {!isReadOnly && (
+        <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1 z-10">
+          <button
+            onClick={handleEditClick}
+            className="w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+            title="Edit Node"
+          >
+            <PencilIcon className="w-4 h-4" />
+          </button>
+          {nodeType === 'variable' && (
+            <button
+              onClick={handleModerateEffectClick}
+              className="w-7 h-7 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              title="Add Moderate Effect"
+            >
+              <BoltIcon className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            onClick={handleDeleteClick}
+            className="w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+            title="Delete Node"
+          >
+            <TrashIcon className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col items-center text-center">
         {/* Variable Name */}
         <div className={`text-sm font-bold mb-1 ${styles.text}`}>
@@ -733,6 +791,68 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
         className="!w-4 !h-4 !bg-green-500 !border-2 !border-white hover:!bg-green-600 !right-[-8px]"
       />
     </div>
+  );
+};
+
+// Custom Edge Component with action buttons
+const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, data, selected, onEditEdge, onDeleteEdge, isReadOnly }: EdgeProps & {
+  onEditEdge?: (edgeId: string) => void;
+  onDeleteEdge?: (edgeId: string) => void;
+  isReadOnly?: boolean;
+}) => {
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEditEdge?.(id);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDeleteEdge?.(id);
+  };
+
+  return (
+    <>
+      <BaseEdge path={edgePath} style={style} />
+      {!isReadOnly && (
+        <EdgeLabelRenderer>
+          <div
+            style={{
+              position: 'absolute',
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+              fontSize: 12,
+              pointerEvents: 'all',
+            }}
+            className={`nodrag nopan group ${selected ? 'opacity-100' : 'opacity-0 hover:opacity-100'} transition-opacity duration-200`}
+          >
+            <div className="flex gap-1 bg-white rounded-full shadow-lg border border-gray-200 p-1">
+              <button
+                onClick={handleEditClick}
+                className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                title="Edit Connection"
+              >
+                <PencilIcon className="w-3 h-3" />
+              </button>
+              <button
+                onClick={handleDeleteClick}
+                className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                title="Delete Connection"
+              >
+                <TrashIcon className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        </EdgeLabelRenderer>
+      )}
+    </>
   );
 };
 
@@ -832,13 +952,98 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
 
   // Expose refresh function through ref
   useImperativeHandle(ref, () => ({
-    refresh
-  }), [refresh]);
+    refresh,
+    getNodes: () => nodes,
+    getEdges: () => edges
+  }), [refresh, nodes, edges]);
 
-  // Create nodeTypes with access to current nodes
+  // Handle edit node button click
+  const handleEditNode = useCallback((nodeId?: string) => {
+    if (isReadOnly) return;
+    
+    const targetNodeId = nodeId || selectedNode;
+    if (!targetNodeId) return;
+
+    const nodeToEdit = nodes.find(node => node.id === targetNodeId);
+    if (nodeToEdit) {
+      setSelectedNode(targetNodeId); // Set as selected when editing
+      if (nodeToEdit.data?.nodeType === 'moderate_effect') {
+        // Use the unified moderate effect form for editing
+        setEditingNode(nodeToEdit);
+        setShowModerateEffectForm(true);
+      } else {
+        // Use the regular node edit form for variable nodes
+        setEditingNode(nodeToEdit);
+      }
+    }
+  }, [selectedNode, nodes, isReadOnly]);
+
+  // Delete selected node
+  const deleteNode = useCallback((nodeId?: string) => {
+    if (isReadOnly) return;
+    
+    const targetNodeId = nodeId || selectedNode;
+    if (!targetNodeId) return;
+
+    const confirmed = confirm('Are you sure you want to delete this node?');
+    if (!confirmed) return;
+
+    setNodes((nds) => nds.filter((node) => node.id !== targetNodeId));
+    setEdges((eds) => eds.filter((edge) =>
+      edge.source !== targetNodeId && edge.target !== targetNodeId
+    ));
+    
+    if (selectedNode === targetNodeId) {
+      setSelectedNode(null);
+    }
+  }, [selectedNode, setNodes, setEdges, isReadOnly]);
+
+  // Create nodeTypes with access to current nodes and handlers
   const nodeTypes: NodeTypes = useMemo(() => ({
-    customNode: (props: any) => <CustomNode {...props} nodes={nodes} mappingQuestionToVariable={mappingQuestionToVariable} questions={questions} />
-  }), [nodes]);
+    customNode: (props: any) => (
+      <CustomNode 
+        {...props} 
+        nodes={nodes} 
+        mappingQuestionToVariable={mappingQuestionToVariable} 
+        questions={questions}
+        isReadOnly={isReadOnly}
+        onEditNode={handleEditNode}
+        onDeleteNode={deleteNode}
+        onAddModerateEffect={() => setShowModerateEffectForm(true)}
+      />
+    )
+  }), [nodes, mappingQuestionToVariable, questions, isReadOnly, handleEditNode, deleteNode]);
+
+  // Create edgeTypes with action handlers
+  const edgeTypes = useMemo(() => ({
+    default: (props: any) => (
+      <CustomEdge
+        {...props}
+        onEditEdge={(edgeId: string) => {
+          const edge = edges.find(e => e.id === edgeId);
+          if (edge) {
+            setSelectedEdge(edge);
+            setEditingEdge(edge);
+          }
+        }}
+        onDeleteEdge={(edgeId: string) => {
+          const edge = edges.find(e => e.id === edgeId);
+          if (edge) {
+            const sourceNode = nodes.find(node => node.id === edge.source);
+            if (sourceNode?.data?.nodeType === 'moderate_effect') {
+              alert('Cannot delete connections from moderate effect nodes. These connections are automatically managed.');
+              return;
+            }
+            const confirmed = confirm('Are you sure you want to delete this connection?');
+            if (confirmed) {
+              setEdges((eds) => eds.filter((e) => e.id !== edgeId));
+            }
+          }
+        }}
+        isReadOnly={isReadOnly}
+      />
+    )
+  }), [edges, nodes, isReadOnly, setEdges]);
 
   // Handle node data update from form
   const handleNodeUpdate = useCallback((nodeId: string, data: NodeData) => {
@@ -1077,17 +1282,6 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
     setEditingNode(null);
   }, []);
 
-  // Delete selected node
-  const deleteNode = useCallback(() => {
-    if (isReadOnly || !selectedNode) return;
-
-    setNodes((nds) => nds.filter((node) => node.id !== selectedNode));
-    setEdges((eds) => eds.filter((edge) =>
-      edge.source !== selectedNode && edge.target !== selectedNode
-    ));
-    setSelectedNode(null);
-  }, [selectedNode, setNodes, setEdges, isReadOnly]);
-
   // Handle node selection only
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNode(node.id);
@@ -1099,23 +1293,6 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
     setSelectedEdge(edge);
     setSelectedNode(null); // Clear node selection when selecting edge
   }, []);
-
-  // Handle edit node button click
-  const handleEditNode = useCallback(() => {
-    if (isReadOnly || !selectedNode) return;
-
-    const nodeToEdit = nodes.find(node => node.id === selectedNode);
-    if (nodeToEdit) {
-      if (nodeToEdit.data?.nodeType === 'moderate_effect') {
-        // Use the unified moderate effect form for editing
-        setEditingNode(nodeToEdit);
-        setShowModerateEffectForm(true);
-      } else {
-        // Use the regular node edit form for variable nodes
-        setEditingNode(nodeToEdit);
-      }
-    }
-  }, [selectedNode, nodes, isReadOnly]);
 
   // Handle delete edge
   const deleteEdge = useCallback(() => {
@@ -1206,54 +1383,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
             </div>
           )}
 
-          {selectedNode && !isReadOnly && (
-            <div className="flex gap-2">
-              <button
-                onClick={handleEditNode}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              >
-                Edit Node
-              </button>
-              {/* Show Add Moderate Effect button only for variable nodes */}
-              {nodes.find(n => n.id === selectedNode)?.data?.nodeType === 'variable' && (
-                <button
-                  onClick={() => setShowModerateEffectForm(true)}
-                  className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
-                >
-                  Add Moderate Effect
-                </button>
-              )}
-              <button
-                onClick={deleteNode}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-              >
-                Delete Selected Node
-              </button>
-            </div>
-          )}
 
-          {selectedEdge && !isReadOnly && (() => {
-            // Check if the selected edge is from a moderate effect node
-            const sourceNode = nodes.find(node => node.id === selectedEdge.source);
-            const isModerateEffectEdge = sourceNode?.data?.nodeType === 'moderate_effect';
-
-            return !isModerateEffectEdge ? (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setEditingEdge(selectedEdge)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                  Edit Connection
-                </button>
-                <button
-                  onClick={deleteEdge}
-                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-                >
-                  Delete Selected Connection
-                </button>
-              </div>
-            ) : null;
-          })()}
 
           <div className="flex gap-4 items-center">
             <div className="text-sm text-gray-600">
@@ -1292,6 +1422,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
           onNodeClick={onNodeClick}
           onEdgeClick={onEdgeClick}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
           attributionPosition="top-right"
           panOnDrag={true}
