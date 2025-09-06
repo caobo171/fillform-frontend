@@ -52,8 +52,9 @@ interface NodeData extends Record<string, unknown> {
 }
 
 // Node Edit Form Component
-const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappingQuestionToVariable, setMappingQuestionToVariable }: {
+const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNewNode, mappingQuestionToVariable, setMappingQuestionToVariable }: {
   node: Node;
+  isNewNode: boolean;
   onSave: (data: NodeData) => void;
   onCancel: () => void;
   availableNodes: Node[];
@@ -61,6 +62,8 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
   mappingQuestionToVariable?: { [key: string]: string };
   setMappingQuestionToVariable?: (mapping: { [key: string]: string }) => void;
 }) => {
+
+  const [mappingQuestions, setMappingQuestions] = useState<MultiValue<{ value: string; label: string; }>>([]);
   const [label, setLabel] = useState((node.data?.label as string) || '');
   const nodeType = (node.data?.nodeType as 'variable' | 'moderate_effect') || 'variable';
   const [observableQuestions, setObservableQuestions] = useState(
@@ -82,10 +85,13 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
     (node.data?.independentVariable as string) || ''
   );
 
+  console.log('isNewNode', isNewNode);
   // State for selected questions
   const selectedQuestions = useMemo(() => {
 
-
+    if (isNewNode) {
+      return mappingQuestions;
+    }
 
     // Find questions that are mapped to this node
     const mappedQuestions = Object.entries(mappingQuestionToVariable || {})
@@ -100,11 +106,17 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
       .filter(Boolean) as { value: string; label: string; }[];
 
     return mappedQuestions;
-  }, [questions, mappingQuestionToVariable, node.id]);
+  }, [questions, mappingQuestionToVariable, node.id, isNewNode, mappingQuestions]);
 
 
   const handleQuestionChange = (selectedOptions: MultiValue<{ value: string; label: string; }>) => {
     // Update question mapping if questions are provided
+
+    if (isNewNode) {
+      setMappingQuestions(selectedOptions);
+      return;
+    }
+
     if (questions && mappingQuestionToVariable && setMappingQuestionToVariable) {
       const newMapping = { ...mappingQuestionToVariable };
 
@@ -143,7 +155,17 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
       if ((questions || []).length <= 0) {
         baseData.observableQuestions = observableQuestions;
       }
+
       onSave(baseData as NodeData);
+      if (isNewNode && mappingQuestionToVariable && setMappingQuestionToVariable) {
+        for (let index = 0; index < mappingQuestions.length; index++) {
+          mappingQuestionToVariable[mappingQuestions[index].value] = node.id;
+        }
+
+        setMappingQuestionToVariable(mappingQuestionToVariable);
+        setMappingQuestions([]);
+      }
+
     }
   };
 
@@ -982,6 +1004,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
   const [editingNode, setEditingNode] = useState<Node | null>(null);
+  const [isNewNode, setIsNewNode] = useState(false);
   const [nodeLabel, setNodeLabel] = useState('');
   const [showModerateEffectForm, setShowModerateEffectForm] = useState(false);
   const [editingEdge, setEditingEdge] = useState<Edge | null>(null);
@@ -1019,10 +1042,12 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       if (nodeToEdit.data?.nodeType === 'moderate_effect') {
         // Use the unified moderate effect form for editing
         setEditingNode(nodeToEdit);
+        setIsNewNode(false);
         setShowModerateEffectForm(true);
       } else {
         // Use the regular node edit form for variable nodes
         setEditingNode(nodeToEdit);
+        setIsNewNode(false);
       }
     }
   }, [selectedNode, nodes, isReadOnly]);
@@ -1097,6 +1122,23 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
   // Handle node data update from form
   const handleNodeUpdate = useCallback((nodeId: string, data: NodeData) => {
     setNodes((nds) => {
+      // Check if the node exists
+      const nodeExists = nds.some(node => node.id === nodeId);
+
+      if (!nodeExists) {
+        // If node doesn't exist, create a new one
+        return [...nds, {
+          id: nodeId,
+          type: 'customNode',
+          position: {
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+          },
+          data: data
+        }];
+      }
+
+      // If node exists, update it
       return nds.map((node) => {
         if (node.id === nodeId) {
           return {
@@ -1110,19 +1152,21 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
         return node;
       });
     });
-  }, [setNodes]);
+  }, [setNodes, nodes]);
 
   // Handle form save
   const handleNodeSave = useCallback((data: NodeData) => {
     if (editingNode) {
       handleNodeUpdate(editingNode.id, data);
       setEditingNode(null);
+      setIsNewNode(false);
     }
   }, [editingNode, handleNodeUpdate]);
 
   // Handle form cancel
   const handleFormCancel = useCallback(() => {
     setEditingNode(null);
+    setIsNewNode(false);
   }, []);
 
   // Initialize node data with default values
@@ -1205,31 +1249,6 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
     [setEdges, edges, hasCycle, isReadOnly],
   );
 
-  // Add new variable node
-  const addNode = useCallback(() => {
-    if (isReadOnly || !nodeLabel.trim()) return;
-
-    const newNode: Node = {
-      id: `node-${Date.now()}`,
-      type: 'customNode',
-      position: {
-        x: Math.random() * 400,
-        y: Math.random() * 400,
-      },
-      data: {
-        label: nodeLabel,
-        nodeType: 'variable' as const,
-        observableQuestions: 1,
-        likertScale: 5,
-        average: 0,
-        standardDeviation: 1
-      },
-    };
-
-    setNodes((nds) => [...nds, newNode]);
-    setNodeLabel('');
-  }, [nodeLabel, setNodes, isReadOnly]);
-
   // Handle moderate effect form save
   const handleModerateEffectSave = useCallback((data: { label: string; moderateVariable: string; independentVariable: string; effectType: 'positive' | 'negative' }) => {
     // Check if we're editing an existing moderate effect node
@@ -1273,6 +1292,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       );
 
       setEditingNode(null);
+      setIsNewNode(false);
       setShowModerateEffectForm(false);
       return;
     }
@@ -1415,12 +1435,14 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
             <div className="flex gap-2">
               <button
                 onClick={() => {
+                  setIsNewNode(true);
                   setEditingNode({
                     id: `node-${Date.now()}`,
-                    type: 'custom',
+                    type: 'customNode',
                     position: { x: 100, y: 100 },
                     data: { nodeType: 'variable', label: '', observableQuestions: 1, likertScale: 5 }
                   });
+
                 }}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
               >
@@ -1492,6 +1514,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       {!isReadOnly && editingNode && editingNode.data?.nodeType === 'variable' && (
         <NodeEditForm
           node={editingNode}
+          isNewNode={isNewNode}
           onSave={handleNodeSave}
           onCancel={handleFormCancel}
           availableNodes={nodes}
