@@ -113,16 +113,11 @@ export default function FormCreate() {
 
                             <Button 
                                 htmlType="submit" 
-                                className="w-full font-bold" 
+                                className="uppercase items-center mt-4 w-full block text-center py-3 px-4 bg-primary-600 text-white font-bold rounded-md hover:bg-primary-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2" 
                                 size="large" 
                                 loading={isSubmitting || loading}
                             >
-                                <div className="flex items-center justify-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Tạo ngay
-                                </div>
+                                <span>Tạo ngay</span>
                             </Button>
                         </form>
 
