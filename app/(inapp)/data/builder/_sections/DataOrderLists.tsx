@@ -165,7 +165,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                 <div className="sm:flex-auto">
                     <h1 className="text-2xl font-semibold text-gray-900">Orders</h1>
                     <p className="mt-2 text-sm text-gray-700">
-                        Danh sách tất cả các lượt chạy form của bạn
+                        Danh sách tất cả các lượt download dữ liệu
                     </p>
                 </div>
                 <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
