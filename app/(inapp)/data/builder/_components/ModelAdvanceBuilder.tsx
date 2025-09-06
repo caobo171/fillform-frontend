@@ -677,7 +677,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
           text: 'text-purple-800',
           badge: 'bg-purple-600',
           count: 'bg-purple-200 text-purple-800',
-          label: 'MODERATE EFFECT'
+          label: 'Hiệu ứng điều tiết'
         };
       default: // variable
         return {
@@ -686,7 +686,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
           text: 'text-blue-900',
           badge: 'bg-blue-600',
           count: 'bg-blue-100 text-blue-800',
-          label: 'VARIABLE'
+          label: 'Biến'
         };
     }
   };
@@ -1083,7 +1083,10 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
         isReadOnly={isReadOnly}
         onEditNode={handleEditNode}
         onDeleteNode={deleteNode}
-        onAddModerateEffect={() => setShowModerateEffectForm(true)}
+        onAddModerateEffect={(id: string) => {
+          setSelectedNode(id)
+          setShowModerateEffectForm(true)
+        }}
       />
     )
   }), [nodes, mappingQuestionToVariable, questions, isReadOnly, handleEditNode, deleteNode]);
@@ -1327,7 +1330,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       id: `edge-${newNodeId}-${selectedNode}`,
       source: newNodeId,
       target: selectedNode,
-      animated: true,
+      animated: false,
       data: { effectType: data.effectType },
       style: {
         stroke: data.effectType === 'positive' ? '#10b981' : '#ef4444',
