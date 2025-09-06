@@ -1413,18 +1413,16 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
         <div className="flex flex-wrap gap-4 items-center">
           {!isReadOnly && (
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={nodeLabel}
-                onChange={(e) => setNodeLabel(e.target.value)}
-                placeholder="Enter tên biến"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onKeyPress={(e) => e.key === 'Enter' && addNode()}
-              />
               <button
-                onClick={addNode}
-                disabled={!nodeLabel.trim()}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                onClick={() => {
+                  setEditingNode({
+                    id: `node-${Date.now()}`,
+                    type: 'custom',
+                    position: { x: 100, y: 100 },
+                    data: { nodeType: 'variable', label: '', observableQuestions: 1, likertScale: 5 }
+                  });
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
               >
                 Thêm biến
               </button>
