@@ -810,7 +810,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
 
 
           {/* Show observable count for variable type */}
-          {(nodeType === 'variable' && questions.length < 0) && (
+          {(nodeType === 'variable' && (questions || []).length < 0) && (
             <div className={`text-xs px-2 py-1 rounded-full font-medium ${styles.count}`}>
               {observableQuestions} biến quan sát
             </div>
