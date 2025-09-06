@@ -21,7 +21,7 @@ import { useMyDataModels, useUserDataModels } from '@/hooks/data.model';
 import { ModelAdvanceBuilder, ModelAdvanceBuilderRef } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
 import ACL from '@/services/ACL';
 import Select from 'react-select';
-import { AdvanceModelType, ModerateEffectNodeDataType } from '@/store/data.service.types';
+import { AdvanceModelType, ModerateEffectNodeDataType, VariableNodeDataType } from '@/store/data.service.types';
 
 interface ChatError {
     id: string;
@@ -156,6 +156,7 @@ export default function BuildDataForm() {
     const [numRequest, setNumRequest] = useState<number>(1);
 
     const [mappingQuestionToVariable, setMappingQuestionToVariable] = useState<{ [key: string]: string }>({});
+    
 
     const realMappingQuestionToVariable = useMemo(() => {
 
@@ -167,7 +168,22 @@ export default function BuildDataForm() {
         }
 
         return res;
-    }, [mappingQuestionToVariable, advanceModelData])
+    }, [mappingQuestionToVariable, advanceModelData]);
+
+
+    const missingMapVariables = useMemo(() => {
+        let res: VariableNodeDataType[] = [];
+        for (const [key, value] of Object.entries(advanceModelData?.nodes || [])) {
+            
+            if (value.data?.nodeType !== "variable") continue;
+
+            let mappingQuestions = Object.values(mappingQuestionToVariable).filter((item) => item == value.id);
+            if (mappingQuestions.length == 0) {
+                res.push(value.data as VariableNodeDataType);
+            }
+        }
+        return res;
+    }, [mappingQuestionToVariable, advanceModelData]);
 
     // Auto-refresh ModelAdvanceBuilder only when switching between model methods or selecting different models
     useEffect(() => {
@@ -513,7 +529,7 @@ export default function BuildDataForm() {
                 dataForm?.config?.isValidEditAnswer === "true" &&
                 dataForm?.config?.isValidLimitRes === "true" &&
                 dataForm?.config?.isValidPublished === "true") {
-                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy config tỉ lệ nhé.`, `00005`, "note");
+                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy thiết lập model ứng với câu hỏi trên form và điền tỉ lệ nhân khẩu học nhé.`, `00005`, "note");
             }
         }
     };
@@ -559,6 +575,15 @@ export default function BuildDataForm() {
                     }
                     return 0;
                 });
+
+                if (missingMapVariables.length > 0) {
+                    chatErrors.push({
+                        id: 'missing_map_variables',
+                        message: 'Có các biến ' + missingMapVariables.map(e => e.label).join(', ') + ' chưa được ánh xạ',
+                        type: 'error'
+                    });
+                }
+
                 setChatErrors(chatErrors);
             }
 
@@ -605,7 +630,7 @@ export default function BuildDataForm() {
                 });
             };
         }
-    }, [dataForm, reloadEvent]);
+    }, [dataForm, reloadEvent, missingMapVariables]);
 
 
 
@@ -633,19 +658,19 @@ export default function BuildDataForm() {
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p>Bạn có thể <b>tự xây dụng mô hình hồi quy tuyến tính</b>, sau đó với mỗi biến, bạn có thể chọn danh sách các câu hỏi thuộc biến trong mô hình</p>
+                                    <p>Bạn hãy <b>thêm biến/nhân tố điều tiết và tác động</b>giữa các biến để tạo mô hình hoàn chỉnh</p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p>Bạn điền <b>tỉ lệ mong muốn (đơn vị %) là số tự nhiên</b>, tương ứng với mỗi đáp án của câu hỏi với những câu hỏi còn lại không thuộc mô hình</p>
+                                    <p>Chú ý chỉnh sửa <b>Tên, Thang đo, Số biến quan sát Chiều tác động</b> sao cho đúng với mô hình của bạn</p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p>Hãy loại bỏ điều hướng session hoặc điền tỉ lệ để đạt hết gạn lọc nhé.</p>
+                                    <p>Hãy <b>loại bỏ điều hướng</b> session hoặc điền tỉ lệ để <b>đạt hết gạn lọc</b> nhé.</p>
                                 </div>
                                 <div className="flex items-start gap-2">
                                     <svg className="flex-shrink-0 h-5 w-5 text-primary-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

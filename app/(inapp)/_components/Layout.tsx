@@ -26,13 +26,6 @@ export default function NormalLayout({ children }: PropsWithChildren) {
   ];
 
 
-  // If not super admin and not beta tester
-  if (!me?.data || (!me.data.is_super_admin && !ACL.isBetaTester(me.data))) {
-    tabs = tabs.filter(e => e.id !== 'build_data');
-  }
-
-
-
   return (
     <div className="min-h-full js-main-layout overflow-x-hidden">
       <Header

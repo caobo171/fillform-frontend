@@ -174,7 +174,7 @@ export default function FormAIOrder() {
                 dataForm?.config?.isValidEditAnswer === "true" &&
                 dataForm?.config?.isValidLimitRes === "true" &&
                 dataForm?.config?.isValidPublished === "true") {
-                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy config tỉ lệ nhé.`, `00005`, "note");
+                addChatError(chatErrors, `Tuyệt! Google form này setting OK. Hãy điền prompt để điền form nhé.`, `00005`, "note");
             }
         }
     };
