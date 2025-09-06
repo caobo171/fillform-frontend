@@ -26,6 +26,7 @@ export default function DataBuilder() {
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [name, setName] = useState<string>('');
+    const [showModelBuilder, setShowModelBuilder] = useState<boolean>(false);
 
     const [model, setModel] = useState<AdvanceModelType | null>(null);
 
@@ -71,50 +72,65 @@ export default function DataBuilder() {
                             </p>
                         </div>
 
-                        {/* Form Section */}
-                        <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
-                            <div
-                                className="p-6 flex flex-col gap-6"
-                            >
-                                <ModelAdvanceBuilder model={model} setModel={setModel} useLocalStorage={true} />
+                        {/* Start Button or Form Section */}
 
-                                {/* Sample Size Input */}
-                                <FormItem label="Tên của model">
-                                    <Input
-                                        type="text"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        placeholder="Nhập Tên model để lưu"
-                                    />
-                                </FormItem>
+                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                            {!showModelBuilder ? (
+                                <div className="text-center">
+                                    <button
+                                        onClick={() => setShowModelBuilder(true)}
+                                        className="mt-4 w-full block text-center py-3 px-4 bg-primary-600 text-white font-bold rounded-md hover:bg-primary-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                    >
+                                        <h5>BẮT ĐẦU XÂY DỰNG MÔ HÌNH NCKH</h5>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="bg-white shadow-sm rounded-lg border border-gray-100 mb-6">
+                                    <div className="p-6 flex flex-col gap-6">
+                                        <ModelAdvanceBuilder model={model} setModel={setModel} useLocalStorage={true} />
 
-                                <Button
-                                    onClick={onSubmitHandle}
-                                    className="w-full font-bold"
-                                    size="large"
-                                    loading={loading}
-                                >
-                                    <div className="flex items-center justify-center">
-                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Tạo model mới
-                                    </div>
-                                </Button>
+                                        {/* Sample Size Input */}
+                                        <FormItem label="Tên của model">
+                                            <Input
+                                                type="text"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                placeholder="Nhập Tên model để lưu"
+                                            />
+                                        </FormItem>
 
-
-                                {/* Alert Message */}
-                                {errorMessage && (
-                                    <div className="px-6">
-                                        <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
-                                            <XCircle className="w-5 h-5 flex-shrink-0" />
-                                            <span>{errorMessage}</span>
+                                        <div className="flex gap-4">
+                                            <Button
+                                                onClick={() => setShowModelBuilder(false)}
+                                                className="font-bold border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                                            >
+                                                Hủy
+                                            </Button>
+                                            <Button
+                                                onClick={onSubmitHandle}
+                                                className="flex-1 font-bold"
+                                                size="large"
+                                                loading={loading}
+                                            >
+                                                <div className="flex items-center justify-center">
+                                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Tạo model mới
+                                                </div>
+                                            </Button>
                                         </div>
+
+                                        {/* Alert Message */}
+                                        {errorMessage && (
+                                            <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded text-center flex items-center gap-2 justify-center">
+                                                <XCircle className="w-5 h-5 flex-shrink-0" />
+                                                <span>{errorMessage}</span>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-
-
+                                </div>
+                            )}
                         </div>
 
 

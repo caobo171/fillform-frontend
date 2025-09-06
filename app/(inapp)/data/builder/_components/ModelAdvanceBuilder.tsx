@@ -129,17 +129,21 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
     if (label.trim()) {
 
 
-      const baseData: NodeData = {
+      const baseData: any = {
         label: label.trim(),
         nodeType,
-        observableQuestions: nodeType === 'variable' ? observableQuestions : 1,
+
         likertScale: nodeType === 'variable' ? likertScale : 5,
         average: nodeType === 'variable' ? parseFloat(average) : undefined,
         standardDeviation: nodeType === 'variable' ? parseFloat(standardDeviation) : undefined,
         moderateVariable: nodeType === 'moderate_effect' ? moderateVariable : undefined,
         independentVariable: nodeType === 'moderate_effect' ? independentVariable : undefined,
       };
-      onSave(baseData);
+
+      if ((questions || []).length <= 0) {
+        baseData.observableQuestions = observableQuestions;
+      }
+      onSave(baseData as NodeData);
     }
   };
 
@@ -148,14 +152,14 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-200 max-w-md">
-        <h3 className="text-lg font-bold mb-4">Edit Variable</h3>
+      <div className="bg-white rounded-lg p-6 w-360 max-w-xl">
+        <h3 className="text-lg font-bold mb-4">Chỉnh sửa biến</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Variable Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Variable Name
+              Tên biến (ví dụ biến là Độ hài lòng => thì tên là DHL)
             </label>
             <input
               type="text"
@@ -168,10 +172,10 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
           </div>
 
           {/* Observable Questions Count - Only for Variable type */}
-          {nodeType === 'variable' && (
+          {nodeType === 'variable' && (questions || []).length <= 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Observable Questions
+                Số lượng biến quan sát <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -190,31 +194,31 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
           {nodeType === 'variable' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Likert Scale Points
+                Thang đo likert
               </label>
               <select
                 value={likertScale}
                 onChange={(e) => setLikertScale(parseInt(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value={3}>3-point scale</option>
-                <option value={4}>4-point scale</option>
-                <option value={5}>5-point scale</option>
-                <option value={6}>6-point scale</option>
-                <option value={7}>7-point scale</option>
-                <option value={8}>8-point scale</option>
-                <option value={9}>9-point scale</option>
-                <option value={10}>10-point scale</option>
+                <option value={3}>Thang đo likert 3</option>
+                <option value={4}>Thang đo likert 4</option>
+                <option value={5}>Thang đo likert 5</option>
+                <option value={6}>Thang đo likert 6</option>
+                <option value={7}>Thang đo likert 7</option>
+                <option value={8}>Thang đo likert 8</option>
+                <option value={9}>Thang đo likert 9</option>
+                <option value={10}>Thang đo likert 10</option>
               </select>
             </div>
           )}
 
           {/* Average and Standard Deviation - Only for Variable type */}
           {nodeType === 'variable' && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid  gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Average (Mean)
+                  Giá trị trung bình (Average), nếu không có giá trị xác định thì để 0
                 </label>
                 <input
                   type="text"
@@ -229,7 +233,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Standard Deviation
+                  Độ lệch chuẩn (Standard Deviation), nếu không có giá trị xác định thì để 1
                 </label>
                 <input
                   type="text"
@@ -250,7 +254,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
           {nodeType === 'variable' && questions && questions.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Map Questions to Variable
+                Các câu hỏi quan sát của biến <span className="text-red-500">*</span>
               </label>
               <Select
                 isMulti
@@ -330,14 +334,14 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, mappi
               type="submit"
               className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Save Changes
+              Hoàn tất
             </button>
             <button
               type="button"
               onClick={onCancel}
               className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
-              Cancel
+              Quay lại
             </button>
           </div>
         </form>
@@ -391,16 +395,16 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96 max-w-md">
+      <div className="bg-white rounded-lg p-6 w-320 max-w-xl">
         <h3 className="text-lg font-bold mb-4">
-          {isEditing ? 'Edit Moderate Effect' : 'Create Moderate Effect'}
+          {isEditing ? 'Chỉnh sửa hiệu ứng điều tiết' : 'Tạo hiệu ứng điều tiết'}
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Moderate Effect Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Moderate Effect Name
+              Tên hiệu ứng điều tiết
             </label>
             <input
               type="text"
@@ -416,7 +420,7 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
           {!isEditing && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Target Variable (Selected)
+                Biến phục thuộc (Là biến bạn đang chọn)
               </label>
               <input
                 type="text"
@@ -430,7 +434,7 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
           {/* Moderate Variable Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Moderate Variable
+              Biến điều tiết
             </label>
             <select
               value={moderateVariable}
@@ -438,7 +442,7 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             >
-              <option value="">Select moderate variable...</option>
+              <option value="">Chọn biến điều tiết...</option>
               {availableNodes.filter(n =>
                 n.data?.nodeType === 'variable' &&
                 n.id !== selectedNodeId &&
@@ -454,7 +458,7 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
           {/* Independent Variable Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Independent Variable
+              Biến độc lập
             </label>
             <select
               value={independentVariable}
@@ -462,7 +466,7 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             >
-              <option value="">Select independent variable...</option>
+              <option value="">Chọn biến độc lập...</option>
               {availableNodes.filter(n =>
                 n.data?.nodeType === 'variable' &&
                 n.id !== selectedNodeId &&
@@ -479,7 +483,7 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
           {/* Effect Type Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Moderate Effect Type
+              Chiều hiệu ứng điều tiết
             </label>
             <div className="space-y-2">
               <label className="flex items-center">
@@ -490,8 +494,8 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
                   onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
                   className="mr-2"
                 />
-                <span className="text-green-600 font-medium">Positive Moderation</span>
-                <span className="text-sm text-gray-500 ml-2">(strengthens the effect)</span>
+                <span className="text-green-600 font-medium">Ảnh hưởng dương</span>
+                <span className="text-sm text-gray-500 ml-2">(tăng cường hiệu ứng)</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -501,8 +505,8 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
                   onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
                   className="mr-2"
                 />
-                <span className="text-red-600 font-medium">Negative Moderation</span>
-                <span className="text-sm text-gray-500 ml-2">(weakens the effect)</span>
+                <span className="text-red-600 font-medium">Ảnh hưởng âm</span>
+                <span className="text-sm text-gray-500 ml-2">(giảm nhẹ hiệu ứng)</span>
               </label>
             </div>
           </div>
@@ -514,14 +518,14 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
               disabled={!label.trim() || !moderateVariable || !independentVariable}
               className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {isEditing ? 'Update Moderate Effect' : 'Create Moderate Effect'}
+              Hoàn thành
             </button>
             <button
               type="button"
               onClick={onCancel}
               className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
-              Cancel
+              Hủy
             </button>
           </div>
         </form>
@@ -552,12 +556,12 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-96 max-w-md">
-        <h3 className="text-lg font-bold mb-4">Edit Connection</h3>
+        <h3 className="text-lg font-bold mb-4">Chỉnh sửa mối quan hệ</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Connection Info */}
           <div className="bg-gray-50 p-3 rounded-md">
-            <div className="text-sm text-gray-600 mb-1">Connection:</div>
+            <div className="text-sm text-gray-600 mb-1">Mối quan hệ:</div>
             <div className="font-medium">
               {(sourceNode?.data?.label as string) || edge.source} → {(targetNode?.data?.label as string) || edge.target}
             </div>
@@ -566,7 +570,7 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
           {/* Effect Type Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Effect Type
+              Chiều của mối quan hệ
             </label>
             <div className="space-y-2">
               <label className="flex items-center">
@@ -577,8 +581,8 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
                   onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
                   className="mr-2"
                 />
-                <span className="text-green-600 font-medium">Positive Effect</span>
-                <span className="text-sm text-gray-500 ml-2">(increases target)</span>
+                <span className="text-green-600 font-medium">Ảnh hưởng dương</span>
+
               </label>
               <label className="flex items-center">
                 <input
@@ -588,8 +592,7 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
                   onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
                   className="mr-2"
                 />
-                <span className="text-red-600 font-medium">Negative Effect</span>
-                <span className="text-sm text-gray-500 ml-2">(decreases target)</span>
+                <span className="text-red-600 font-medium">Ảnh hưởng âm</span>
               </label>
             </div>
           </div>
@@ -617,11 +620,11 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
 };
 
 // Custom Node Component
-const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, questions, isReadOnly, onEditNode, onDeleteNode, onAddModerateEffect, id, ...props }: { 
-  data: NodeData; 
-  selected?: boolean; 
-  nodes?: Node[]; 
-  mappingQuestionToVariable?: any; 
+const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, questions, isReadOnly, onEditNode, onDeleteNode, onAddModerateEffect, id, ...props }: {
+  data: NodeData;
+  selected?: boolean;
+  nodes?: Node[];
+  mappingQuestionToVariable?: any;
   questions?: any;
   isReadOnly?: boolean;
   onEditNode?: (nodeId: string) => void;
@@ -687,35 +690,58 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
   };
 
   return (
-    <div className={`px-4 py-3 shadow-md rounded-md border-2 min-w-[140px] relative group ${selected ? 'border-green-500' : styles.border
+    <div className={`px-4 py-3 rounded-md border-2 min-w-[140px] relative group transition-all duration-200 ${selected ? 'border-primary-500 shadow-lg shadow-primary-200 scale-105' : styles.border
       } ${styles.bg}`}>
-      
+
       {/* Action Buttons - Show on hover */}
       {!isReadOnly && (
         <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1 z-10">
-          <button
-            onClick={handleEditClick}
-            className="w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-            title="Edit Node"
-          >
-            <PencilIcon className="w-4 h-4" />
-          </button>
-          {nodeType === 'variable' && (
+          <div className="relative group/edit">
             <button
-              onClick={handleModerateEffectClick}
-              className="w-7 h-7 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-              title="Add Moderate Effect"
+              onClick={handleEditClick}
+              className="w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
             >
-              <BoltIcon className="w-4 h-4" />
+              <PencilIcon className="w-4 h-4" />
             </button>
+            <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+              <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                {nodeType === 'variable' ? "Chỉnh sửa biến" : "Chỉnh sửa hiệu ứng điều tiết"}
+                <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </div>
+          </div>
+
+          {nodeType === 'variable' && (
+            <div className="relative group/moderate">
+              <button
+                onClick={handleModerateEffectClick}
+                className="w-7 h-7 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              >
+                <BoltIcon className="w-4 h-4" />
+              </button>
+              <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/moderate:opacity-100 transition-opacity duration-200 pointer-events-none">
+                <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                  Thêm hiệu ứng điều tiết
+                  <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </div>
+            </div>
           )}
-          <button
-            onClick={handleDeleteClick}
-            className="w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-            title="Delete Node"
-          >
-            <TrashIcon className="w-4 h-4" />
-          </button>
+
+          <div className="relative group/delete">
+            <button
+              onClick={handleDeleteClick}
+              className="w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+            >
+              <TrashIcon className="w-4 h-4" />
+            </button>
+            <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/delete:opacity-100 transition-opacity duration-200 pointer-events-none">
+              <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                {nodeType === 'variable' ? "Xoá biến" : "Xoá hiệu ứng điều tiết"}
+                <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -747,22 +773,24 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
           {nodeType === 'moderate_effect' && (moderateVariable || independentVariable) && (
             <div className="bg-purple-300 text-purple-900 text-xs px-2 py-1 rounded-full font-medium">
               {moderateVariableLabel && independentVariableLabel ? `${moderateVariableLabel} × ${independentVariableLabel}` :
-                moderateVariableLabel ? `Moderate: ${moderateVariableLabel}` :
-                  independentVariableLabel ? `Independent: ${independentVariableLabel}` : ''}
+                moderateVariableLabel ? `Biến điều tiết: ${moderateVariableLabel}` :
+                  independentVariableLabel ? `Biến độc lập: ${independentVariableLabel}` : ''}
             </div>
           )}
           {
             nodeType === 'variable' && mappedQuestions.length > 0 && (
               <div className={`text-xs px-2 py-1 rounded-full font-medium ${styles.count}`}>
-                {mappedQuestions.length} mapped questions
+                {mappedQuestions.length} câu hỏi quan sát
               </div>
             )
           }
 
+
+
           {/* Show observable count for variable type */}
-          {nodeType === 'variable' && (
+          {(nodeType === 'variable' && questions.length < 0) && (
             <div className={`text-xs px-2 py-1 rounded-full font-medium ${styles.count}`}>
-              {observableQuestions} Observable{observableQuestions !== 1 ? 's' : ''}
+              {observableQuestions} biến quan sát
             </div>
           )}
 
@@ -834,21 +862,42 @@ const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, ta
             className={`nodrag nopan group ${selected ? 'opacity-100' : 'opacity-0 hover:opacity-100'} transition-opacity duration-200`}
           >
             <div className="flex gap-1 bg-white rounded-full shadow-lg border border-gray-200 p-1">
-              <button
-                onClick={handleEditClick}
-                className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
-                title="Edit Connection"
-              >
-                <PencilIcon className="w-3 h-3" />
-              </button>
-              <button
-                onClick={handleDeleteClick}
-                className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
-                title="Delete Connection"
-              >
-                <TrashIcon className="w-3 h-3" />
-              </button>
+              <div className="relative group/edit">
+                <button
+                  onClick={handleEditClick}
+                  className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                  title="Chỉnh sửa mối quan hệ"
+                >
+                  <PencilIcon className="w-3 h-3" />
+                </button>
+                <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    Chỉnh sửa mối quan hệ
+                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative group/edit">
+                <button
+                  onClick={handleDeleteClick}
+                  className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                  title="Xoá mối quan hệ"
+                >
+
+                  <TrashIcon className="w-3 h-3" />
+
+
+                </button>
+                <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    Xoá mối quan hệ
+                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
+              </div>
             </div>
+
           </div>
         </EdgeLabelRenderer>
       )}
@@ -960,7 +1009,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
   // Handle edit node button click
   const handleEditNode = useCallback((nodeId?: string) => {
     if (isReadOnly) return;
-    
+
     const targetNodeId = nodeId || selectedNode;
     if (!targetNodeId) return;
 
@@ -981,7 +1030,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
   // Delete selected node
   const deleteNode = useCallback((nodeId?: string) => {
     if (isReadOnly) return;
-    
+
     const targetNodeId = nodeId || selectedNode;
     if (!targetNodeId) return;
 
@@ -992,7 +1041,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
     setEdges((eds) => eds.filter((edge) =>
       edge.source !== targetNodeId && edge.target !== targetNodeId
     ));
-    
+
     if (selectedNode === targetNodeId) {
       setSelectedNode(null);
     }
@@ -1001,10 +1050,10 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
   // Create nodeTypes with access to current nodes and handlers
   const nodeTypes: NodeTypes = useMemo(() => ({
     customNode: (props: any) => (
-      <CustomNode 
-        {...props} 
-        nodes={nodes} 
-        mappingQuestionToVariable={mappingQuestionToVariable} 
+      <CustomNode
+        {...props}
+        nodes={nodes}
+        mappingQuestionToVariable={mappingQuestionToVariable}
         questions={questions}
         isReadOnly={isReadOnly}
         onEditNode={handleEditNode}
@@ -1064,7 +1113,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
   }, [setNodes]);
 
   // Handle form save
-  const handleFormSave = useCallback((data: NodeData) => {
+  const handleNodeSave = useCallback((data: NodeData) => {
     if (editingNode) {
       handleNodeUpdate(editingNode.id, data);
       setEditingNode(null);
@@ -1144,7 +1193,6 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       const newEdge: Edge = {
         ...params,
         id: `edge-${params.source}-${params.target}`,
-        animated: true,
         data: { effectType: 'positive' },
         style: { stroke: '#10b981', strokeWidth: 2 },
         markerEnd: {
@@ -1387,9 +1435,9 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
 
           <div className="flex gap-4 items-center">
             <div className="text-sm text-gray-600">
-              Nodes: {nodes.length} | Edges: {edges.length}
-              {selectedNode && ` | Selected Node: ${selectedNode}`}
-              {selectedEdge && ` | Selected Edge: ${selectedEdge.id}`}
+              Số biến: {nodes.length} | Số mối quan hệ: {edges.length}
+              {selectedNode && ` | Bạn đang chọn biến: ${nodes.find(n => n.id === selectedNode)?.data?.label || selectedNode}`}
+              {selectedEdge && ` | Bạn đang chọn mối quan hệ: ${selectedEdge.id}`}
             </div>
 
             {!isReadOnly && (
@@ -1446,7 +1494,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       {!isReadOnly && editingNode && editingNode.data?.nodeType === 'variable' && (
         <NodeEditForm
           node={editingNode}
-          onSave={handleFormSave}
+          onSave={handleNodeSave}
           onCancel={handleFormCancel}
           availableNodes={nodes}
           questions={questions}
