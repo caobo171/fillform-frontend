@@ -189,10 +189,13 @@ export const ORDER_TYPE = {
 export const REFER_PERCENT = 15;
 export const MIN_DRAW_CREDIT = 100000;
 export const AI_PRICE = 1150;
+
 export const MODEL_PRICE = 250;
-export const SERVICE_BASIC_MODEL_FEE = 100000;
-export const SERVICE_ADVANCE_MODEL_FEE = 200000;
-export const MODEL_VARIABLE_PRICE = 50;
+export const MODERATE_VARIABLE_PRICE = 50000;
+export const MEDIATOR_VARIABLE_PRICE = 50000;
+export const DEPENDENT_VARIABLE_PRICE = 10000;
+export const INDEPENDENT_VARIABLE_PRICE = 20000;
+
 export const PULSES_TOKEN = 'My5wdWxzZXN1cnZleXM';
 
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { XCircle } from 'lucide-react'
 import { z } from 'zod'
 
@@ -18,7 +17,7 @@ import { Code } from '@/core/Constants'
 import { ModelAdvanceBuilder } from '../../_components/ModelAdvanceBuilder'
 import { useDataModelById } from '@/hooks/data.model'
 import { useParams, useRouter } from 'next/navigation';
-import { AdvanceModelType } from '@/store/data.service.types'
+import { AdvanceModelType, ModerateEffectNodeDataType } from '@/store/data.service.types'
 import CreateDownloadOrderForm from '@/components/form/CreateDownloadOrderForm'
 import { useMe, useMyBankInfo } from '@/hooks/user'
 
@@ -53,12 +52,24 @@ export default function DataModelBuilder() {
     const currentModerateVariables = useMemo(() => {
         if (!model?.nodes) return [];
 
+
         // Filter nodes that have nodeType "moderate_effect"
-        return model.nodes.filter((node: any) =>
+        let moderateEffects = model.nodes.filter((node) =>
             node.data?.nodeType === "moderate_effect"
         );
+
+        const nodes = model.nodes;
+
+        let moderateVariables = nodes.filter((node) => {
+            if (node.data?.nodeType !== "variable") return false;
+
+            return moderateEffects.find((moderateEffect) => (moderateEffect.data as ModerateEffectNodeDataType).moderateVariable === node.id);
+        });
+
+        return moderateVariables;
     }, [model]);
 
+    
     const currentMediatorVariables = useMemo(() => {
         if (!model?.nodes || !model?.edges) return [];
 
@@ -73,13 +84,53 @@ export default function DataModelBuilder() {
             const hasIncoming = edges.some((edge: any) => edge.target === node.id);
             const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
 
-            return hasIncoming && hasOutgoing;
+            return hasIncoming && hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
         });
-    }, [model]);
+    }, [model, currentModerateVariables]);
 
 
-    const isSEM = currentModerateVariables.length > 0 || currentMediatorVariables.length > 0;
+    const currentIndependentVariables = useMemo(() => {
+        if (!model?.nodes || !model?.edges) return [];
 
+        const nodes = model.nodes;
+        const edges = model.edges;
+
+        // Find nodes that are independent variables:
+        // - Have nodeType "variable" (not moderate_effect)
+        // - Have outgoing edges (they influence other variables)
+        // - Have no incoming edges (they are not influenced by other variables)
+        return nodes.filter((node: any) => {
+            if (node.data?.nodeType !== "variable") return false;
+
+            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
+            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
+
+            // Independent variables have outgoing edges but no incoming edges
+            return hasOutgoing && !hasIncoming && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
+        });
+    }, [model, currentModerateVariables]);
+
+
+    const currentDependentVariables = useMemo(() => {
+        if (!model?.nodes || !model?.edges) return [];
+
+        const nodes = model.nodes;
+        const edges = model.edges;
+
+        // Find nodes that are dependent variables:
+        // - Have nodeType "variable" (not moderate_effect)
+        // - Have incoming edges (they are influenced by other variables)
+        // - Have NO outgoing edges (they are final outcome variables)
+        return nodes.filter((node: any) => {
+            if (node.data?.nodeType !== "variable") return false;
+
+            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
+            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
+
+            // Dependent variables have incoming edges but no outgoing edges
+            return hasIncoming && !hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
+        });
+    }, [model, currentModerateVariables]);
 
 
 
@@ -271,9 +322,11 @@ export default function DataModelBuilder() {
                                                 className="max-w-full"
                                                 showTitle={false}
                                                 showBackButton={false}
-                                                isSEM={isSEM}
+
                                                 numModerateVariables={currentModerateVariables.length}
                                                 numMediatorVariables={currentMediatorVariables.length}
+                                                numDependentVariables={currentDependentVariables.length}
+                                                numIndependentVariables={currentIndependentVariables.length}
                                             />
 
                                             <button

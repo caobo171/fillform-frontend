@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { MODEL_PRICE, MODEL_VARIABLE_PRICE, SERVICE_ADVANCE_MODEL_FEE, SERVICE_BASIC_MODEL_FEE } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { useMe } from '@/hooks/user';
+import { MODERATE_VARIABLE_PRICE, MEDIATOR_VARIABLE_PRICE, DEPENDENT_VARIABLE_PRICE, INDEPENDENT_VARIABLE_PRICE } from '@/core/Constants';
 
 interface CreateDownloadOrderFormProps {
     userCredit: number;
@@ -15,9 +15,10 @@ interface CreateDownloadOrderFormProps {
     className?: string;
     showTitle?: boolean;
     showBackButton?: boolean;
-    isSEM?: boolean;
     numModerateVariables?: number;
     numMediatorVariables?: number;
+    numIndependentVariables?: number;
+    numDependentVariables?: number;
 }
 
 
@@ -28,46 +29,32 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
     modelId,
     modelName,
     onNumRequestChange,
-    isSEM,
     numModerateVariables,
     numMediatorVariables,
+    numIndependentVariables,
+    numDependentVariables,
 
     className = '',
     showTitle = true,
     showBackButton = true,
 }) => {
     const user = useMe();
-    const [pricePerUnit, setPricePerUnit] = useState<number>(0);
     const [total, setTotal] = useState<number>(0);
 
-    // Calculate price based on SEM and variables
+    // Calculate price based on variable types and counts
     useEffect(() => {
-        let currentPricePerUnit = MODEL_PRICE;
-        
-        // Add variable-based pricing
-        if (numModerateVariables || numMediatorVariables) {
-            const variableFeePerRequest = (numModerateVariables || 0) + (numMediatorVariables || 0);
-            currentPricePerUnit += variableFeePerRequest * MODEL_VARIABLE_PRICE;
-        }
-        
-        setPricePerUnit(currentPricePerUnit);
-    }, [numModerateVariables, numMediatorVariables]);
+        let totalPrice = 0;
+
+        // Calculate price based on each variable type
+        totalPrice += (numModerateVariables || 0) * MODERATE_VARIABLE_PRICE;
+        totalPrice += (numMediatorVariables || 0) * MEDIATOR_VARIABLE_PRICE;
+        totalPrice += (numIndependentVariables || 0) * INDEPENDENT_VARIABLE_PRICE;
+        totalPrice += (numDependentVariables || 0) * DEPENDENT_VARIABLE_PRICE;
+
+        setTotal(totalPrice);
+    }, [numModerateVariables, numMediatorVariables, numIndependentVariables, numDependentVariables]);
 
 
-    // Calculate total cost
-    useEffect(() => {
-        let adjustedPricePerUnit = pricePerUnit;
-        let calculatedTotal = numRequest * adjustedPricePerUnit;
-        
-        // Add service fee based on SEM status
-        if (isSEM) {
-            calculatedTotal += SERVICE_ADVANCE_MODEL_FEE;
-        } else {
-            calculatedTotal += SERVICE_BASIC_MODEL_FEE;
-        }
-        
-        setTotal(calculatedTotal);
-    }, [numRequest, pricePerUnit, isSEM]);
 
 
 
@@ -98,14 +85,6 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
                     </div>
                 </div>
                 <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
-                    <label htmlFor="price" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi mẫu:</label>
-                    <div className="w-full sm:w-1/2 p-2 rounded">
-                        <p id="pricePerAnswer" className="sm:text-right font-bold">
-                            {pricePerUnit.toLocaleString()} VND
-                        </p>
-                    </div>
-                </div>
-                <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
                     <label htmlFor="num_request" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Số lượng mẫu:</label>
                     <div className="w-full sm:w-1/2">
                         <input
@@ -132,44 +111,47 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
                 {/* Pricing Breakdown */}
                 <div className="bg-white rounded-lg p-4 mb-3 border border-blue-100">
                     <h4 className="font-medium text-blue-800 mb-3">Chi tiết giá:</h4>
-                    <div className="space-y-2 text-sm">
-                        {/* Base price */}
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-700">Phí chạy mô hình trên từng mẫu:</span>
-                            <span className="font-medium text-purple-600">{MODEL_PRICE.toLocaleString()} VND</span>
-                        </div>
-                        
-                        {/* Variable-based fees per request */}
-                        {((numModerateVariables || 0) > 0 || (numMediatorVariables || 0) > 0) && (
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-700">
-                                    Phí biến số ({numModerateVariables || 0} điều tiết + {numMediatorVariables || 0} trung gian):
+                    <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                        {(numModerateVariables || 0) > 0 && (
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm text-gray-600">
+                                    Biến điều tiết ({numModerateVariables} × {MODERATE_VARIABLE_PRICE.toLocaleString()}):
                                 </span>
-                                <span className="font-medium text-purple-600">
-                                    +{(((numModerateVariables || 0) + (numMediatorVariables || 0)) * MODEL_VARIABLE_PRICE).toLocaleString()} VND/yêu cầu
+                                <span className="font-medium">
+                                    {((numModerateVariables || 0) * MODERATE_VARIABLE_PRICE).toLocaleString()} VND
                                 </span>
                             </div>
                         )}
-                        
-                        {/* Total per unit */}
-                        <div className="border-t border-gray-200 pt-2 mt-2">
-                            <div className="flex justify-between items-center">
-                                <span className="font-medium text-gray-900">Tổng đơn giá/yêu cầu:</span>
-                                <span className="font-bold text-lg text-blue-600">{pricePerUnit.toLocaleString()} VND</span>
-                            </div>
-                        </div>
-
-                        {/* Service fee */}
-                        <div className="border-t border-gray-200 pt-2 mt-2">
-                            <div className="flex justify-between items-center">
-                                <span className="font-medium text-gray-700">
-                                    {isSEM ? 'Phí dịch vụ cố định (SEM):' : 'Phí dịch vụ cố định (Linear regression Model):'}
+                        {(numMediatorVariables || 0) > 0 && (
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm text-gray-600">
+                                    Biến trung gian ({numMediatorVariables} × {MEDIATOR_VARIABLE_PRICE.toLocaleString()}):
                                 </span>
-                                <span className="font-bold text-lg">
-                                    +{(isSEM ? SERVICE_ADVANCE_MODEL_FEE : SERVICE_BASIC_MODEL_FEE).toLocaleString()} VND
+                                <span className="font-medium">
+                                    {((numMediatorVariables || 0) * MEDIATOR_VARIABLE_PRICE).toLocaleString()} VND
                                 </span>
                             </div>
-                        </div>
+                        )}
+                        {(numIndependentVariables || 0) > 0 && (
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm text-gray-600">
+                                    Biến độc lập ({numIndependentVariables} × {INDEPENDENT_VARIABLE_PRICE.toLocaleString()}):
+                                </span>
+                                <span className="font-medium">
+                                    {((numIndependentVariables || 0) * INDEPENDENT_VARIABLE_PRICE).toLocaleString()} VND
+                                </span>
+                            </div>
+                        )}
+                        {(numDependentVariables || 0) > 0 && (
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm text-gray-600">
+                                    Biến phụ thuộc ({numDependentVariables} × {DEPENDENT_VARIABLE_PRICE.toLocaleString()}):
+                                </span>
+                                <span className="font-medium">
+                                    {((numDependentVariables || 0) * DEPENDENT_VARIABLE_PRICE).toLocaleString()} VND
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

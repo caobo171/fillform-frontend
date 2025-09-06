@@ -18,14 +18,15 @@ const VariableNodeDataType = z.object({
 const ModerateEffectNodeDataType = z.object({
     label: z.string(),
     nodeType: z.literal("moderate_effect"),
-    observableQuestions: z.number(),
-    likertScale: z.number(),
     moderateVariable: z.string(),
     independentVariable: z.string(),
     effectType: z.enum(["positive", "negative"])
 });
 
 const NodeDataType = z.union([VariableNodeDataType, ModerateEffectNodeDataType]);
+
+export type ModerateEffectNodeDataType = z.infer<typeof ModerateEffectNodeDataType>;
+export type VariableNodeDataType = z.infer<typeof VariableNodeDataType>;
 
 const NodeType = z.object({
     id: z.string(),

@@ -21,6 +21,7 @@ import { useMyDataModels, useUserDataModels } from '@/hooks/data.model';
 import { ModelAdvanceBuilder, ModelAdvanceBuilderRef } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
 import ACL from '@/services/ACL';
 import Select from 'react-select';
+import { AdvanceModelType, ModerateEffectNodeDataType } from '@/store/data.service.types';
 
 interface ChatError {
     id: string;
@@ -45,8 +46,6 @@ export default function BuildDataForm() {
 
     const availableQuestions = dataForm?.form.loaddata || [];
 
-    const [model, setModel] = useState<DataModel | null>(null);
-
     // CreateOrderForm state variables
     const { data: user } = useMe();
     const bankInfo = useMyBankInfo();
@@ -64,42 +63,90 @@ export default function BuildDataForm() {
 
 
     const modelsData = useMyDataModels(1, 200, {});
-    const [modelMode, setModelMode] = useState<'basic' | 'advance'>('basic');
-
 
     const [selectedAdvanceModel, setSelectedAdvanceModel] = useState<RawDataModel | null>(null);
-    const [advanceModelData, setAdvanceModelData] = useState<any>(null);
+    const [advanceModelData, setAdvanceModelData] = useState<AdvanceModelType | null>(null);
 
     const currentModerateVariables = useMemo(() => {
         if (!advanceModelData?.nodes) return [];
-        
+
         // Filter nodes that have nodeType "moderate_effect"
-        return advanceModelData.nodes.filter((node: any) => 
+        let moderateEffects = advanceModelData.nodes.filter((node) =>
             node.data?.nodeType === "moderate_effect"
         );
+
+        const nodes = advanceModelData.nodes;
+
+        let moderateVariables = nodes.filter((node) => {
+            if (node.data?.nodeType !== "variable") return false;
+
+            return moderateEffects.find((moderateEffect) => (moderateEffect.data as ModerateEffectNodeDataType).moderateVariable === node.id);
+        });
+
+        return moderateVariables;
     }, [advanceModelData]);
 
     const currentMediatorVariables = useMemo(() => {
         if (!advanceModelData?.nodes || !advanceModelData?.edges) return [];
-        
+
         const nodes = advanceModelData.nodes;
         const edges = advanceModelData.edges;
-        
+
         // Find nodes that are mediators (have both incoming and outgoing edges)
         // and are variable type (not moderate_effect)
         return nodes.filter((node: any) => {
             if (node.data?.nodeType !== "variable") return false;
-            
+
             const hasIncoming = edges.some((edge: any) => edge.target === node.id);
             const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
-            
-            return hasIncoming && hasOutgoing;
+
+            return hasIncoming && hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
         });
-    }, [advanceModelData]);
+    }, [advanceModelData, currentModerateVariables]);
 
 
-    const isSEM = currentModerateVariables.length > 0 || currentMediatorVariables.length > 0;
+    const currentIndependentVariables = useMemo(() => {
+        if (!advanceModelData?.nodes || !advanceModelData?.edges) return [];
 
+        const nodes = advanceModelData.nodes;
+        const edges = advanceModelData.edges;
+
+        // Find nodes that are independent variables:
+        // - Have nodeType "variable" (not moderate_effect)
+        // - Have outgoing edges (they influence other variables)
+        // - Have no incoming edges (they are not influenced by other variables)
+        return nodes.filter((node: any) => {
+            if (node.data?.nodeType !== "variable") return false;
+
+            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
+            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
+
+            // Independent variables have outgoing edges but no incoming edges
+            return hasOutgoing && !hasIncoming && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
+        });
+    }, [advanceModelData, currentModerateVariables]);
+
+
+    const currentDependentVariables = useMemo(() => {
+        if (!advanceModelData?.nodes || !advanceModelData?.edges) return [];
+
+        const nodes = advanceModelData.nodes;
+        const edges = advanceModelData.edges;
+
+        // Find nodes that are dependent variables:
+        // - Have nodeType "variable" (not moderate_effect)
+        // - Have incoming edges (they are influenced by other variables)
+        // - Have NO outgoing edges (they are final outcome variables)
+        return nodes.filter((node: any) => {
+            if (node.data?.nodeType !== "variable") return false;
+
+            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
+            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
+
+            // Dependent variables have incoming edges but no outgoing edges
+            return hasIncoming && !hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
+        });
+    }, [advanceModelData, currentModerateVariables]);
 
 
 
@@ -108,24 +155,19 @@ export default function BuildDataForm() {
 
     const [numRequest, setNumRequest] = useState<number>(1);
 
-    const modelQuestions = useMemo(() => {
-        let res: any[] = model?.model?.questions || [];
+    const [mappingQuestionToVariable, setMappingQuestionToVariable] = useState<{ [key: string]: string }>({});
 
-        function getQuestions(observedItems: any[]) {
-            for (let i = 0; i < (observedItems?.length || 0); i++) {
-                res = [...res, ...(observedItems[i].questions || [])];
-                if (observedItems[i].observedItems) {
-                    getQuestions(observedItems[i].observedItems);
-                }
+    const realMappingQuestionToVariable = useMemo(() => {
+
+        let res: { [key: string]: string } = {};
+        for (const [key, value] of Object.entries(mappingQuestionToVariable)) {
+            if (advanceModelData?.nodes.find((node) => node.id === value)) {
+                res[key] = value;
             }
         }
 
-        getQuestions(model?.observedItems || []);
         return res;
-    }, [model]);
-
-
-    const [mappingQuestionToVariable, setMappingQuestionToVariable] = useState<{ [key: string]: string }>({});
+    }, [mappingQuestionToVariable, advanceModelData])
 
     // Auto-refresh ModelAdvanceBuilder only when switching between model methods or selecting different models
     useEffect(() => {
@@ -143,7 +185,7 @@ export default function BuildDataForm() {
             let dataModelId = selectedAdvanceModel?.id;
 
             // If we're in advance mode and creating a new model
-            if (modelMode === 'advance' && !selectedAdvanceModel && advanceModelData) {
+            if (!selectedAdvanceModel && advanceModelData) {
                 // First create the new model
                 const createModelResponse = await Fetch.postWithAccessToken<{
                     code: number,
@@ -166,10 +208,8 @@ export default function BuildDataForm() {
             const res = await Fetch.postWithAccessToken<{ code: number, message: string, form: RawForm, data_model?: RawDataModel }>('/api/form/save.model', {
                 id: dataForm?.form.id,
                 advance_model: JSON.stringify(advanceModelData),
-                model: JSON.stringify(model),
                 data_model_id: dataModelId,
                 mapping_question_to_variable: JSON.stringify(mappingQuestionToVariable),
-                model_mode: modelMode,
             });
 
             if (res.data.form) {
@@ -205,7 +245,6 @@ export default function BuildDataForm() {
         try {
             const response = await Fetch.postWithAccessToken<{ code: number, message: string }>('/api/order/create.model.run', {
                 form_id: dataForm?.form?.id,
-                model: JSON.stringify(model),
                 delay_type: delayValue,
                 num_request: numRequest,
                 schedule_enabled: scheduleEnabled ? 1 : 0,
@@ -293,7 +332,6 @@ export default function BuildDataForm() {
         try {
             await Fetch.postWithAccessToken('/api/form/sync.config', {
                 id: dataForm?.form.id,
-                model: JSON.stringify(model),
             });
 
             await mutateForm();
@@ -504,35 +542,6 @@ export default function BuildDataForm() {
     }, [modelsData?.data?.data_models?.length, dataForm]);
 
     useEffect(() => {
-        // Generate a unique ID for variables
-        const generateId = () => {
-            return `id_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        };
-        if (dataForm?.form && dataForm?.form.data_model) {
-            setModel(dataForm?.form.data_model);
-
-        } else if (dataForm?.form && !dataForm?.form.data_model) {
-            const initialModel: DataModel = {
-                model: {
-                    code: generateId().substring(0, 8),
-                    name: `Biến phụ thuộc`,
-                    model: 'linear_regression',
-                    questions: []
-                },
-                observedItems: []
-            };
-            setModel(initialModel);
-        }
-
-        if (dataForm?.form && dataForm?.form.model_mode) {
-            if (dataForm?.form.model_mode === 'advance') {
-                setModelMode('advance');
-            } else {
-                setModelMode('basic');
-            }
-        }
-
-
         if (dataForm?.form && dataForm?.form.advance_model_config?.mapping_question_to_variable) {
             setMappingQuestionToVariable(dataForm?.form.advance_model_config?.mapping_question_to_variable)
         }
@@ -689,218 +698,180 @@ export default function BuildDataForm() {
                     </div>
 
                     <div className="container mx-auto mb-2">
-                        {/* Model Mode Selector */}
-                        {(ACL.isBetaTester(me.data) || ACL.isAdmin(me.data)) ? (
-                            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-4">
-                                <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn phương thức tạo Model</h3>
-                                <div className="flex space-x-4 mb-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => setModelMode('basic')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'basic'
-                                            ? 'bg-primary text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        🔧 Basic - Xây dựng Model cơ bản
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setModelMode('advance')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${modelMode === 'advance'
-                                            ? 'bg-primary text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        📋 Advance - Sử dụng Model có sẵn
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (<></>)}
-
                         {/* Conditional Rendering Based on Mode */}
-                        {modelMode === 'basic' ? (
-                            <BasicModelBuilder dataForm={dataForm} model={model} setModel={setModel} />
-                        ) : (
-                            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                                <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn Model từ danh sách có sẵn</h3>
-                                {modelsData.isLoading ? (
-                                    <div className="flex items-center justify-center py-8">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                        <span className="ml-2 text-gray-600">Đang tải danh sách model...</span>
-                                    </div>
-                                ) : modelsData.error ? (
-                                    <div className="text-red-600 p-4 bg-red-50 rounded-lg">
-                                        <p>Lỗi khi tải danh sách model: {modelsData.error?.message || 'Có lỗi xảy ra'}</p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {/* Model Selection Options */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-3">
-                                                Chọn phương thức tạo Model
-                                            </label>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setIsCreatingNewModel(false);
-                                                        setSelectedAdvanceModel(null);
-                                                        setAdvanceModelData(null);
-                                                        // Refresh the model builder to clear any existing data
-                                                        modelBuilderRef.current?.refresh();
-                                                    }}
-                                                    className={`p-4 border-2 rounded-lg text-left transition-all hover:shadow-md ${!isCreatingNewModel
-                                                            ? 'border-primary bg-primary/5 text-primary'
-                                                            : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                                                        }`}
-                                                >
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className="text-2xl">📋</div>
-                                                        <div>
-                                                            <h3 className="font-medium">Sử dụng Model có sẵn</h3>
-                                                            <p className="text-sm opacity-75">Chọn từ danh sách model đã tạo</p>
-                                                        </div>
-                                                    </div>
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setIsCreatingNewModel(true);
-                                                        setSelectedAdvanceModel(null);
-                                                        setAdvanceModelData({
-                                                            name: 'Model mới',
-                                                            nodes: [],
-                                                            edges: []
-                                                        });
-                                                    }}
-                                                    className={`p-4 border-2 rounded-lg text-left transition-all hover:shadow-md ${isCreatingNewModel
-                                                            ? 'border-primary bg-primary/5 text-primary'
-                                                            : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                                                        }`}
-                                                >
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className="text-2xl">🆕</div>
-                                                        <div>
-                                                            <h3 className="font-medium">Tạo Model mới</h3>
-                                                            <p className="text-sm opacity-75">Xây dựng model từ đầu</p>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Model Selection Dropdown - Only show when using existing models */}
-                                        {!isCreatingNewModel && (
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Chọn Model có sẵn
-                                                </label>
-                                                <Select
-                                                    value={selectedAdvanceModel ? {
-                                                        value: selectedAdvanceModel.id,
-                                                        label: `${selectedAdvanceModel.name} - ${(selectedAdvanceModel.data_model?.nodes || []).length} biến - ${new Date(selectedAdvanceModel.createdAt).toLocaleDateString('vi-VN')}`
-                                                    } : null}
-                                                    onChange={(selectedOption: { value: string; label: string } | null) => {
-                                                        if (selectedOption) {
-                                                            const model = modelsData.data?.data_models.find(m => m.id === selectedOption.value);
-                                                            if (model) {
-                                                                setSelectedAdvanceModel(model);
-                                                                setAdvanceModelData(model.data_model);
-                                                            }
-                                                        } else {
-                                                            setSelectedAdvanceModel(null);
-                                                            setAdvanceModelData(null);
-                                                        }
-                                                    }}
-                                                    options={modelsData.data?.data_models?.map((dataModel: RawDataModel) => ({
-                                                        value: dataModel.id,
-                                                        label: `${dataModel.name} - ${(dataModel.data_model?.nodes || []).length} biến - ${new Date(dataModel.createdAt).toLocaleDateString('vi-VN')}`
-                                                    })) || []}
-                                                    placeholder="-- Tìm kiếm và chọn model --"
-                                                    isClearable
-                                                    isSearchable
-                                                    className="text-sm"
-                                                    styles={{
-                                                        control: (provided: any) => ({
-                                                            ...provided,
-                                                            minHeight: '48px',
-                                                            fontSize: '14px',
-                                                            borderColor: '#d1d5db',
-                                                            '&:hover': {
-                                                                borderColor: '#9ca3af'
-                                                            },
-                                                            '&:focus-within': {
-                                                                borderColor: 'var(--primary)',
-                                                                boxShadow: '0 0 0 2px rgba(var(--primary-rgb), 0.2)'
-                                                            }
-                                                        }),
-                                                        option: (provided: any, state: any) => ({
-                                                            ...provided,
-                                                            fontSize: '14px',
-                                                            backgroundColor: state.isSelected ? 'var(--primary)' : state.isFocused ? '#f3f4f6' : 'white',
-                                                            color: state.isSelected ? 'white' : state.isFocused ? '#333' : 'black'
-                                                        }),
-                                                        singleValue: (provided: any) => ({
-                                                            ...provided,
-                                                            fontSize: '14px'
-                                                        })
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
-
-                                        {/* Model Editor */}
-                                        {advanceModelData && (
-                                            <div className="mt-6">
-                                                <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                                    <div className="flex items-center gap-2">
-                                                        <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        <p className="text-blue-800 text-sm font-medium">
-                                                            {isCreatingNewModel ? (
-                                                                <>🆕 Đang tạo model mới: <strong>{advanceModelData.name}</strong></>
-                                                            ) : (
-                                                                <>Đang chỉnh sửa model: <strong>{selectedAdvanceModel?.name}</strong></>
-                                                            )}
-                                                        </p>
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-semibold mb-4 text-gray-900">Chọn Model từ danh sách có sẵn</h3>
+                            {modelsData.isLoading ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                    <span className="ml-2 text-gray-600">Đang tải danh sách model...</span>
+                                </div>
+                            ) : modelsData.error ? (
+                                <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+                                    <p>Lỗi khi tải danh sách model: {modelsData.error?.message || 'Có lỗi xảy ra'}</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {/* Model Selection Options */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                                            Chọn phương thức tạo Model
+                                        </label>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsCreatingNewModel(false);
+                                                    setSelectedAdvanceModel(null);
+                                                    setAdvanceModelData(null);
+                                                    // Refresh the model builder to clear any existing data
+                                                    modelBuilderRef.current?.refresh();
+                                                }}
+                                                className={`p-4 border-2 rounded-lg text-left transition-all hover:shadow-md ${!isCreatingNewModel
+                                                    ? 'border-primary bg-primary/5 text-primary'
+                                                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="text-2xl">📋</div>
+                                                    <div>
+                                                        <h3 className="font-medium">Sử dụng Model có sẵn</h3>
+                                                        <p className="text-sm opacity-75">Chọn từ danh sách model đã tạo</p>
                                                     </div>
                                                 </div>
-                                                <ModelAdvanceBuilder
-                                                    ref={modelBuilderRef}
-                                                    mappingQuestionToVariable={mappingQuestionToVariable}
-                                                    setMappingQuestionToVariable={setMappingQuestionToVariable}
-                                                    questions={availableQuestions}
-                                                    model={advanceModelData}
-                                                    setModel={setAdvanceModelData}
-                                                    useLocalStorage={false}
-                                                />
-                                            </div>
-                                        )}
+                                            </button>
 
-                                        {!modelsData.data?.data_models?.length && (
-                                            <div className="text-center py-8 text-gray-500">
-                                                <p>Không có model nào được tìm thấy.</p>
-                                                <p className="text-sm mt-2">Hãy tạo model mới bằng cách chọn "Basic - Tự xây dựng Model".</p>
-                                            </div>
-                                        )}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsCreatingNewModel(true);
+                                                    setSelectedAdvanceModel(null);
+                                                    setAdvanceModelData({
+                                                        name: 'Model mới',
+                                                        nodes: [],
+                                                        edges: []
+                                                    });
+                                                }}
+                                                className={`p-4 border-2 rounded-lg text-left transition-all hover:shadow-md ${isCreatingNewModel
+                                                    ? 'border-primary bg-primary/5 text-primary'
+                                                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="text-2xl">🆕</div>
+                                                    <div>
+                                                        <h3 className="font-medium">Tạo Model mới</h3>
+                                                        <p className="text-sm opacity-75">Xây dựng model từ đầu</p>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </div>
                                     </div>
-                                )}
-                            </div>
-                        )}
+
+                                    {/* Model Selection Dropdown - Only show when using existing models */}
+                                    {!isCreatingNewModel && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Chọn Model có sẵn
+                                            </label>
+                                            <Select
+                                                value={selectedAdvanceModel ? {
+                                                    value: selectedAdvanceModel.id,
+                                                    label: `${selectedAdvanceModel.name} - ${(selectedAdvanceModel.data_model?.nodes || []).length} biến - ${new Date(selectedAdvanceModel.createdAt).toLocaleDateString('vi-VN')}`
+                                                } : null}
+                                                onChange={(selectedOption: { value: string; label: string } | null) => {
+                                                    if (selectedOption) {
+                                                        const model = modelsData.data?.data_models.find(m => m.id === selectedOption.value);
+                                                        if (model) {
+                                                            setSelectedAdvanceModel(model);
+                                                            setAdvanceModelData(model.data_model);
+                                                        }
+                                                    } else {
+                                                        setSelectedAdvanceModel(null);
+                                                        setAdvanceModelData(null);
+                                                    }
+                                                }}
+                                                options={modelsData.data?.data_models?.map((dataModel: RawDataModel) => ({
+                                                    value: dataModel.id,
+                                                    label: `${dataModel.name} - ${(dataModel.data_model?.nodes || []).length} biến - ${new Date(dataModel.createdAt).toLocaleDateString('vi-VN')}`
+                                                })) || []}
+                                                placeholder="-- Tìm kiếm và chọn model --"
+                                                isClearable
+                                                isSearchable
+                                                className="text-sm"
+                                                styles={{
+                                                    control: (provided: any) => ({
+                                                        ...provided,
+                                                        minHeight: '48px',
+                                                        fontSize: '14px',
+                                                        borderColor: '#d1d5db',
+                                                        '&:hover': {
+                                                            borderColor: '#9ca3af'
+                                                        },
+                                                        '&:focus-within': {
+                                                            borderColor: 'var(--primary)',
+                                                            boxShadow: '0 0 0 2px rgba(var(--primary-rgb), 0.2)'
+                                                        }
+                                                    }),
+                                                    option: (provided: any, state: any) => ({
+                                                        ...provided,
+                                                        fontSize: '14px',
+                                                        backgroundColor: state.isSelected ? 'var(--primary)' : state.isFocused ? '#f3f4f6' : 'white',
+                                                        color: state.isSelected ? 'white' : state.isFocused ? '#333' : 'black'
+                                                    }),
+                                                    singleValue: (provided: any) => ({
+                                                        ...provided,
+                                                        fontSize: '14px'
+                                                    })
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Model Editor */}
+                                    {advanceModelData && (
+                                        <div className="mt-6">
+                                            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                                <div className="flex items-center gap-2">
+                                                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <p className="text-blue-800 text-sm font-medium">
+                                                        {isCreatingNewModel ? (
+                                                            <>🆕 Đang tạo model mới: <strong>{advanceModelData.name}</strong></>
+                                                        ) : (
+                                                            <>Đang chỉnh sửa model: <strong>{selectedAdvanceModel?.name}</strong></>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <ModelAdvanceBuilder
+                                                ref={modelBuilderRef}
+                                                mappingQuestionToVariable={realMappingQuestionToVariable}
+                                                setMappingQuestionToVariable={setMappingQuestionToVariable}
+                                                questions={availableQuestions}
+                                                model={advanceModelData}
+                                                setModel={setAdvanceModelData}
+                                                useLocalStorage={false}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {!modelsData.data?.data_models?.length && (
+                                        <div className="text-center py-8 text-gray-500">
+                                            <p>Không có model nào được tìm thấy.</p>
+                                            <p className="text-sm mt-2">Hãy tạo model mới bằng cách chọn "Basic - Tự xây dựng Model".</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="text-left bg-gray-50 p-1 rounded-lg container mx-auto">
                         <div className="space-y-2">
                             {dataForm?.form.loaddata && dataForm?.form.loaddata.filter(e => {
-                                if (modelMode == 'advance') {
-                                    return !mappingQuestionToVariable[e.id]
-                                } else {
-                                    return !modelQuestions.find(modelQuestion => modelQuestion.id == e.id)
-                                }
-
+                                return !realMappingQuestionToVariable[e.id]
                             }).map((question, questionIndex) => (
                                 <div key={questionIndex} id={`question-${question.id}`} className="js-question p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="md:flex md:items-start gap-8">
@@ -935,7 +906,7 @@ export default function BuildDataForm() {
                                                                         {answer.data}
                                                                     </label>
                                                                     <input
-                                                                    
+
                                                                         type="number"
                                                                         min="0"
                                                                         step="any"
@@ -1022,10 +993,10 @@ export default function BuildDataForm() {
                                         formName={dataForm?.form?.name}
                                         bankInfo={bankInfo}
                                         showBackButton={false}
-                                        modelMode={modelMode}
-                                        isSEM={isSEM}
                                         numModerateVariables={currentModerateVariables.length}
                                         numMediatorVariables={currentMediatorVariables.length}
+                                        numIndependentVariables={currentIndependentVariables.length}
+                                        numDependentVariables={currentDependentVariables.length}
                                         specificStartDate={specificStartDate}
                                         specificEndDate={specificEndDate}
                                         specificDailySchedules={specificDailySchedules}
