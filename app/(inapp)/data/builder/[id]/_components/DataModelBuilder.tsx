@@ -185,6 +185,12 @@ export default function DataModelBuilder() {
                 num_request: numRequest,
             });
 
+            if (response.data.code !== Code.SUCCESS) {
+                setLoading(false);
+                setSubmitDisabled(false);
+                Toast.error(response.data.message || 'Failed to create download order');
+                return;
+            }
 
             let data = response.data.result.finalData;
 
@@ -206,12 +212,8 @@ export default function DataModelBuilder() {
 
             Helper.exportCSVFile(headers, rows, Helper.purify('data_builder_' + name));
 
-            if (response.data.code === Code.SUCCESS) {
-                Toast.success('Download order created successfully!');
-                router.push('/data/builder');
-            } else {
-                Toast.error(response.data.message || 'Failed to create download order');
-            }
+            Toast.success('Download order created successfully!');
+            router.push('/data/builder');
         } catch (error) {
             console.error('Error creating download order:', error);
             Toast.error('Failed to create download order');
