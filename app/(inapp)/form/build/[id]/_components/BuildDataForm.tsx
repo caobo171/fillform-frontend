@@ -159,6 +159,7 @@ export default function BuildDataForm() {
     
 
     const realMappingQuestionToVariable = useMemo(() => {
+        console.log('mappingQuestionToVariable', Object.keys(mappingQuestionToVariable));
 
         let res: { [key: string]: string } = {};
         for (const [key, value] of Object.entries(mappingQuestionToVariable)) {
@@ -558,10 +559,6 @@ export default function BuildDataForm() {
     }, [modelsData?.data?.data_models?.length, dataForm]);
 
     useEffect(() => {
-        if (dataForm?.form && dataForm?.form.advance_model_config?.mapping_question_to_variable) {
-            setMappingQuestionToVariable(dataForm?.form.advance_model_config?.mapping_question_to_variable)
-        }
-
         if (dataForm?.form && dataForm?.form.loaddata) {
             const validateAll = () => {
                 let chatErrors: ChatError[] = [];
@@ -579,7 +576,7 @@ export default function BuildDataForm() {
                 if (missingMapVariables.length > 0) {
                     chatErrors.push({
                         id: 'missing_map_variables',
-                        message: 'Có các biến ' + missingMapVariables.map(e => e.label).join(', ') + ' chưa được ánh xạ',
+                        message: 'Có các biến ' + missingMapVariables.map(e => e.label).join(', ') + ' chưa được ánh xạ với câu hỏi nào trên form',
                         type: 'error'
                     });
                 }
@@ -631,6 +628,12 @@ export default function BuildDataForm() {
             };
         }
     }, [dataForm, reloadEvent, missingMapVariables]);
+
+    useEffect(() => {
+        if (dataForm?.form && dataForm?.form.advance_model_config?.mapping_question_to_variable) {
+            setMappingQuestionToVariable(dataForm?.form.advance_model_config?.mapping_question_to_variable)
+        }
+    }, [dataForm, reloadEvent]);
 
 
 
