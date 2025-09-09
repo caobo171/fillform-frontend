@@ -54,6 +54,7 @@ export type RawForm = {
   version: string,
   sections: any,
   data_model: any,
+  owner_id: string,
 
   model_mode?: string,
   advance_model_config?: {
