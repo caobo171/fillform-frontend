@@ -117,8 +117,8 @@ const OrderPage = () => {
     return (
         <section className="bg-gradient-to-b from-primary-50 to-white py-12 mx-auto px-4 sm:px-6">
             {isFetching ? <LoadingAbsolute /> : <></>}
-            <div className="container mx-auto text-center" data-aos="fade-up">
-                <div className="mb-10">
+            <div className="container mx-auto" data-aos="fade-up">
+                <div className="mb-10 text-center">
                     <h2 className="text-3xl font-bold mb-4">Chi tiết Order</h2>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left mb-8">
@@ -146,10 +146,17 @@ const OrderPage = () => {
                                 {
                                     isAdmin ? (
 
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Gía tiền:</span>
-                                            <span className="font-semibold">{order.data?.credit?.amount || ' Chưa lưu'}</span>
-                                        </div>
+                                        <>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Gía tiền:</span>
+                                                <span className="font-semibold">{order.data?.credit?.amount || ' Chưa lưu'}</span>
+                                            </div>
+
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Link fillform form:</span>
+                                                <span className="font-semibold text-primary-600 hover:underline max-w-[60%] truncate"><Link href={`/form/${order.data?.order.form_id}`}>{order.data?.order.name}</Link></span>
+                                            </div>
+                                        </>
                                     ) : <></>
                                 }
 
@@ -302,6 +309,8 @@ const OrderPage = () => {
 
 
 
+
+
                                 {
                                     order.data?.order.type === ORDER_TYPE.AGENT && order.data?.order.ai_result?.status !== 'DONE_AI_THINKING' ? (
                                         <div className="pt-2 border-t border-gray-100 mt-2">
@@ -381,9 +390,47 @@ const OrderPage = () => {
                     isAdmin && order.data?.order ? (
                         <>
                             <OrderEditForm order={order.data?.order} mutateOrder={() => order.mutate()} />
+                            {/* Order Details List */}
+                            <h3 className="text-2xl font-bold mb-3">Danh sách request</h3>
+                            <div className="bg-gray-50 p-3 rounded mb-6">
+                                {order.isLoading ? (
+                                    <Loading />
+                                ) : (
+                                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 text-xs">
+                                        {order.data?.order_detail_list.map((detail, index) => (
+                                            <div key={index} className="bg-white border border-gray-200 rounded overflow-hidden text-sm">
+                                                <div className="flex">
+                                                    <div className="w-1/4 bg-gray-100 p-2">#{detail.index}</div>
+                                                    <div className={clsx("w-2/4 p-2",
+                                                        detail.result === "completed" ? "bg-green-100 text-green-800" : "",
+                                                        detail.result === "failed" ? "bg-red-100 text-red-800" : "",
+                                                        detail.result === "pending" ? "bg-yellow-100 text-yellow-800" : "",
+                                                        detail.result === "waiting" ? "bg-blue-100 text-blue-800" : "",
+                                                        detail.result === "paused" ? "bg-purple-100 text-purple-800" : "",
+                                                        detail.result === "stopped" ? "bg-gray-100 text-gray-800" : "",
+                                                    )}>
+                                                        {detail.result?.toUpperCase()}
+                                                    </div>
+                                                    <a href={detail.data} target='_blank' className="w-1/4 text-center hover:bg-blue-50 flex items-center justify-center text-blue-600">
+                                                        Xem
+                                                    </a>
+                                                </div>
+                                                {detail.start_time ? (
+                                                    <div className="p-2 bg-gray-50 text-xs">
+                                                        Bắt đầu: {new Date(Number(detail.start_time)).toLocaleString()}
+                                                    </div>
+                                                ) : <></>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </>
                     ) : null
                 }
+
+
+
 
                 {/* Form Config */}
                 <div className="text-left">
@@ -419,7 +466,7 @@ const OrderPage = () => {
                     {/* Showing AI Result */}
                     <>
                         {order.data?.order.ai_result && (
-                            <div className="bg-white p-6 rounded-lg border border-gray-100">
+                            <div className="bg-white p-6 rounded-lg border border-gray-100 mb-6">
                                 <h3 className="text-xl font-bold mb-4">Kết quả phân tích</h3>
 
                                 {order.data?.order.ai_result?.report_file ? <div className="p-4 my-3 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-md">
@@ -505,6 +552,28 @@ const OrderPage = () => {
                     </>
 
 
+                    {/** Showing model */}
+
+                    <>
+                        {order.data?.order.type === ORDER_TYPE.DATA_MODEL ? (
+                            <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
+                                <h2 className="text-2xl font-bold mb-4">Cấu hình mô hình</h2>
+
+                                <div className="bg-white p-6 rounded-lg border border-gray-100">
+
+                                    {
+                                        order.data?.order?.ai_result?.output_model ? (
+                                            <ModelAdvanceBuilder model={order.data?.order?.ai_result?.output_model} setModel={() => { }} isReadOnly={true} />
+                                        ) : (
+                                            <p>Không có mô hình</p>
+                                        )
+                                    }
+                                </div>
+                            </div>
+                        ) : <></>}
+
+                    </>
+
 
                     {/* Showing percentage */}
 
@@ -514,10 +583,11 @@ const OrderPage = () => {
                                 <>
                                     <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
 
-                                    <div className="bg-white p-6 rounded-lg border border-gray-100">
+                                    <div className="bg-white p-6 rounded-lg border border-gray-100  mb-6">
+
                                         {order.data?.order.data.filter(question => {
                                             if (order.data?.order.type === ORDER_TYPE.DATA_MODEL) {
-                                                return realMappingQuestionToVariable[question.id]
+                                                return !realMappingQuestionToVariable[question.id]
                                             }
 
                                             return true;
@@ -594,25 +664,6 @@ const OrderPage = () => {
 
 
 
-                    <>
-                        {order.data?.order.type === ORDER_TYPE.DATA_MODEL ? (
-                            <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
-                                <h2 className="text-2xl font-bold mb-4">Cấu hình mô hình</h2>
-
-                                <div className="bg-white p-6 rounded-lg border border-gray-100">
-
-                                    {
-                                        order.data?.order?.ai_result?.output_model ? (
-                                            <ModelAdvanceBuilder model={order.data?.order?.ai_result?.output_model} setModel={() => { }} isReadOnly={true} />
-                                        ) : (
-                                            <p>Không có mô hình</p>
-                                        )
-                                    }
-                                </div>
-                            </div>
-                        ) : <></>}
-
-                    </>
 
                 </div>
             </div>

@@ -124,6 +124,7 @@ export type RawOrder = {
   failed_num: number;
   data: any[];
   data_url?: string;
+  form_id?: string;
   schedule_setup?: {
     enabled: number;
     config: {
