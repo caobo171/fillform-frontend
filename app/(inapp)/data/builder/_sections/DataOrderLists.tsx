@@ -20,7 +20,7 @@ import { useMyDataOrders, useUserDataOrders } from '@/hooks/data.order';
 const ITEMS_PER_PAGE = 10;
 
 
-export default function OrderLists({ admin }: { admin?: boolean }) {
+export default function DataOrderLists({ admin }: { admin?: boolean }) {
     const [currentPage, setCurrentPage] = useState(1);
     let dataOrder = null;
     const params = useParams();

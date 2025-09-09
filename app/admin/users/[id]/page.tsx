@@ -16,6 +16,8 @@ import { TextArea, Input, Modal } from '@/components/common'
 import { AnyObject } from '@/store/interface'
 import OrderLists from '@/app/(inapp)/_sections/OrderLists'
 import FormLists from '@/app/(inapp)/_sections/FormLists'
+import DataOrderLists from '@/app/(inapp)/data/builder/_sections/DataOrderLists'
+import DataModelLists from '@/app/(inapp)/data/builder/_sections/DataModelLists'
 const ITEMS_PER_PAGE = 10;
 
 export default function UserDetailPage() {
@@ -104,6 +106,10 @@ export default function UserDetailPage() {
                     {/* Forms Table */}
                     <FormLists admin={true} />
                     <OrderLists admin={true} />
+
+                    <DataModelLists admin={true} />
+                    <DataOrderLists admin={true} />
+
 
                 </div>
             </section>
