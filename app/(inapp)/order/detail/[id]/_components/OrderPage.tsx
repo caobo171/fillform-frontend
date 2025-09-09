@@ -14,6 +14,7 @@ import { useParams } from 'next/navigation'
 import { FC, useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import clsx from 'clsx'
+import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder'
 
 
 
@@ -42,6 +43,8 @@ const OrderPage = () => {
     const [startDateWarning, setStartDateWarning] = useState('');
     const [endDateWarning, setEndDateWarning] = useState('');
     const [isGeneratingSchedules, setIsGeneratingSchedules] = useState(false);
+
+    const model = order.data?.order?.ai_result?.output_model;
 
     useEffect(() => {
         setOwner(order.data?.order.owner)
@@ -940,6 +943,8 @@ const OrderPage = () => {
                         }
                     </>
 
+
+                    {/* Showing AI Result */}
                     <>
 
 
@@ -1029,9 +1034,13 @@ const OrderPage = () => {
                         )}
                     </>
 
+
+
+                    {/* Showing percentage */}
+
                     <>
                         {
-                            order.data?.order.type === ORDER_TYPE.AUTOFILL ? (
+                            (order.data?.order.type === ORDER_TYPE.AUTOFILL || order.data?.order.type === ORDER_TYPE.DATA_MODEL) ? (
                                 <>
                                     <h2 className="text-2xl font-bold mb-4">Cấu hình tỉ lệ Form</h2>
 
@@ -1107,6 +1116,27 @@ const OrderPage = () => {
 
                     </>
 
+
+
+                    <>
+                        {order.data?.order.type === ORDER_TYPE.DATA_MODEL ? (
+                            <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
+                                <h2 className="text-2xl font-bold mb-4">Cấu hình mô hình</h2>
+
+                                <div className="bg-white p-6 rounded-lg border border-gray-100">
+
+                                    {
+                                        order.data?.order?.ai_result?.output_model ? (
+                                            <ModelAdvanceBuilder model={order.data?.order?.ai_result?.output_model} setModel={() => { }} isReadOnly={true} />
+                                        ) : (
+                                            <p>Không có mô hình</p>
+                                        )
+                                    }
+                                </div>
+                            </div>
+                        ) : <></>}
+
+                    </>
 
                 </div>
             </div>

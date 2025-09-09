@@ -221,6 +221,7 @@ export default function BuildDataForm() {
 
             const res = await Fetch.postWithAccessToken<{ code: number, message: string, form: RawForm, data_model?: RawDataModel }>('/api/form/save.model', {
                 id: dataForm?.form.id,
+                ...data,
                 advance_model: JSON.stringify(advanceModelData),
                 data_model_id: dataModelId,
                 mapping_question_to_variable: JSON.stringify(mappingQuestionToVariable),
