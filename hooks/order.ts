@@ -1,5 +1,5 @@
 import Fetch from '@/lib/core/fetch/Fetch';
-import { RawForm, RawOrder } from '@/store/types';
+import { RawCredit, RawForm, RawOrder } from '@/store/types';
 import useSWR from 'swr'
 
 
@@ -92,6 +92,7 @@ export const useOrderById = (id: string) => {
 			order: RawOrder,
 			order_detail_list: OrderDetailRequest[],
 			order_fail_list: string[],
+			credit: RawCredit,
 			config: any
 		}>(url, {
 			id: id
@@ -101,6 +102,7 @@ export const useOrderById = (id: string) => {
 			order: rest.data.order as RawOrder,
 			order_detail_list: rest.data.order_detail_list as OrderDetailRequest[],
 			order_fail_list: rest.data.order_fail_list as string[],
+			credit: rest.data.credit as RawCredit,
 			config: rest.data.config as any
 		};
 	});

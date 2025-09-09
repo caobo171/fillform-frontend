@@ -140,6 +140,7 @@ export type RawOrder = {
     demographicQuestions: any[];
     analyzeData: any;
     demographicAnalysis: any;
+    mapping_question_to_variable: { [key: string]: string },
     data_file: {
       name: string;
       url: string;
@@ -170,6 +171,10 @@ export type RawCredit = {
   owner: string;
   status: string;
   description: string;
+  amount: number;
+  referId?: string;
+  orderType?: string;
+  orderId?: string;
 }
 
 
