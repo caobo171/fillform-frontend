@@ -177,7 +177,7 @@ const DataOrderPage = () => {
                                 }
 
                                 let rows: AnyObject[] = [];
-                                for (let row_index = 1; row_index < data.length; row_index++) {
+                                for (let row_index = 0; row_index < data.length; row_index++) {
                                     let row: AnyObject = {};
                                     for (let col_index = 0; col_index < Object.keys(headers).length; col_index++) {
                                         let header_key = Object.keys(headers)[col_index];
