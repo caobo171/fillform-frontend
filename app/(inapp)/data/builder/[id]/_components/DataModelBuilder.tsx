@@ -18,8 +18,13 @@ import { ModelAdvanceBuilder } from '../../_components/ModelAdvanceBuilder'
 import { useDataModelById } from '@/hooks/data.model'
 import { useParams, useRouter } from 'next/navigation';
 import { AdvanceModelType, ModerateEffectNodeDataType } from '@/store/data.service.types'
+import { useModelVariables } from '@/hooks/useModelVariables'
 import CreateDownloadOrderForm from '@/components/form/CreateDownloadOrderForm'
 import { useMe, useMyBankInfo } from '@/hooks/user'
+import DescriptiveStatistics from '@/components/analysis/DescriptiveStatistics'
+import CronbachAlphaResults from '@/components/analysis/CronbachAlphaResults'
+import EFAResults from '@/components/analysis/EFAResults'
+import LinearRegressionResults from '@/components/analysis/LinearRegressionResults'
 
 export default function DataModelBuilder() {
 
@@ -33,7 +38,6 @@ export default function DataModelBuilder() {
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [name, setName] = useState<string>('');
-    const [isShowingResult, setIsShowingResult] = useState<boolean>(false);
 
     const [model, setModel] = useState<AdvanceModelType | null>(null);
     // State for showing download order form after model is saved
@@ -48,89 +52,23 @@ export default function DataModelBuilder() {
     }, [dataModel]);
 
 
-
-    const currentModerateVariables = useMemo(() => {
-        if (!model?.nodes) return [];
+    const [isShowingResult, setIsShowingResult] = useState<boolean>(false);
 
 
-        // Filter nodes that have nodeType "moderate_effect"
-        let moderateEffects = model.nodes.filter((node) =>
-            node.data?.nodeType === "moderate_effect"
-        );
-
-        const nodes = model.nodes;
-
-        let moderateVariables = nodes.filter((node) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            return moderateEffects.find((moderateEffect) => (moderateEffect.data as ModerateEffectNodeDataType).moderateVariable === node.id);
-        });
-
-        return moderateVariables;
-    }, [model]);
+    useEffect(() => {
+        if (numRequest > 0){
+            setIsShowingResult(false);
+        }
+    }, [numRequest])
 
 
-    const currentMediatorVariables = useMemo(() => {
-        if (!model?.nodes || !model?.edges) return [];
+    const {
+        moderateVariables: currentModerateVariables,
+        mediatorVariables: currentMediatorVariables,
+        independentVariables: currentIndependentVariables,
+        dependentVariables: currentDependentVariables,
+    } = useModelVariables(model);
 
-        const nodes = model.nodes;
-        const edges = model.edges;
-
-        // Find nodes that are mediators (have both incoming and outgoing edges)
-        // and are variable type (not moderate_effect)
-        return nodes.filter((node: any) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
-            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
-
-            return hasIncoming && hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
-        });
-    }, [model, currentModerateVariables]);
-
-
-    const currentIndependentVariables = useMemo(() => {
-        if (!model?.nodes || !model?.edges) return [];
-
-        const nodes = model.nodes;
-        const edges = model.edges;
-
-        // Find nodes that are independent variables:
-        // - Have nodeType "variable" (not moderate_effect)
-        // - Have outgoing edges (they influence other variables)
-        // - Have no incoming edges (they are not influenced by other variables)
-        return nodes.filter((node: any) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
-            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
-
-            // Independent variables have outgoing edges but no incoming edges
-            return hasOutgoing && !hasIncoming && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
-        });
-    }, [model, currentModerateVariables]);
-
-
-    const currentDependentVariables = useMemo(() => {
-        if (!model?.nodes || !model?.edges) return [];
-
-        const nodes = model.nodes;
-        const edges = model.edges;
-
-        // Find nodes that are dependent variables:
-        // - Have nodeType "variable" (not moderate_effect)
-        // - Have incoming edges (they are influenced by other variables)
-        // - Have NO outgoing edges (they are final outcome variables)
-        return nodes.filter((node: any) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
-            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
-
-            // Dependent variables have incoming edges but no outgoing edges
-            return hasIncoming && !hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
-        });
-    }, [model, currentModerateVariables]);
 
 
 
@@ -163,8 +101,7 @@ export default function DataModelBuilder() {
         }
     }
 
-    const handleDownloadOrderSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleDownloadOrderSubmit = async () => {
         if (!numRequest || numRequest <= 0) {
             Toast.error('Please enter a valid number of requests');
             return;
@@ -214,6 +151,47 @@ export default function DataModelBuilder() {
 
             Toast.success('Download order created successfully!');
             router.push('/data/builder');
+        } catch (error) {
+            console.error('Error creating download order:', error);
+            Toast.error('Failed to create download order');
+        } finally {
+            setLoading(false);
+            setSubmitDisabled(false);
+        }
+    }
+
+    const handleDownloadOrderAnalysis = async () => {
+        if (!numRequest || numRequest <= 0) {
+            Toast.error('Please enter a valid number of requests');
+            return;
+        }
+
+        setLoading(true);
+        setSubmitDisabled(true);
+
+        try {
+            const response = await Fetch.postWithAccessToken<{
+                code: number,
+                message?: string,
+                result: {
+                    finalData: any[]
+                }
+            }>('/api/data.model/analysis', {
+                model_id: dataModel?.data_model?.id,
+                num_request: numRequest,
+            });
+
+            if (response.data.code !== Code.SUCCESS) {
+                setLoading(false);
+                setSubmitDisabled(false);
+                Toast.error(response.data.message || 'Failed to create download order');
+                return;
+            }
+
+            mutateModel();
+            setIsShowingResult(true);
+
+            Toast.success('Analysis completed successfully!');
         } catch (error) {
             console.error('Error creating download order:', error);
             Toast.error('Failed to create download order');
@@ -314,36 +292,52 @@ export default function DataModelBuilder() {
                                             <h3 className="text-xl font-bold text-gray-900">TẠO YÊU CẦU TẢI DỮ LIỆU</h3>
                                         </div>
 
-                                        <form onSubmit={handleDownloadOrderSubmit}>
-                                            <CreateDownloadOrderForm
-                                                userCredit={me.data?.credit || 0}
-                                                numRequest={numRequest}
-                                                modelId={dataModel?.data_model?.id || undefined}
-                                                modelName={name}
-                                                bankInfo={bankInfo}
-                                                onNumRequestChange={(value) => setNumRequest(value)}
-                                                className="max-w-full"
-                                                showTitle={false}
-                                                showBackButton={false}
 
-                                                numModerateVariables={currentModerateVariables.length}
-                                                numMediatorVariables={currentMediatorVariables.length}
-                                                numDependentVariables={currentDependentVariables.length}
-                                                numIndependentVariables={currentIndependentVariables.length}
-                                            />
+                                        <CreateDownloadOrderForm
+                                            userCredit={me.data?.credit || 0}
+                                            numRequest={numRequest}
+                                            modelId={dataModel?.data_model?.id || undefined}
+                                            modelName={name}
+                                            bankInfo={bankInfo}
+                                            onNumRequestChange={(value) => setNumRequest(value)}
+                                            className="max-w-full"
+                                            showTitle={false}
+                                            showBackButton={false}
+                                            hidePayment={!isShowingResult}
+                                            numModerateVariables={currentModerateVariables.length}
+                                            numMediatorVariables={currentMediatorVariables.length}
+                                            numDependentVariables={currentDependentVariables.length}
+                                            numIndependentVariables={currentIndependentVariables.length}
+                                        />
 
+                                        {!isShowingResult ? (
                                             <button
-                                                type="submit"
+                                                type="button"
+                                                onClick={() => handleDownloadOrderAnalysis()}
+                                                disabled={loading}
+                                                className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                                    ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                                </svg>
+                                                Kiểm tra kết quả dữ liệu
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDownloadOrderSubmit()}
                                                 disabled={submitDisabled || loading || numRequest <= 0}
                                                 className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
-                                                ${submitDisabled || numRequest <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    ${submitDisabled || numRequest <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                                 </svg>
                                                 {loading ? 'Đang xử lý...' : 'Tạo yêu cầu tải dữ liệu'}
                                             </button>
-                                        </form>
+                                        )}
+
                                     </div>
                                 )}
 
@@ -361,6 +355,54 @@ export default function DataModelBuilder() {
 
 
                         </div>
+
+
+
+                        {
+                            isShowingResult && (
+                                <>
+                                    {/* Basic Analysis Results */}
+                                    {
+                                        dataModel?.data_model?.temp_data?.basic_analysis ? (
+                                            <div className="mb-8">
+                                                {/* Descriptive Statistics */}
+                                                {dataModel?.data_model?.temp_data?.basic_analysis?.descriptive_statistics && (
+                                                    <DescriptiveStatistics
+                                                        statistics={dataModel?.data_model?.temp_data?.basic_analysis?.descriptive_statistics}
+                                                    />
+                                                )}
+
+                                                {/* Cronbach's Alpha */}
+                                                {dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas && dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas.length > 0 && (
+                                                    <CronbachAlphaResults
+                                                        cronbachAlphas={dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas}
+                                                    />
+                                                )}
+
+                                                {/* EFA Results */}
+                                                {dataModel?.data_model?.temp_data?.basic_analysis?.efa_result && (
+                                                    <EFAResults
+                                                        efaResult={dataModel?.data_model?.temp_data?.basic_analysis?.efa_result}
+                                                    />
+                                                )}
+                                            </div>
+                                        ) : null
+                                    }
+
+
+                                    {/* Linear Regression Results */}
+                                    {
+                                        dataModel?.data_model?.temp_data?.linear_regression_analysis?.regression_result ? (
+                                            <LinearRegressionResults
+                                                regressionResult={dataModel?.data_model?.temp_data?.linear_regression_analysis?.regression_result}
+                                            />
+                                        ) : null
+                                    }
+                                </>
+                            )
+                        }
+
+
                     </div>
                 </div>
             </section>

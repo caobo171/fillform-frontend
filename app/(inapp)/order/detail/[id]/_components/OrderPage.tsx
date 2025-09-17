@@ -467,7 +467,7 @@ const OrderPage = () => {
                     <>
                         {order.data?.order.ai_result && (
                             <div className="bg-white p-6 rounded-lg border border-gray-100 mb-6">
-                                <h3 className="text-xl font-bold mb-4">Kết quả phân tích</h3>
+                                <h3 className="text-lg font-bold mb-4">Kết quả phân tích</h3>
 
                                 {order.data?.order.ai_result?.report_file ? <div className="p-4 my-3 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-md">
                                     <p className="flex items-center">

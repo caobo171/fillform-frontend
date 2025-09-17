@@ -17,7 +17,7 @@ export const EFAResults: React.FC<EFAResultsProps> = ({
 
   return (
     <div className={`bg-white rounded shadow-sm p-6 border border-gray-100 mb-6 ${className}`}>
-      <h3 className="text-xl font-bold mb-4">Phân tích nhân tố khám phá (EFA)</h3>
+      <h3 className="text-lg font-bold mb-4">Phân tích nhân tố khám phá (EFA)</h3>
       
       {/* EFA Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

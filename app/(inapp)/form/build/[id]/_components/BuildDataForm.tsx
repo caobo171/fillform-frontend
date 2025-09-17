@@ -22,6 +22,7 @@ import { ModelAdvanceBuilder, ModelAdvanceBuilderRef } from '@/app/(inapp)/data/
 import ACL from '@/services/ACL';
 import Select from 'react-select';
 import { AdvanceModelType, ModerateEffectNodeDataType, VariableNodeDataType } from '@/store/data.service.types';
+import { useModelVariables } from '@/hooks/useModelVariables';
 
 interface ChatError {
     id: string;
@@ -65,88 +66,12 @@ export default function BuildDataForm() {
     const [selectedAdvanceModel, setSelectedAdvanceModel] = useState<RawDataModel | null>(null);
     const [advanceModelData, setAdvanceModelData] = useState<AdvanceModelType | null>(null);
 
-    const currentModerateVariables = useMemo(() => {
-        if (!advanceModelData?.nodes) return [];
-
-        // Filter nodes that have nodeType "moderate_effect"
-        let moderateEffects = advanceModelData.nodes.filter((node) =>
-            node.data?.nodeType === "moderate_effect"
-        );
-
-        const nodes = advanceModelData.nodes;
-
-        let moderateVariables = nodes.filter((node) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            return moderateEffects.find((moderateEffect) => (moderateEffect.data as ModerateEffectNodeDataType).moderateVariable === node.id);
-        });
-
-        return moderateVariables;
-    }, [advanceModelData]);
-
-    const currentMediatorVariables = useMemo(() => {
-        if (!advanceModelData?.nodes || !advanceModelData?.edges) return [];
-
-        const nodes = advanceModelData.nodes;
-        const edges = advanceModelData.edges;
-
-        // Find nodes that are mediators (have both incoming and outgoing edges)
-        // and are variable type (not moderate_effect)
-        return nodes.filter((node: any) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
-            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
-
-            return hasIncoming && hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
-        });
-    }, [advanceModelData, currentModerateVariables]);
-
-
-    const currentIndependentVariables = useMemo(() => {
-        if (!advanceModelData?.nodes || !advanceModelData?.edges) return [];
-
-        const nodes = advanceModelData.nodes;
-        const edges = advanceModelData.edges;
-
-        // Find nodes that are independent variables:
-        // - Have nodeType "variable" (not moderate_effect)
-        // - Have outgoing edges (they influence other variables)
-        // - Have no incoming edges (they are not influenced by other variables)
-        return nodes.filter((node: any) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
-            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
-
-            // Independent variables have outgoing edges but no incoming edges
-            return hasOutgoing && !hasIncoming && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
-        });
-    }, [advanceModelData, currentModerateVariables]);
-
-
-    const currentDependentVariables = useMemo(() => {
-        if (!advanceModelData?.nodes || !advanceModelData?.edges) return [];
-
-        const nodes = advanceModelData.nodes;
-        const edges = advanceModelData.edges;
-
-        // Find nodes that are dependent variables:
-        // - Have nodeType "variable" (not moderate_effect)
-        // - Have incoming edges (they are influenced by other variables)
-        // - Have NO outgoing edges (they are final outcome variables)
-        return nodes.filter((node: any) => {
-            if (node.data?.nodeType !== "variable") return false;
-
-            const hasIncoming = edges.some((edge: any) => edge.target === node.id);
-            const hasOutgoing = edges.some((edge: any) => edge.source === node.id);
-
-            // Dependent variables have incoming edges but no outgoing edges
-            return hasIncoming && !hasOutgoing && !currentModerateVariables.find((moderateVariable: any) => moderateVariable.id === node.id);
-        });
-    }, [advanceModelData, currentModerateVariables]);
-
-
+    const {
+        moderateVariables: currentModerateVariables,
+        mediatorVariables: currentMediatorVariables,
+        independentVariables: currentIndependentVariables,
+        dependentVariables: currentDependentVariables,
+    } = useModelVariables(advanceModelData);
 
     const [isCreatingNewModel, setIsCreatingNewModel] = useState<boolean>(false);
     const modelBuilderRef = useRef<ModelAdvanceBuilderRef>(null);
@@ -154,6 +79,8 @@ export default function BuildDataForm() {
     const [numRequest, setNumRequest] = useState<number>(1);
 
     const [mappingQuestionToVariable, setMappingQuestionToVariable] = useState<{ [key: string]: string }>({});
+
+    const [isShowingResult, setIsShowingResult] = useState<boolean>(false);
     
 
     const realMappingQuestionToVariable = useMemo(() => {
@@ -993,8 +920,10 @@ export default function BuildDataForm() {
                                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                 </svg>
-                                Lưu lại và tiếp tục
+                                Lưu lại mô hình và tiếp tục chọn số lượng mẫu
                             </button>
+
+
 
                             {isSaved && !chatErrors.some(error => error.type === 'error') && (
                                 <div className="animate-fade-in bg-green-50 border-l-4 border-green-600 p-6 mb-6 rounded-lg shadow-sm flex flex-col items-center text-center">
@@ -1029,6 +958,7 @@ export default function BuildDataForm() {
                                         onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
                                         onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
                                         onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
+
                                         onNumRequestChange={(value) => {
                                             setNumRequest(value);
                                         }}

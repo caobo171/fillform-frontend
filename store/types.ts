@@ -61,6 +61,17 @@ export type RawForm = {
     data_model_id: string,
     mapping_question_to_variable: { [key: string]: string },
   }
+  temp_data: {
+    num_request: number,
+    basic_analysis: {
+      descriptive_statistics: DescriptiveStatistic[],
+      cronbach_alphas: CronbachAlpha[],
+      efa_result: EFAResult
+    },
+    linear_regression_analysis: {
+      regression_result: RegressionResult
+    }
+  }
 };
 
 export type RawUser = {
@@ -202,6 +213,18 @@ export type RawDataModel = {
 
   version: string;
   createdAt: string;
+
+  temp_data: {
+    basic_analysis: {
+      descriptive_statistics: DescriptiveStatistic[],
+      cronbach_alphas: CronbachAlpha[],
+      efa_result: EFAResult
+    },
+    linear_regression_analysis: {
+      regression_result: RegressionResult,
+    },
+    num_request: number,
+  }
 }
 
 
