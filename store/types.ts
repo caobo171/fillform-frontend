@@ -282,19 +282,7 @@ export type RawDataOrderModel = {
         alpha: number,
         items: string[]
       }[],
-      descriptive_statistics:{
-        count: number,
-        kurtosis: number,
-        max: number,
-        mean: number,
-        median: number,
-        min: number,
-        q25: number,
-        q75: number,
-        skewness: number,
-        std: number,
-        variable: string
-      }[],
+      descriptive_statistics:DescriptiveStatistic[],
 
       correlation_matrix: {
         [variable: string]: {
@@ -323,25 +311,7 @@ export type RawDataOrderModel = {
     },
 
     linear_regression_analysis?: {
-      regression_result: {
-        adjusted_r_squared: number,
-        coefficients: {
-          variable: string,
-          coefficient: number,
-          std_error: number,
-          t_statistic: number,
-          p_value: number,
-          significance: string
-        },
-        f_p_value: number,
-        f_statistic: number,
-        hypothesis: string,
-        n_observations: number,
-        r_squared: number,
-        residual_std_error: number,
-        source_variable: string,
-        target_variable: string
-      }
+      regression_result: RegressionResult
     }
 
 
@@ -478,3 +448,41 @@ export type RawDataOrderModel = {
   status: string;
   createdAt: string;
 };
+
+
+
+export interface RegressionCoefficient {
+  variable: string;
+  coefficient: number;
+  std_error: number;
+  t_statistic: number;
+  p_value: number;
+  significance: string;
+}
+
+export interface RegressionResult {
+  adjusted_r_squared: number;
+  coefficients: RegressionCoefficient[];
+  f_p_value: number;
+  f_statistic: number;
+  hypothesis: string;
+  n_observations: number;
+  r_squared: number;
+  residual_std_error: number;
+  source_variable: string;
+  target_variable: string;
+}
+
+export interface DescriptiveStatistic {
+  variable: string;
+  count: number;
+  mean: number;
+  std: number;
+  min: number;
+  q25: number;
+  median: number;
+  q75: number;
+  max: number;
+  skewness: number;
+  kurtosis: number;
+}

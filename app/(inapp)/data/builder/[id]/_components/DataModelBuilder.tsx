@@ -33,7 +33,7 @@ export default function DataModelBuilder() {
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [name, setName] = useState<string>('');
-    const [sample, setSample] = useState<number>(0);
+    const [isShowingResult, setIsShowingResult] = useState<boolean>(false);
 
     const [model, setModel] = useState<AdvanceModelType | null>(null);
     // State for showing download order form after model is saved

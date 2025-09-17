@@ -9,13 +9,15 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import clsx from 'clsx'
 import { useDataOrderById } from '@/hooks/data.order'
-import Constants, { Code, ORDER_STATUS } from '@/core/Constants'
+import Constants, { Code, ORDER_STATUS, OPTIONS_DELAY_ENUM } from '@/core/Constants'
 import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder'
 import { AnyObject } from '@/store/interface'
 import DataTable from './DataTable'
 import Fetch from '@/lib/core/fetch/Fetch'
 import { Alert } from '@/components/common'
 import { Toast } from '@/services/Toast'
+import LinearRegressionResults from "@/components/analysis/LinearRegressionResults";
+import DescriptiveStatistics from "@/components/analysis/DescriptiveStatistics";
 
 
 
@@ -242,45 +244,9 @@ const DataOrderPage = () => {
                         <div className="mb-8">
                             {/* Descriptive Statistics */}
                             {order.data.order.data.basic_analysis.descriptive_statistics && (
-                                <div className="bg-white rounded shadow-sm p-6 border border-gray-100 mb-6">
-                                    <h3 className="text-xl font-bold mb-4">Thống kê mô tả (Descriptive Statistics)</h3>
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full table-auto">
-                                            <thead>
-                                                <tr className="bg-gray-50">
-                                                    <th className="px-4 py-2 text-left">Biến</th>
-                                                    <th className="px-4 py-2 text-right">N</th>
-                                                    <th className="px-4 py-2 text-right">Trung bình</th>
-                                                    <th className="px-4 py-2 text-right">Độ lệch chuẩn</th>
-                                                    <th className="px-4 py-2 text-right">Min</th>
-                                                    <th className="px-4 py-2 text-right">Q25</th>
-                                                    <th className="px-4 py-2 text-right">Trung vị</th>
-                                                    <th className="px-4 py-2 text-right">Q75</th>
-                                                    <th className="px-4 py-2 text-right">Max</th>
-                                                    <th className="px-4 py-2 text-right">Skewness</th>
-                                                    <th className="px-4 py-2 text-right">Kurtosis</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {order.data.order.data.basic_analysis.descriptive_statistics.map((stat, index) => (
-                                                    <tr key={index} className="border-t">
-                                                        <td className="px-4 py-2 font-medium">{stat.variable}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.count}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.mean.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.std.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.min.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.q25.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.median.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.q75.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.max.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.skewness.toFixed(3)}</td>
-                                                        <td className="px-4 py-2 text-right">{stat.kurtosis.toFixed(3)}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                <DescriptiveStatistics 
+                                    statistics={order.data.order.data.basic_analysis.descriptive_statistics}
+                                />
                             )}
 
                             {/* Cronbach's Alpha */}
@@ -402,98 +368,9 @@ const DataOrderPage = () => {
                 {/* Linear Regression Results */}
                 {
                     order.data?.order?.data?.linear_regression_analysis?.regression_result ? (
-                        <div className="bg-white rounded shadow-sm p-6 border border-gray-100 mb-8">
-                            <h3 className="text-xl font-bold mb-4">Phân tích hồi quy tuyến tính (Linear Regression)</h3>
-                            
-                            {/* Model Summary */}
-                            <div className="mb-6">
-                                <h4 className="text-lg font-semibold mb-3">Tóm tắt mô hình</h4>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <div className="text-sm text-gray-600">R²</div>
-                                        <div className="text-lg font-semibold">{order.data.order.data.linear_regression_analysis.regression_result.r_squared.toFixed(3)}</div>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <div className="text-sm text-gray-600">Adjusted R²</div>
-                                        <div className="text-lg font-semibold">{order.data.order.data.linear_regression_analysis.regression_result.adjusted_r_squared.toFixed(3)}</div>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <div className="text-sm text-gray-600">F-Statistic</div>
-                                        <div className="text-lg font-semibold">{order.data.order.data.linear_regression_analysis.regression_result.f_statistic.toFixed(3)}</div>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <div className="text-sm text-gray-600">F p-value</div>
-                                        <div className="text-lg font-semibold">
-                                            {order.data.order.data.linear_regression_analysis.regression_result.f_p_value < 0.001 ? '<0.001' : order.data.order.data.linear_regression_analysis.regression_result.f_p_value.toFixed(3)}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <div className="text-sm text-gray-600">Mô hình</div>
-                                        <div className="text-sm font-medium">{order.data.order.data.linear_regression_analysis.regression_result.hypothesis}</div>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <div className="text-sm text-gray-600">Số quan sát</div>
-                                        <div className="text-lg font-semibold">{order.data.order.data.linear_regression_analysis.regression_result.n_observations}</div>
-                                    </div>
-                                    <div className="bg-gray-50 p-4 rounded">
-                                        <div className="text-sm text-gray-600">Sai số chuẩn</div>
-                                        <div className="text-lg font-semibold">{order.data.order.data.linear_regression_analysis.regression_result.residual_std_error.toFixed(3)}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Coefficients Table */}
-                            <div>
-                                <h4 className="text-lg font-semibold mb-3">Hệ số hồi quy</h4>
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full table-auto">
-                                        <thead>
-                                            <tr className="bg-gray-50">
-                                                <th className="px-4 py-2 text-left">Biến</th>
-                                                <th className="px-4 py-2 text-right">Hệ số</th>
-                                                <th className="px-4 py-2 text-right">Sai số chuẩn</th>
-                                                <th className="px-4 py-2 text-right">t-Statistic</th>
-                                                <th className="px-4 py-2 text-right">p-value</th>
-                                                <th className="px-4 py-2 text-center">Ý nghĩa</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {order.data.order.data.linear_regression_analysis.regression_result.coefficients.map((coeff, index) => (
-                                                <tr key={index} className="border-t">
-                                                    <td className="px-4 py-2 font-medium">{coeff.variable}</td>
-                                                    <td className="px-4 py-2 text-right">{coeff.coefficient.toFixed(4)}</td>
-                                                    <td className="px-4 py-2 text-right">{coeff.std_error.toFixed(4)}</td>
-                                                    <td className="px-4 py-2 text-right">{coeff.t_statistic.toFixed(3)}</td>
-                                                    <td className="px-4 py-2 text-right">
-                                                        {coeff.p_value < 0.001 ? '<0.001' : coeff.p_value.toFixed(3)}
-                                                    </td>
-                                                    <td className="px-4 py-2 text-center">
-                                                        <span className={`font-semibold ${
-                                                            coeff.significance === '***' ? 'text-green-600' :
-                                                            coeff.significance === '**' ? 'text-blue-600' :
-                                                            coeff.significance === '*' ? 'text-yellow-600' :
-                                                            'text-gray-400'
-                                                        }`}>
-                                                            {coeff.significance || 'ns'}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div className="mt-4 text-sm text-gray-600">
-                                    <p>
-                                        <span className="text-green-600 font-semibold">***:</span> p &lt; 0.001 | 
-                                        <span className="text-blue-600 font-semibold ml-2">**:</span> p &lt; 0.01 | 
-                                        <span className="text-yellow-600 font-semibold ml-2">*:</span> p &lt; 0.05 | 
-                                        <span className="text-gray-400 font-semibold ml-2">ns:</span> không có ý nghĩa thống kê
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        <LinearRegressionResults 
+                            regressionResult={order.data.order.data.linear_regression_analysis.regression_result}
+                        />
                     ) : null
                 }
 
