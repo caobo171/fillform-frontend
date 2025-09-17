@@ -24,6 +24,10 @@ import Select from 'react-select';
 import { AdvanceModelType, ModerateEffectNodeDataType, VariableNodeDataType } from '@/store/data.service.types';
 import { useModelVariables } from '@/hooks/useModelVariables';
 import { ModelSelectionComponent } from './ModelSelectionComponent';
+import DescriptiveStatistics from '@/components/analysis/DescriptiveStatistics';
+import CronbachAlphaResults from '@/components/analysis/CronbachAlphaResults';
+import EFAResults from '@/components/analysis/EFAResults';
+import LinearRegressionResults from '@/components/analysis/LinearRegressionResults';
 
 interface ChatError {
     id: string;
@@ -82,7 +86,7 @@ export default function BuildDataForm() {
     const [mappingQuestionToVariable, setMappingQuestionToVariable] = useState<{ [key: string]: string }>({});
 
     const [isShowingResult, setIsShowingResult] = useState<boolean>(false);
-    
+
 
     const realMappingQuestionToVariable = useMemo(() => {
 
@@ -100,7 +104,7 @@ export default function BuildDataForm() {
     const missingMapVariables = useMemo(() => {
         let res: VariableNodeDataType[] = [];
         for (const [key, value] of Object.entries(advanceModelData?.nodes || [])) {
-            
+
             if (value.data?.nodeType !== "variable") continue;
 
             let mappingQuestions = Object.values(mappingQuestionToVariable).filter((item) => item == value.id);
@@ -267,6 +271,47 @@ export default function BuildDataForm() {
         } finally {
             setIsLoading(false);
             setReloadEvent(!reloadEvent);
+        }
+    };
+
+
+    const onHandleDataAnalysis = async () => {
+        if (!numRequest || numRequest <= 0) {
+            Toast.error('Please enter a valid number of requests');
+            return;
+        }
+
+        setIsLoading(true);
+        setSubmitDisabled(true);
+
+        try {
+            const response = await Fetch.postWithAccessToken<{
+                code: number,
+                message?: string,
+                form: RawForm
+            }>('/api/form/analysis', {
+                id: dataForm?.form?.id,
+                data_model_id: selectedAdvanceModel?.id,
+                num_request: numRequest,
+            });
+
+            if (response.data.code !== Code.SUCCESS) {
+                setIsLoading(false);
+                setSubmitDisabled(false);
+                Toast.error(response.data.message || 'Failed to create analysis');
+                return;
+            }
+
+            mutateForm();
+            setIsShowingResult(true);
+
+            Toast.success('Analysis completed successfully!');
+        } catch (error) {
+            console.error('Error creating analysis:', error);
+            Toast.error('Failed to create analysis');
+        } finally {
+            setIsLoading(false);
+            setSubmitDisabled(false);
         }
     };
 
@@ -782,116 +827,198 @@ export default function BuildDataForm() {
                                     </div>
 
 
-                                    <CreateOrderForm
-                                        orderType={ORDER_TYPE.DATA_MODEL}
-                                        disabledDays={disabledDays}
-                                        scheduleEnabled={scheduleEnabled}
-                                        startTime={startTime}
-                                        endTime={endTime}
-                                        userCredit={user?.credit || 0}
-                                        numRequest={numRequest}
-                                        delayType={delayValue}
-                                        formId={dataForm?.form?.id}
-                                        formName={dataForm?.form?.name}
-                                        bankInfo={bankInfo}
-                                        showBackButton={false}
-                                        numModerateVariables={currentModerateVariables.length}
-                                        numMediatorVariables={currentMediatorVariables.length}
-                                        numIndependentVariables={currentIndependentVariables.length}
-                                        numDependentVariables={currentDependentVariables.length}
-                                        specificStartDate={specificStartDate}
-                                        specificEndDate={specificEndDate}
-                                        specificDailySchedules={specificDailySchedules}
-                                        onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
-                                        onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
-                                        onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
-
-                                        onNumRequestChange={(value) => {
-                                            setNumRequest(value);
-                                        }}
-                                        onDelayTypeChange={(value) => {
-                                            setDelayValue(value);
-                                        }}
-                                        onScheduleEnabledChange={(value) => {
-                                            setScheduleEnabled(value);
-                                        }}
-                                        onStartTimeChange={(value) => {
-                                            setStartTime(value);
-                                        }}
-                                        onEndTimeChange={(value) => {
-                                            setEndTime(value);
-                                        }}
-                                        onDisabledDaysChange={(value) => {
-                                            setDisabledDays(value);
-                                        }}
-                                        className="bg-white p-10 rounded-lg shadow-sm border border-gray-100 max-w-2xl"
-                                    />
-
-                                    <button
-                                        type="submit"
-                                        onClick={() => {
-                                            onSubmitOrder();
-                                        }}
-                                        className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
-                                                ${(user?.credit || 0) < numRequest || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        disabled={(user?.credit || 0) < numRequest || submitDisabled}
-                                    >
-                                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        {isShowErrorMessage ? 'Vẫn tiếp tục điền form' : 'Bắt đầu điền form'}
-                                    </button>
-
-
-                                    <div className="w-full mt-4 flex items-center justify-center">
-                                        {isShowErrorMessage && chatErrors.some(error => error.type === 'error') && (
-                                            <div className="w-full max-w-md text-red-800 bg-red-50 px-5 py-4 rounded-lg border border-red-200 shadow flex flex-col items-center animate-shake text-center" role="alert">
-                                                <div className="flex items-center mb-2">
-                                                    <svg className="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                    </svg>
-                                                    <span className="text-base font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
-                                                </div>
-                                                <ul className="list-disc list-inside text-sm text-left pl-5 mb-3">
-                                                    {chatErrors.filter(error => error.type === 'error').map((error, index) => (
-                                                        <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
-                                                    ))}
-                                                </ul>
+                                    {!isShowingResult ? (
+                                        <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-100 max-w-2xl">
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Số lượng mẫu cần tạo
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="1000"
+                                                    value={numRequest}
+                                                    onChange={(e) => setNumRequest(parseInt(e.target.value) || 0)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    placeholder="Nhập số lượng mẫu..."
+                                                />
                                             </div>
-                                        )}
-                                    </div>
+
+                                            <button
+                                                type="button"
+                                                onClick={onHandleDataAnalysis}
+                                                disabled={numRequest <= 0}
+                                                className={`w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                                    ${numRequest <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                                </svg>
+                                                Kiểm tra kết quả dữ liệu
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <CreateOrderForm
+                                                orderType={ORDER_TYPE.DATA_MODEL}
+                                                disabledDays={disabledDays}
+                                                scheduleEnabled={scheduleEnabled}
+                                                startTime={startTime}
+                                                endTime={endTime}
+                                                userCredit={user?.credit || 0}
+                                                numRequest={numRequest}
+                                                delayType={delayValue}
+                                                formId={dataForm?.form?.id}
+                                                formName={dataForm?.form?.name}
+                                                bankInfo={bankInfo}
+                                                showBackButton={false}
+                                                numModerateVariables={currentModerateVariables.length}
+                                                numMediatorVariables={currentMediatorVariables.length}
+                                                numIndependentVariables={currentIndependentVariables.length}
+                                                numDependentVariables={currentDependentVariables.length}
+                                                specificStartDate={specificStartDate}
+                                                specificEndDate={specificEndDate}
+                                                specificDailySchedules={specificDailySchedules}
+                                                onSpecificStartDateChange={(value) => setSpecificStartDate(value)}
+                                                onSpecificEndDateChange={(value) => setSpecificEndDate(value)}
+                                                onSpecificDailySchedulesChange={(value) => setSpecificDailySchedules(value)}
+
+                                                onNumRequestChange={(value) => {
+                                                    setNumRequest(value);
+                                                }}
+                                                onDelayTypeChange={(value) => {
+                                                    setDelayValue(value);
+                                                }}
+                                                onScheduleEnabledChange={(value) => {
+                                                    setScheduleEnabled(value);
+                                                }}
+                                                onStartTimeChange={(value) => {
+                                                    setStartTime(value);
+                                                }}
+                                                onEndTimeChange={(value) => {
+                                                    setEndTime(value);
+                                                }}
+                                                onDisabledDaysChange={(value) => {
+                                                    setDisabledDays(value);
+                                                }}
+                                                className="bg-white p-10 rounded-lg shadow-sm border border-gray-100 max-w-2xl"
+                                            />
+                                            <button
+                                                type="submit"
+                                                onClick={() => {
+                                                    onSubmitOrder();
+                                                }}
+                                                className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                                ${(user?.credit || 0) < numRequest || submitDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                disabled={(user?.credit || 0) < numRequest || submitDisabled}
+                                            >
+                                                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {isShowErrorMessage ? 'Vẫn tiếp tục điền form' : 'Bắt đầu điền form'}
+                                            </button>
+
+
+                                            <div className="w-full mt-4 flex items-center justify-center">
+                                                {isShowErrorMessage && chatErrors.some(error => error.type === 'error') && (
+                                                    <div className="w-full max-w-md text-red-800 bg-red-50 px-5 py-4 rounded-lg border border-red-200 shadow flex flex-col items-center animate-shake text-center" role="alert">
+                                                        <div className="flex items-center mb-2">
+                                                            <svg className="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                            </svg>
+                                                            <span className="text-base font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
+                                                        </div>
+                                                        <ul className="list-disc list-inside text-sm text-left pl-5 mb-3">
+                                                            {chatErrors.filter(error => error.type === 'error').map((error, index) => (
+                                                                <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="w-full mt-4 flex justify-center items-center">
+
+                                                {isSaved && chatErrors.some(error => error.type === 'error') && (
+                                                    <div className="w-full max-w-md mt-4 text-red-800 bg-red-50 px-5 py-4 rounded-lg border border-red-200 shadow flex flex-col items-center animate-shake" role="alert">
+                                                        <div className="flex items-center mb-2">
+                                                            <svg className="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                            </svg>
+                                                            <span className="text-base font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
+                                                        </div>
+                                                        <ul className="list-disc list-inside text-sm text-left pl-5 mb-3">
+                                                            {chatErrors.filter(error => error.type === 'error').map((error, index) => (
+                                                                <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
+                                                            ))}
+                                                        </ul>
+                                                        <button
+                                                            onClick={() => onSubmitOrder()}
+                                                            className="inline-flex items-center px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all"
+                                                        >
+                                                            Vẫn chạy điền form
+                                                            <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+
+                                    )}
+
+
                                 </div>
                             )}
-                            <div className="w-full mt-4 flex justify-center items-center">
 
-                                {isSaved && chatErrors.some(error => error.type === 'error') && (
-                                    <div className="w-full max-w-md mt-4 text-red-800 bg-red-50 px-5 py-4 rounded-lg border border-red-200 shadow flex flex-col items-center animate-shake" role="alert">
-                                        <div className="flex items-center mb-2">
-                                            <svg className="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
-                                            <span className="text-base font-medium">Vui lòng kiểm tra và sửa các lỗi sau:</span>
-                                        </div>
-                                        <ul className="list-disc list-inside text-sm text-left pl-5 mb-3">
-                                            {chatErrors.filter(error => error.type === 'error').map((error, index) => (
-                                                <li key={index} dangerouslySetInnerHTML={{ __html: error.message }}></li>
-                                            ))}
-                                        </ul>
-                                        <button
-                                            onClick={() => onSubmitOrder()}
-                                            className="inline-flex items-center px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all"
-                                        >
-                                            Vẫn chạy điền form
-                                            <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </form>
+
+
+                    {
+                        isShowingResult && (
+                            <>
+                                {/* Basic Analysis Results */}
+                                {
+                                    dataForm?.form?.temp_data?.basic_analysis ? (
+                                        <div className="mb-8">
+                                            {/* Descriptive Statistics */}
+                                            {dataForm?.form?.temp_data?.basic_analysis?.descriptive_statistics && (
+                                                <DescriptiveStatistics
+                                                    statistics={dataForm?.form?.temp_data?.basic_analysis?.descriptive_statistics}
+                                                />
+                                            )}
+
+                                            {/* Cronbach's Alpha */}
+                                            {dataForm?.form?.temp_data?.basic_analysis?.cronbach_alphas && dataForm?.form?.temp_data?.basic_analysis?.cronbach_alphas.length > 0 && (
+                                                <CronbachAlphaResults
+                                                    cronbachAlphas={dataForm?.form?.temp_data?.basic_analysis?.cronbach_alphas}
+                                                />
+                                            )}
+
+                                            {/* EFA Results */}
+                                            {dataForm?.form?.temp_data?.basic_analysis?.efa_result && (
+                                                <EFAResults
+                                                    efaResult={dataForm?.form?.temp_data?.basic_analysis?.efa_result}
+                                                />
+                                            )}
+                                        </div>
+                                    ) : null
+                                }
+
+
+                                {/* Linear Regression Results */}
+                                {
+                                    dataForm?.form?.temp_data?.linear_regression_analysis?.regression_result ? (
+                                        <LinearRegressionResults
+                                            regressionResult={dataForm?.form?.temp_data?.linear_regression_analysis?.regression_result}
+                                        />
+                                    ) : null
+                                }
+                            </>
+                        )
+                    }
                 </div>
             </section>
 
