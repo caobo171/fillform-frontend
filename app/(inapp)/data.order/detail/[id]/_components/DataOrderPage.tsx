@@ -219,65 +219,78 @@ const DataOrderPage = () => {
 
 
 
-                {
-                    order.data?.order?.data?.analysis ? (
-                        <DataTable
-                            data={order.data.order.data.analysis}
-                            title="Kết quả phân tích SmartPLS"
-                            className="mb-8"
-                        />
-                    ) : null
-                }
+
+                <>
+                    {
+                        isAdmin ? (
+                            <>
+                                {
+                                    order.data?.order?.data?.analysis ? (
+                                        <DataTable
+                                            data={order.data.order.data.analysis}
+                                            title="Kết quả phân tích SmartPLS"
+                                            className="mb-8"
+                                        />
+                                    ) : null
+                                }
 
 
 
-                {
-                    order.data?.order?.data?.analysis ? (
-                        <DataTable
-                            data={order.data.order.data.analysis}
-                            title="Kết quả phân tích SmartPLS"
-                            className="mb-8"
-                        />
-                    ) : null
-                }
+                                {
+                                    order.data?.order?.data?.analysis ? (
+                                        <DataTable
+                                            data={order.data.order.data.analysis}
+                                            title="Kết quả phân tích SmartPLS"
+                                            className="mb-8"
+                                        />
+                                    ) : null
+                                }
 
-                {/* Basic Analysis Results */}
-                {
-                    order.data?.order?.data?.basic_analysis ? (
-                        <div className="mb-8">
-                            {/* Descriptive Statistics */}
-                            {order.data.order.data.basic_analysis.descriptive_statistics && (
-                                <DescriptiveStatistics
-                                    statistics={order.data.order.data.basic_analysis.descriptive_statistics}
-                                />
-                            )}
+                                {/* Basic Analysis Results */}
+                                {
+                                    order.data?.order?.data?.basic_analysis ? (
+                                        <div className="mb-8">
+                                            {/* Descriptive Statistics */}
+                                            {order.data.order.data.basic_analysis.descriptive_statistics && (
+                                                <DescriptiveStatistics
+                                                    statistics={order.data.order.data.basic_analysis.descriptive_statistics}
+                                                />
+                                            )}
 
-                            {/* Cronbach's Alpha */}
-                            {order.data.order.data.basic_analysis.cronbach_alphas && order.data.order.data.basic_analysis.cronbach_alphas.length > 0 && (
-                                <CronbachAlphaResults
-                                    cronbachAlphas={order.data.order.data.basic_analysis.cronbach_alphas}
-                                />
-                            )}
+                                            {/* Cronbach's Alpha */}
+                                            {order.data.order.data.basic_analysis.cronbach_alphas && order.data.order.data.basic_analysis.cronbach_alphas.length > 0 && (
+                                                <CronbachAlphaResults
+                                                    cronbachAlphas={order.data.order.data.basic_analysis.cronbach_alphas}
+                                                />
+                                            )}
 
-                            {/* EFA Results */}
-                            {order.data.order.data.basic_analysis.efa_result && (
-                                <EFAResults
-                                    efaResult={order.data.order.data.basic_analysis.efa_result}
-                                />
-                            )}
-                        </div>
-                    ) : null
-                }
+                                            {/* EFA Results */}
+                                            {order.data.order.data.basic_analysis.efa_result && (
+                                                <EFAResults
+                                                    efaResult={order.data.order.data.basic_analysis.efa_result}
+                                                />
+                                            )}
+                                        </div>
+                                    ) : null
+                                }
 
 
-                {/* Linear Regression Results */}
-                {
-                    order.data?.order?.data?.linear_regression_analysis?.regression_result ? (
-                        <LinearRegressionResults
-                            regressionResult={order.data.order.data.linear_regression_analysis.regression_result}
-                        />
-                    ) : null
-                }
+                                {/* Linear Regression Results */}
+                                {
+                                    order.data?.order?.data?.linear_regression_analysis?.regression_result ? (
+                                        <LinearRegressionResults
+                                            regressionResult={order.data.order.data.linear_regression_analysis.regression_result}
+                                        />
+                                    ) : null
+                                }
+                            </>
+                        ) : null
+                    }
+
+                </>
+
+
+
 
                 {/* SmartPLS Analysis Section */}
                 {
