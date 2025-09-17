@@ -486,3 +486,26 @@ export interface DescriptiveStatistic {
   skewness: number;
   kurtosis: number;
 }
+
+export interface EFAFactor {
+  factor_number: number;
+  eigenvalue: number;
+  variance_explained: number;
+  loadings: {
+    [variable: string]: number;
+  };
+}
+
+export interface EFAResult {
+  kmo_measure: number;
+  bartlett_test_statistic: number;
+  bartlett_p_value: number;
+  total_variance_explained: number;
+  factors: EFAFactor[];
+}
+
+export interface CronbachAlpha {
+  construct_name: string;
+  alpha: number;
+  items: string[];
+}

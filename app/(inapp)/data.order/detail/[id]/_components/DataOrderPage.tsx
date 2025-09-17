@@ -18,6 +18,8 @@ import { Alert } from '@/components/common'
 import { Toast } from '@/services/Toast'
 import LinearRegressionResults from "@/components/analysis/LinearRegressionResults";
 import DescriptiveStatistics from "@/components/analysis/DescriptiveStatistics";
+import EFAResults from "@/components/analysis/EFAResults";
+import CronbachAlphaResults from "@/components/analysis/CronbachAlphaResults";
 
 
 
@@ -216,6 +218,7 @@ const DataOrderPage = () => {
                 </div>
 
 
+
                 {
                     order.data?.order?.data?.analysis ? (
                         <DataTable
@@ -228,7 +231,7 @@ const DataOrderPage = () => {
 
 
 
-{
+                {
                     order.data?.order?.data?.analysis ? (
                         <DataTable
                             data={order.data.order.data.analysis}
@@ -244,196 +247,93 @@ const DataOrderPage = () => {
                         <div className="mb-8">
                             {/* Descriptive Statistics */}
                             {order.data.order.data.basic_analysis.descriptive_statistics && (
-                                <DescriptiveStatistics 
+                                <DescriptiveStatistics
                                     statistics={order.data.order.data.basic_analysis.descriptive_statistics}
                                 />
                             )}
 
                             {/* Cronbach's Alpha */}
                             {order.data.order.data.basic_analysis.cronbach_alphas && order.data.order.data.basic_analysis.cronbach_alphas.length > 0 && (
-                                <div className="bg-white rounded shadow-sm p-6 border border-gray-100 mb-6">
-                                    <h3 className="text-xl font-bold mb-4">Độ tin cậy Cronbach's Alpha</h3>
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full table-auto">
-                                            <thead>
-                                                <tr className="bg-gray-50">
-                                                    <th className="px-4 py-2 text-left">Nhân tố</th>
-                                                    <th className="px-4 py-2 text-right">Cronbach's Alpha</th>
-                                                    <th className="px-4 py-2 text-right">Số biến</th>
-                                                    <th className="px-4 py-2 text-left">Các biến</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {order.data.order.data.basic_analysis.cronbach_alphas.map((alpha, index) => (
-                                                    <tr key={index} className="border-t">
-                                                        <td className="px-4 py-2 font-medium">{alpha.construct_name}</td>
-                                                        <td className="px-4 py-2 text-right">
-                                                            <span className={`font-semibold ${alpha.alpha >= 0.7 ? 'text-green-600' : alpha.alpha >= 0.6 ? 'text-yellow-600' : 'text-red-600'}`}>
-                                                                {alpha.alpha.toFixed(3)}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-4 py-2 text-right">{alpha.items.length}</td>
-                                                        <td className="px-4 py-2 text-sm text-gray-600">{alpha.items.join(', ')}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div className="mt-4 text-sm text-gray-600">
-                                        <p><span className="text-green-600 font-semibold">≥ 0.7:</span> Độ tin cậy tốt | 
-                                           <span className="text-yellow-600 font-semibold ml-2">0.6-0.7:</span> Độ tin cậy chấp nhận được | 
-                                           <span className="text-red-600 font-semibold ml-2">&lt; 0.6:</span> Độ tin cậy kém</p>
-                                    </div>
-                                </div>
+                                <CronbachAlphaResults
+                                    cronbachAlphas={order.data.order.data.basic_analysis.cronbach_alphas}
+                                />
                             )}
 
-                            {/* EFA Analysis */}
+                            {/* EFA Results */}
                             {order.data.order.data.basic_analysis.efa_result && (
-                                <div className="bg-white rounded shadow-sm p-6 border border-gray-100 mb-6">
-                                    <h3 className="text-xl font-bold mb-4">Phân tích nhân tố khám phá (EFA)</h3>
-                                    
-                                    {/* EFA Summary */}
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                        <div className="bg-gray-50 p-4 rounded">
-                                            <div className="text-sm text-gray-600">KMO Measure</div>
-                                            <div className="text-lg font-semibold">{order.data.order.data.basic_analysis.efa_result.kmo_measure.toFixed(3)}</div>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded">
-                                            <div className="text-sm text-gray-600">Bartlett's Test</div>
-                                            <div className="text-lg font-semibold">{order.data.order.data.basic_analysis.efa_result.bartlett_test_statistic.toFixed(2)}</div>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded">
-                                            <div className="text-sm text-gray-600">Bartlett's p-value</div>
-                                            <div className="text-lg font-semibold">{order.data.order.data.basic_analysis.efa_result.bartlett_p_value < 0.001 ? '<0.001' : order.data.order.data.basic_analysis.efa_result.bartlett_p_value.toFixed(3)}</div>
-                                        </div>
-                                        <div className="bg-gray-50 p-4 rounded">
-                                            <div className="text-sm text-gray-600">Tổng phương sai giải thích</div>
-                                            <div className="text-lg font-semibold">{order.data.order.data.basic_analysis.efa_result.total_variance_explained.toFixed(1)}%</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Factor Loadings */}
-                                    {order.data.order.data.basic_analysis.efa_result.factors && order.data.order.data.basic_analysis.efa_result.factors.length > 0 && (
-                                        <div>
-                                            <h4 className="text-lg font-semibold mb-3">Ma trận nhân tố</h4>
-                                            <div className="overflow-x-auto">
-                                                <table className="min-w-full table-auto">
-                                                    <thead>
-                                                        <tr className="bg-gray-50">
-                                                            <th className="px-4 py-2 text-left">Biến</th>
-                                                            {order.data.order.data.basic_analysis.efa_result.factors.map((factor, index) => (
-                                                                <th key={index} className="px-4 py-2 text-right">
-                                                                    Nhân tố {factor.factor_number}
-                                                                    <div className="text-xs text-gray-500">
-                                                                        (λ={factor.eigenvalue.toFixed(2)}, {factor.variance_explained.toFixed(1)}%)
-                                                                    </div>
-                                                                </th>
-                                                            ))}
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {/* Get all unique variables from all factors */}
-                                                        {Array.from(new Set(
-                                                            order.data.order.data.basic_analysis.efa_result.factors.flatMap(factor => 
-                                                                Object.keys(factor.loadings)
-                                                            )
-                                                        )).map((variable, varIndex) => (
-                                                            <tr key={varIndex} className="border-t">
-                                                                <td className="px-4 py-2 font-medium">{variable}</td>
-                                                                {order.data?.order?.data?.basic_analysis?.efa_result?.factors.map((factor, factorIndex) => (
-                                                                    <td key={factorIndex} className="px-4 py-2 text-right">
-                                                                        {factor.loadings[variable] ? (
-                                                                            <span className={`${Math.abs(factor.loadings[variable]) >= 0.5 ? 'font-bold text-blue-600' : ''}`}>
-                                                                                {factor.loadings[variable].toFixed(3)}
-                                                                            </span>
-                                                                        ) : '-'}
-                                                                    </td>
-                                                                ))}
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div className="mt-4 text-sm text-gray-600">
-                                                <p><span className="font-semibold text-blue-600">Hệ số tải ≥ 0.5:</span> Có ý nghĩa thống kê</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                <EFAResults
+                                    efaResult={order.data.order.data.basic_analysis.efa_result}
+                                />
                             )}
                         </div>
                     ) : null
                 }
 
+
                 {/* Linear Regression Results */}
                 {
                     order.data?.order?.data?.linear_regression_analysis?.regression_result ? (
-                        <LinearRegressionResults 
+                        <LinearRegressionResults
                             regressionResult={order.data.order.data.linear_regression_analysis.regression_result}
                         />
                     ) : null
                 }
 
-                <>
-                    {
-                        isAdmin ? (
-                            <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
-                                <h2 className="text-2xl font-bold mb-4">Chạy phân tích dữ liệu SmartPLS</h2>
-                                <p className="text-gray-600 mb-6">Chưa có kết quả phân tích. Nhấn nút bên dưới để bắt đầu phân tích dữ liệu với thuật toán SmartPLS.</p>
+                {/* SmartPLS Analysis Section */}
+                {
+                    isAdmin ? (
+                        <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
+                            <h2 className="text-2xl font-bold mb-4">Chạy phân tích dữ liệu SmartPLS</h2>
+                            <p className="text-gray-600 mb-6">Chưa có kết quả phân tích. Nhấn nút bên dưới để bắt đầu phân tích dữ liệu với thuật toán SmartPLS.</p>
 
-                                <button
-                                    onClick={async () => {
-                                        setIsAnalyzing(true);
-                                        try {
-                                            const response = await Fetch.postWithAccessToken<{
-                                                order: any,
-                                                code: number,
-                                                message: string
-                                            }>("/api/data.order/analysize", {
-                                                id: params.id
-                                            });
+                            <button
+                                onClick={async () => {
+                                    setIsAnalyzing(true);
+                                    try {
+                                        const response = await Fetch.postWithAccessToken<{
+                                            order: any,
+                                            code: number,
+                                            message: string
+                                        }>("/api/data.order/analysize", {
+                                            id: params.id
+                                        });
 
-                                            const result = await response;
-                                            if (result.data.code === Code.SUCCESS) {
-                                                // Refresh the order data to show analysis results
-                                                order.mutate();
-                                            } else {
-                                                Toast.error('Có lỗi xảy ra khi phân tích dữ liệu: ' + result.data.message);
-                                            }
-                                        } catch (error) {
-                                            console.error('Error analyzing data:', error);
-                                            Toast.error('Có lỗi xảy ra khi phân tích dữ liệu');
-                                        } finally {
-
+                                        if (response.data.code === Code.SUCCESS) {
+                                            Toast.success("Phân tích thành công!");
+                                            order.mutate();
+                                        } else {
+                                            Toast.error(response.data.message || "Có lỗi xảy ra khi phân tích");
                                         }
-                                    }}
-                                    // disabled={isAnalyzing}
-                                    className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                >
-                                    {isAnalyzing ? (
-                                        <>
-                                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            <span>Đang phân tích...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                            </svg>
-                                            <span>Bắt đầu phân tích SmartPLS</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        ) : <></>
-                    }
-                </>
-
-
-
+                                    } catch (error) {
+                                        console.error("Analysis error:", error);
+                                        Toast.error("Có lỗi xảy ra khi phân tích");
+                                    } finally {
+                                        setIsAnalyzing(false);
+                                    }
+                                }}
+                                disabled={isAnalyzing}
+                                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200 space-x-2"
+                            >
+                                {isAnalyzing ? (
+                                    <>
+                                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>Đang phân tích...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                        </svg>
+                                        <span>Bắt đầu phân tích SmartPLS</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    ) : null
+                }
             </div>
         </section>
     )

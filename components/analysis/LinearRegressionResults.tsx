@@ -14,7 +14,7 @@ export const LinearRegressionResults: React.FC<LinearRegressionResultsProps> = (
 }) => {
   return (
     <div className={`bg-white rounded shadow-sm p-6 border border-gray-100 mb-8 ${className}`}>
-      <h3 className="text-xl font-bold mb-4">Phân tích hồi quy tuyến tính (Linear Regression)</h3>
+      <h3 className="text-lg font-bold mb-4">Phân tích hồi quy tuyến tính (Linear Regression)</h3>
       
       {/* Model Summary */}
       <div className="mb-6">
