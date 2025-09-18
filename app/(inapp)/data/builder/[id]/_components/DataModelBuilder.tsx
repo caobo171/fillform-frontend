@@ -21,10 +21,11 @@ import { AdvanceModelType, ModerateEffectNodeDataType } from '@/store/data.servi
 import { useModelVariables } from '@/hooks/useModelVariables'
 import CreateDownloadOrderForm from '@/components/form/CreateDownloadOrderForm'
 import { useMe, useMyBankInfo } from '@/hooks/user'
-import DescriptiveStatistics from '@/components/analysis/DescriptiveStatistics'
-import CronbachAlphaResults from '@/components/analysis/CronbachAlphaResults'
-import EFAResults from '@/components/analysis/EFAResults'
-import LinearRegressionResults from '@/components/analysis/LinearRegressionResults'
+import DescriptiveStatistics from '@/components/analysis/DescriptiveStatistics';
+import CronbachAlphaResults from '@/components/analysis/CronbachAlphaResults';
+import EFAResults from '@/components/analysis/EFAResults';
+import LinearRegressionResults from '@/components/analysis/LinearRegressionResults';
+import PearsonCorrelations from '@/components/analysis/PearsonCorrelations';
 
 export default function DataModelBuilder() {
 
@@ -56,7 +57,7 @@ export default function DataModelBuilder() {
 
 
     useEffect(() => {
-        if (numRequest > 0){
+        if (numRequest > 0) {
             setIsShowingResult(false);
         }
     }, [numRequest])
@@ -372,6 +373,13 @@ export default function DataModelBuilder() {
                                                     />
                                                 )}
 
+                                                {/* Pearson Correlations */}
+                                                {dataModel?.data_model?.temp_data?.basic_analysis?.pearson_correlations && dataModel?.data_model?.temp_data?.basic_analysis?.pearson_correlations.length > 0 && (
+                                                    <PearsonCorrelations
+                                                        correlations={dataModel?.data_model?.temp_data?.basic_analysis?.pearson_correlations}
+                                                    />
+                                                )}
+
                                                 {/* Cronbach's Alpha */}
                                                 {dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas && dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas.length > 0 && (
                                                     <CronbachAlphaResults
@@ -385,6 +393,8 @@ export default function DataModelBuilder() {
                                                         efaResult={dataModel?.data_model?.temp_data?.basic_analysis?.efa_result}
                                                     />
                                                 )}
+
+
                                             </div>
                                         ) : null
                                     }

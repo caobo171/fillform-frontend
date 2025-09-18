@@ -66,7 +66,8 @@ export type RawForm = {
     basic_analysis: {
       descriptive_statistics: DescriptiveStatistic[],
       cronbach_alphas: CronbachAlpha[],
-      efa_result: EFAResult
+      efa_result: EFAResult,
+      pearson_correlations: PearsonCorrelation[],
     },
     linear_regression_analysis: {
       regression_result: RegressionResult
@@ -218,7 +219,8 @@ export type RawDataModel = {
     basic_analysis: {
       descriptive_statistics: DescriptiveStatistic[],
       cronbach_alphas: CronbachAlpha[],
-      efa_result: EFAResult
+      efa_result: EFAResult,
+      pearson_correlations: PearsonCorrelation[],
     },
     linear_regression_analysis: {
       regression_result: RegressionResult,
@@ -305,7 +307,7 @@ export type RawDataOrderModel = {
         alpha: number,
         items: string[]
       }[],
-      descriptive_statistics:DescriptiveStatistic[],
+      descriptive_statistics: DescriptiveStatistic[],
 
       correlation_matrix: {
         [variable: string]: {
@@ -313,10 +315,13 @@ export type RawDataOrderModel = {
         }
       },
 
+
+      pearson_correlations: PearsonCorrelation[],
+
       efa_result: {
         bartlett_p_value: number,
         bartlett_test_statistic: number,
-        
+
         kmo_measure: number,
         total_variance_explained: number,
 
@@ -434,7 +439,7 @@ export type RawDataOrderModel = {
         }
       },
 
-      raw_outer_model:{
+      raw_outer_model: {
         [variable: string]: {
           [variable: string]: number
         }
@@ -531,4 +536,13 @@ export interface CronbachAlpha {
   construct_name: string;
   alpha: number;
   items: string[];
+}
+
+export interface PearsonCorrelation {
+  variable1: string;
+  variable2: string;
+  correlation_coefficient: number;
+  p_value: number;
+  sample_size: number;
+  significance: string;
 }

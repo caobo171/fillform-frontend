@@ -28,6 +28,7 @@ import DescriptiveStatistics from '@/components/analysis/DescriptiveStatistics';
 import CronbachAlphaResults from '@/components/analysis/CronbachAlphaResults';
 import EFAResults from '@/components/analysis/EFAResults';
 import LinearRegressionResults from '@/components/analysis/LinearRegressionResults';
+import PearsonCorrelations from '@/components/analysis/PearsonCorrelations';
 
 interface ChatError {
     id: string;
@@ -983,10 +984,22 @@ export default function BuildDataForm() {
                                 {
                                     dataForm?.form?.temp_data?.basic_analysis ? (
                                         <div className="mb-8">
+
+
                                             {/* Descriptive Statistics */}
                                             {dataForm?.form?.temp_data?.basic_analysis?.descriptive_statistics && (
                                                 <DescriptiveStatistics
+                                                    mappingQuestionToVariable={realMappingQuestionToVariable}
+                                                    model={advanceModelData}
+                                                    questions={dataForm.form.loaddata}
                                                     statistics={dataForm?.form?.temp_data?.basic_analysis?.descriptive_statistics}
+                                                />
+                                            )}
+
+                                            {/* Pearson Correlations */}
+                                            {dataForm?.form?.temp_data?.basic_analysis?.pearson_correlations && dataForm?.form?.temp_data?.basic_analysis?.pearson_correlations.length > 0 && (
+                                                <PearsonCorrelations
+                                                    correlations={dataForm?.form?.temp_data?.basic_analysis?.pearson_correlations}
                                                 />
                                             )}
 
@@ -1000,6 +1013,9 @@ export default function BuildDataForm() {
                                             {/* EFA Results */}
                                             {dataForm?.form?.temp_data?.basic_analysis?.efa_result && (
                                                 <EFAResults
+                                                    mappingQuestionToVariable={realMappingQuestionToVariable}
+                                                    model={advanceModelData}
+                                                    questions={dataForm.form.loaddata}
                                                     efaResult={dataForm?.form?.temp_data?.basic_analysis?.efa_result}
                                                 />
                                             )}

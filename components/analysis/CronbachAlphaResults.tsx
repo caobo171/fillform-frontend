@@ -1,5 +1,6 @@
 import React from 'react';
 import { CronbachAlpha } from '@/store/types';
+import { AdvanceModelType } from '@/store/data.service.types';
 
 interface CronbachAlphaResultsProps {
   cronbachAlphas: CronbachAlpha[];
@@ -28,11 +29,10 @@ export const CronbachAlphaResults: React.FC<CronbachAlphaResultsProps> = ({
               <tr key={index} className="border-t">
                 <td className="px-4 py-2 font-medium">{alpha.construct_name}</td>
                 <td className="px-4 py-2 text-right">
-                  <span className={`font-semibold ${
-                    alpha.alpha >= 0.7 ? 'text-green-600' : 
-                    alpha.alpha >= 0.6 ? 'text-yellow-600' : 
-                    'text-red-600'
-                  }`}>
+                  <span className={`font-semibold ${alpha.alpha >= 0.7 ? 'text-green-600' :
+                      alpha.alpha >= 0.6 ? 'text-yellow-600' :
+                        'text-red-600'
+                    }`}>
                     {alpha.alpha.toFixed(3)}
                   </span>
                 </td>
@@ -45,8 +45,8 @@ export const CronbachAlphaResults: React.FC<CronbachAlphaResultsProps> = ({
       </div>
       <div className="mt-4 text-sm text-gray-600">
         <p>
-          <span className="text-green-600 font-semibold">≥ 0.7:</span> Độ tin cậy tốt | 
-          <span className="text-yellow-600 font-semibold ml-2">0.6-0.7:</span> Độ tin cậy chấp nhận được | 
+          <span className="text-green-600 font-semibold">≥ 0.7:</span> Độ tin cậy tốt |
+          <span className="text-yellow-600 font-semibold ml-2">0.6-0.7:</span> Độ tin cậy chấp nhận được |
           <span className="text-red-600 font-semibold ml-2">&lt; 0.6:</span> Độ tin cậy kém
         </p>
       </div>
