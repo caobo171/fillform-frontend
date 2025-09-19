@@ -21,11 +21,8 @@ import { AdvanceModelType, ModerateEffectNodeDataType } from '@/store/data.servi
 import { useModelVariables } from '@/hooks/useModelVariables'
 import CreateDownloadOrderForm from '@/components/form/CreateDownloadOrderForm'
 import { useMe, useMyBankInfo } from '@/hooks/user'
-import DescriptiveStatistics from '@/components/analysis/DescriptiveStatistics';
-import CronbachAlphaResults from '@/components/analysis/CronbachAlphaResults';
-import EFAResults from '@/components/analysis/EFAResults';
-import LinearRegressionResults from '@/components/analysis/LinearRegressionResults';
-import PearsonCorrelations from '@/components/analysis/PearsonCorrelations';
+import SmartPLSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SmartPLSResult'
+import SPSSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SPSSResult'
 
 export default function DataModelBuilder() {
 
@@ -362,49 +359,24 @@ export default function DataModelBuilder() {
                         {
                             isShowingResult && (
                                 <>
-                                    {/* Basic Analysis Results */}
                                     {
-                                        dataModel?.data_model?.temp_data?.basic_analysis ? (
-                                            <div className="mb-8">
-                                                {/* Descriptive Statistics */}
-                                                {dataModel?.data_model?.temp_data?.basic_analysis?.descriptive_statistics && (
-                                                    <DescriptiveStatistics
-                                                        statistics={dataModel?.data_model?.temp_data?.basic_analysis?.descriptive_statistics}
-                                                    />
-                                                )}
-
-                                                {/* Pearson Correlations */}
-                                                {dataModel?.data_model?.temp_data?.basic_analysis?.pearson_correlations && dataModel?.data_model?.temp_data?.basic_analysis?.pearson_correlations.length > 0 && (
-                                                    <PearsonCorrelations
-                                                        correlations={dataModel?.data_model?.temp_data?.basic_analysis?.pearson_correlations}
-                                                    />
-                                                )}
-
-                                                {/* Cronbach's Alpha */}
-                                                {dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas && dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas.length > 0 && (
-                                                    <CronbachAlphaResults
-                                                        cronbachAlphas={dataModel?.data_model?.temp_data?.basic_analysis?.cronbach_alphas}
-                                                    />
-                                                )}
-
-                                                {/* EFA Results */}
-                                                {dataModel?.data_model?.temp_data?.basic_analysis?.efa_result && (
-                                                    <EFAResults
-                                                        efaResult={dataModel?.data_model?.temp_data?.basic_analysis?.efa_result}
-                                                    />
-                                                )}
-
-
-                                            </div>
+                                        dataModel?.data_model?.temp_data?.smartPLS ? (
+                                            <SmartPLSResult
+                                                data={dataModel?.data_model?.temp_data?.smartPLS}
+                                                title="Kết quả phân tích SmartPLS"
+                                                className="mb-8"
+                                            />
                                         ) : null
                                     }
 
-
-                                    {/* Linear Regression Results */}
+                                    {/* SPSS Analysis Results */}
                                     {
-                                        dataModel?.data_model?.temp_data?.linear_regression_analysis?.regression_result ? (
-                                            <LinearRegressionResults
-                                                regressionResult={dataModel?.data_model?.temp_data?.linear_regression_analysis?.regression_result}
+                                        (dataModel?.data_model?.temp_data?.basic_analysis || dataModel?.data_model?.temp_data?.linear_regression_analysis) ? (
+                                            <SPSSResult
+                                                basicAnalysis={dataModel?.data_model?.temp_data?.basic_analysis}
+                                                linearRegressionAnalysis={dataModel?.data_model?.temp_data?.linear_regression_analysis}
+                                                title="Kết quả phân tích SPSS"
+                                                className="mb-8"
                                             />
                                         ) : null
                                     }

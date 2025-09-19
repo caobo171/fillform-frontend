@@ -12,7 +12,6 @@ import { useDataOrderById } from '@/hooks/data.order'
 import Constants, { Code, ORDER_STATUS, OPTIONS_DELAY_ENUM } from '@/core/Constants'
 import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder'
 import { AnyObject } from '@/store/interface'
-import DataTable from './DataTable'
 import Fetch from '@/lib/core/fetch/Fetch'
 import { Alert } from '@/components/common'
 import { Toast } from '@/services/Toast'
@@ -20,6 +19,7 @@ import LinearRegressionResults from "@/components/analysis/LinearRegressionResul
 import DescriptiveStatistics from "@/components/analysis/DescriptiveStatistics";
 import EFAResults from "@/components/analysis/EFAResults";
 import CronbachAlphaResults from "@/components/analysis/CronbachAlphaResults";
+import SmartPLSResult from './SmartPLSResult'
 
 
 
@@ -225,21 +225,9 @@ const DataOrderPage = () => {
                         isAdmin ? (
                             <>
                                 {
-                                    order.data?.order?.data?.analysis ? (
-                                        <DataTable
-                                            data={order.data.order.data.analysis}
-                                            title="Kết quả phân tích SmartPLS"
-                                            className="mb-8"
-                                        />
-                                    ) : null
-                                }
-
-
-
-                                {
-                                    order.data?.order?.data?.analysis ? (
-                                        <DataTable
-                                            data={order.data.order.data.analysis}
+                                    order.data?.order?.data?.smartPLS ? (
+                                        <SmartPLSResult
+                                            data={order.data.order.data.smartPLS}
                                             title="Kết quả phân tích SmartPLS"
                                             className="mb-8"
                                         />

@@ -24,11 +24,8 @@ import Select from 'react-select';
 import { AdvanceModelType, ModerateEffectNodeDataType, VariableNodeDataType } from '@/store/data.service.types';
 import { useModelVariables } from '@/hooks/useModelVariables';
 import { ModelSelectionComponent } from './ModelSelectionComponent';
-import DescriptiveStatistics from '@/components/analysis/DescriptiveStatistics';
-import CronbachAlphaResults from '@/components/analysis/CronbachAlphaResults';
-import EFAResults from '@/components/analysis/EFAResults';
-import LinearRegressionResults from '@/components/analysis/LinearRegressionResults';
-import PearsonCorrelations from '@/components/analysis/PearsonCorrelations';
+import SmartPLSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SmartPLSResult';
+import SPSSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SPSSResult';
 
 interface ChatError {
     id: string;
@@ -980,58 +977,33 @@ export default function BuildDataForm() {
                     {
                         isShowingResult && (
                             <>
-                                {/* Basic Analysis Results */}
+
                                 {
-                                    dataForm?.form?.temp_data?.basic_analysis ? (
-                                        <div className="mb-8">
-
-
-                                            {/* Descriptive Statistics */}
-                                            {dataForm?.form?.temp_data?.basic_analysis?.descriptive_statistics && (
-                                                <DescriptiveStatistics
-                                                    mappingQuestionToVariable={realMappingQuestionToVariable}
-                                                    model={advanceModelData}
-                                                    questions={dataForm.form.loaddata}
-                                                    statistics={dataForm?.form?.temp_data?.basic_analysis?.descriptive_statistics}
-                                                />
-                                            )}
-
-                                            {/* Pearson Correlations */}
-                                            {dataForm?.form?.temp_data?.basic_analysis?.pearson_correlations && dataForm?.form?.temp_data?.basic_analysis?.pearson_correlations.length > 0 && (
-                                                <PearsonCorrelations
-                                                    correlations={dataForm?.form?.temp_data?.basic_analysis?.pearson_correlations}
-                                                />
-                                            )}
-
-                                            {/* Cronbach's Alpha */}
-                                            {dataForm?.form?.temp_data?.basic_analysis?.cronbach_alphas && dataForm?.form?.temp_data?.basic_analysis?.cronbach_alphas.length > 0 && (
-                                                <CronbachAlphaResults
-                                                    cronbachAlphas={dataForm?.form?.temp_data?.basic_analysis?.cronbach_alphas}
-                                                />
-                                            )}
-
-                                            {/* EFA Results */}
-                                            {dataForm?.form?.temp_data?.basic_analysis?.efa_result && (
-                                                <EFAResults
-                                                    mappingQuestionToVariable={realMappingQuestionToVariable}
-                                                    model={advanceModelData}
-                                                    questions={dataForm.form.loaddata}
-                                                    efaResult={dataForm?.form?.temp_data?.basic_analysis?.efa_result}
-                                                />
-                                            )}
-                                        </div>
-                                    ) : null
-                                }
-
-
-                                {/* Linear Regression Results */}
-                                {
-                                    dataForm?.form?.temp_data?.linear_regression_analysis?.regression_result ? (
-                                        <LinearRegressionResults
-                                            regressionResult={dataForm?.form?.temp_data?.linear_regression_analysis?.regression_result}
+                                    dataForm?.form?.temp_data?.smartPLS ? (
+                                        <SmartPLSResult
+                                            data={dataForm?.form?.temp_data?.smartPLS}
+                                            title="Kết quả phân tích SmartPLS"
+                                            className="mb-8"
                                         />
                                     ) : null
                                 }
+                                {/* SPSS Analysis Results */}
+                                {
+                                    (dataForm?.form?.temp_data?.basic_analysis || dataForm?.form?.temp_data?.linear_regression_analysis) ? (
+                                        <SPSSResult
+                                            basicAnalysis={dataForm?.form?.temp_data?.basic_analysis}
+                                            linearRegressionAnalysis={dataForm?.form?.temp_data?.linear_regression_analysis}
+                                            title="Kết quả phân tích SPSS"
+                                            className="mb-8"
+                                            questions={dataForm.form.loaddata}
+                                            mappingQuestionToVariable={realMappingQuestionToVariable}
+                                            model={advanceModelData}
+                                        />
+                                    ) : null
+                                }
+
+
+                                {/* SmartPLS Results */}
                             </>
                         )
                     }

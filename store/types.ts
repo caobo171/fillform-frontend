@@ -63,6 +63,7 @@ export type RawForm = {
   }
   temp_data: {
     num_request: number,
+    smartPLS: SmartPLSResult,
     basic_analysis: {
       descriptive_statistics: DescriptiveStatistic[],
       cronbach_alphas: CronbachAlpha[],
@@ -225,10 +226,108 @@ export type RawDataModel = {
     linear_regression_analysis: {
       regression_result: RegressionResult,
     },
+
+    smartPLS: SmartPLSResult,
     num_request: number,
   }
 }
 
+
+export type SmartPLSResult = {
+  raw_crossloading: {
+    [latent_variable: string]: {
+      [latent_variable: string]: number
+    }
+  },
+  raw_path_coefficient: {
+    [latent_variable: string]: {
+      [latent_variable: string]: number
+    }
+  },
+  raw_effects: {
+    [hypothesis: string]: {
+      direct: number,
+      indirect: number,
+      total: number,
+      from: string,
+      to: string
+    },
+  },
+
+  raw_inner_model: {
+    [hypothesis: string]: {
+      estimate: number,
+      from: string,
+      p_t: number,
+      std_error: number,
+      t: number,
+      to: string
+    }
+  },
+
+  raw_inner_summary: {
+    [variable: string]: {
+      ave: number,
+      block_communality: number,
+      mean_redundancy: number,
+      r_squared: number,
+      r_squared_adj: number,
+      type: string
+    }
+  },
+
+  raw_outer_model: {
+    [variable: string]: {
+      [variable: string]: number
+    }
+  },
+
+  raw_path_coefficients: {
+    [hypothesis: string]: {
+      direct: number,
+      indirect: number,
+      total: number,
+      from: string,
+      to: string
+    },
+  },
+
+
+  raw_unidimensionality: {
+    [variable: string]: {
+      cronbach_alpha: number,
+      dillon_goldstein_rho: number,
+      eig_1st: number,
+      eig_2nd: number,
+      mode: string,
+      mvs: number
+    }
+  },
+
+
+  raw_htmt: {
+    [latent_variable: string]: {
+      [latent_variable: string]: number
+    }
+  },
+
+
+  raw_fornell_larcker: {
+    [latent_variable: string]: {
+      [latent_variable: string]: number
+    }
+  },
+
+
+  raw_vif: {
+    [variable: string]: number
+  },
+
+
+  raw_f_squared: {
+    [variable: string]: number
+  },
+};
 
 // The full Zod schema for the data model
 export const DataModelSchema = z.object({
@@ -299,6 +398,8 @@ export type RawDataOrderModel = {
   owner_id: string;
   num: number,
   data: {
+
+    smartPLS?: SmartPLSResult,
     finalData: any[],
 
     basic_analysis?: {
@@ -342,133 +443,6 @@ export type RawDataOrderModel = {
       regression_result: RegressionResult
     }
 
-
-    analysis?: {
-      // raw_bootstrap: {
-      //   r_squared: {
-      //     [latent_variable: string]: {
-      //       mean: number,
-      //       original: number,
-      //       perc_025: number,
-      //       perc_975: number,
-      //       std_error: number,
-      //       t_stat: number
-      //     }
-      //   },
-      //   loading: {
-      //     [latent_variable: string]: {
-      //       mean: number,
-      //       original: number,
-      //       perc_025: number,
-      //       perc_975: number,
-      //       std_error: number,
-      //       t_stat: number
-      //     }
-      //   },
-      //   paths: {
-      //     [hypothesis: string]: {
-      //       mean: number,
-      //       original: number,
-      //       perc_025: number,
-      //       perc_975: number,
-      //       std_error: number,
-      //       t_stat: number
-      //     }
-      //   },
-      //   total_effects: {
-      //     [hypothesis: string]: {
-      //       mean: number,
-      //       original: number,
-      //       perc_025: number,
-      //       perc_975: number,
-      //       std_error: number,
-      //       t_stat: number
-      //     }
-      //   }
-      //   weights: {
-      //     [latent_variable: string]: {
-      //       mean: number,
-      //       original: number,
-      //       perc_025: number,
-      //       perc_975: number,
-      //       std_error: number,
-      //       t_stat: number
-      //     }
-      //   }
-      // },
-
-      raw_crossloading: {
-        [latent_variable: string]: {
-          [latent_variable: string]: number
-        }
-      },
-      raw_path_coefficient: {
-        [latent_variable: string]: {
-          [latent_variable: string]: number
-        }
-      },
-      raw_effects: {
-        [hypothesis: string]: {
-          direct: number,
-          indirect: number,
-          total: number,
-          from: string,
-          to: string
-        },
-      },
-
-      raw_inner_model: {
-        [hypothesis: string]: {
-          estimate: number,
-          from: string,
-          p_t: number,
-          std_error: number,
-          t: number,
-          to: string
-        }
-      },
-
-      raw_inner_summary: {
-        [variable: string]: {
-          ave: number,
-          block_communality: number,
-          mean_redundancy: number,
-          r_squared: number,
-          r_squared_adj: number,
-          type: string
-        }
-      },
-
-      raw_outer_model: {
-        [variable: string]: {
-          [variable: string]: number
-        }
-      },
-
-      raw_path_coefficients: {
-        [hypothesis: string]: {
-          direct: number,
-          indirect: number,
-          total: number,
-          from: string,
-          to: string
-        },
-      },
-
-
-      raw_unidimensionality: {
-        [variable: string]: {
-          cronbach_alpha: number,
-          dillon_goldstein_rho: number,
-          eig_1st: number,
-          eig_2nd: number,
-          mode: string,
-          mvs: number
-        }
-      },
-
-      raw_goodness_of_fit: number,
-    }
   },
 
   owner: string;
