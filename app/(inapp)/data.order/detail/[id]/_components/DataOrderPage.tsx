@@ -13,13 +13,9 @@ import Constants, { Code, ORDER_STATUS, OPTIONS_DELAY_ENUM } from '@/core/Consta
 import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder'
 import { AnyObject } from '@/store/interface'
 import Fetch from '@/lib/core/fetch/Fetch'
-import { Alert } from '@/components/common'
 import { Toast } from '@/services/Toast'
-import LinearRegressionResults from "@/components/analysis/LinearRegressionResults";
-import DescriptiveStatistics from "@/components/analysis/DescriptiveStatistics";
-import EFAResults from "@/components/analysis/EFAResults";
-import CronbachAlphaResults from "@/components/analysis/CronbachAlphaResults";
 import SmartPLSResult from './SmartPLSResult'
+import SPSSResult from './SPSSResult'
 
 
 
@@ -234,40 +230,14 @@ const DataOrderPage = () => {
                                     ) : null
                                 }
 
-                                {/* Basic Analysis Results */}
+                                {/* SPSS Analysis Results */}
                                 {
-                                    order.data?.order?.data?.basic_analysis ? (
-                                        <div className="mb-8">
-                                            {/* Descriptive Statistics */}
-                                            {order.data.order.data.basic_analysis.descriptive_statistics && (
-                                                <DescriptiveStatistics
-                                                    statistics={order.data.order.data.basic_analysis.descriptive_statistics}
-                                                />
-                                            )}
-
-                                            {/* Cronbach's Alpha */}
-                                            {order.data.order.data.basic_analysis.cronbach_alphas && order.data.order.data.basic_analysis.cronbach_alphas.length > 0 && (
-                                                <CronbachAlphaResults
-                                                    cronbachAlphas={order.data.order.data.basic_analysis.cronbach_alphas}
-                                                />
-                                            )}
-
-                                            {/* EFA Results */}
-                                            {order.data.order.data.basic_analysis.efa_result && (
-                                                <EFAResults
-                                                    efaResult={order.data.order.data.basic_analysis.efa_result}
-                                                />
-                                            )}
-                                        </div>
-                                    ) : null
-                                }
-
-
-                                {/* Linear Regression Results */}
-                                {
-                                    order.data?.order?.data?.linear_regression_analysis?.regression_result ? (
-                                        <LinearRegressionResults
-                                            regressionResult={order.data.order.data.linear_regression_analysis.regression_result}
+                                    (order.data?.order?.data?.basic_analysis || order?.data?.order?.data?.linear_regression_analysis) ? (
+                                        <SPSSResult
+                                            basicAnalysis={order.data?.order?.data?.basic_analysis}
+                                            linearRegressionAnalysis={order?.data?.order?.data?.linear_regression_analysis}
+                                            title="Kết quả phân tích SPSS"
+                                            className="mb-8"
                                         />
                                     ) : null
                                 }
