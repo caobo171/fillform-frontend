@@ -50,7 +50,7 @@ export default function DataModelBuilder() {
     }, [dataModel]);
 
 
-    const [isShowingResult, setIsShowingResult] = useState<boolean>(false);
+    const [isShowingResult, setIsShowingResult] = useState<boolean>(true);
 
 
     useEffect(() => {
@@ -357,7 +357,7 @@ export default function DataModelBuilder() {
 
 
                         {
-                            isShowingResult && (
+                            (isShowingResult && false) && (
                                 <>
                                     {
                                         dataModel?.data_model?.temp_data?.smartPLS ? (
