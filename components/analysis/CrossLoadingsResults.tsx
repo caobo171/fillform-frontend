@@ -32,6 +32,7 @@ export const CrossLoadingsResults: React.FC<CrossLoadingsResultsProps> = ({
     varQuestionMapping[question.id] = varCode + '_' + (varCodeIndex + 1);
   }
 
+
   const getVariableDisplayInfo = (questionId: string) => {
     if (!model || !questions.length) {
       return { displayName: questionId, description: '' };
@@ -42,10 +43,10 @@ export const CrossLoadingsResults: React.FC<CrossLoadingsResultsProps> = ({
 
     const question = questions.find(q => q.id == questionId);
     if (question) {
-      description = question.question || question.text || question.title || '';
+      description = question.question || question.text || question.title || question.description;
     }
 
-    if (mappingQuestionToVariable) {
+    if (mappingQuestionToVariable && varQuestionMapping[questionId]) {
       variableName = varQuestionMapping[questionId];
     } else {
       variableName = questionId;
@@ -73,7 +74,7 @@ export const CrossLoadingsResults: React.FC<CrossLoadingsResultsProps> = ({
         </p>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[320px] overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

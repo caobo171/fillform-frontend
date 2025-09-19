@@ -14,7 +14,7 @@ export const CronbachAlphaResults: React.FC<CronbachAlphaResultsProps> = ({
   return (
     <div className={`bg-white rounded shadow-sm p-6 border border-gray-100 mb-6 ${className}`}>
       <h3 className="text-lg font-bold mb-4">Độ tin cậy Cronbach's Alpha</h3>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[320px] overflow-y-auto">
         <table className="min-w-full table-auto">
           <thead>
             <tr className="bg-gray-50">

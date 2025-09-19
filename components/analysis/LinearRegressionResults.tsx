@@ -58,7 +58,7 @@ export const LinearRegressionResults: React.FC<LinearRegressionResultsProps> = (
       {/* Coefficients Table */}
       <div>
         <h4 className="text-lg font-semibold mb-3">Hệ số hồi quy</h4>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[320px] overflow-y-auto">
           <table className="min-w-full table-auto">
             <thead>
               <tr className="bg-gray-50">

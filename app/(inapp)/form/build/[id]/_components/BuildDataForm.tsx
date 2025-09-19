@@ -984,6 +984,9 @@ export default function BuildDataForm() {
                                             data={dataForm?.form?.temp_data?.smartPLS}
                                             title="Kết quả phân tích SmartPLS"
                                             className="mb-8"
+                                            questions={dataForm.form.loaddata}
+                                            mappingQuestionToVariable={realMappingQuestionToVariable}
+                                            model={advanceModelData}
                                         />
                                     ) : null
                                 }

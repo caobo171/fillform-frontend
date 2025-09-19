@@ -47,11 +47,11 @@ export const DescriptiveStatistics: React.FC<DescriptiveStatisticsProps> = ({
     // Find the question by ID
     const question = questions.find(q => q.id == questionId);
     if (question) {
-      description = question.question || question.text || question.title || '';
+      description = question.question || question.text || question.title || question.description;
     }
 
 
-    if (mappingQuestionToVariable) {
+    if (mappingQuestionToVariable && varQuestionMapping[questionId]) {
       variableName = varQuestionMapping[questionId];
     } else {
       variableName = questionId;

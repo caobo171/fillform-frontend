@@ -18,6 +18,7 @@ export const OuterModelResults: React.FC<OuterModelResultsProps> = ({
 }) => {
   const varCodeMapping: Record<string, any> = {};
   const varQuestionMapping: Record<string, any> = {};
+  
 
   for (let i = 0; i < questions.length; i++) {
     const question = questions[i];
@@ -42,10 +43,10 @@ export const OuterModelResults: React.FC<OuterModelResultsProps> = ({
 
     const question = questions.find(q => q.id == questionId);
     if (question) {
-      description = question.question || question.text || question.title || '';
+      description = question.question || question.text || question.title || question.description || '';
     }
 
-    if (mappingQuestionToVariable) {
+    if (mappingQuestionToVariable && varQuestionMapping[questionId]) {
       variableName = varQuestionMapping[questionId];
     } else {
       variableName = questionId;
@@ -54,6 +55,7 @@ export const OuterModelResults: React.FC<OuterModelResultsProps> = ({
     const displayName = `${variableName}`;
     return { displayName, description };
   };
+
 
   if (!outerModel || Object.keys(outerModel).length === 0) {
     return null;
@@ -73,7 +75,7 @@ export const OuterModelResults: React.FC<OuterModelResultsProps> = ({
         </p>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[200px] overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

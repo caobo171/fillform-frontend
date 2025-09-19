@@ -49,14 +49,15 @@ export const UnidimensionalityResults: React.FC<UnidimensionalityResultsProps> =
 
     const question = questions.find(q => q.id == questionId);
     if (question) {
-      description = question.question || question.text || question.title || '';
+      description = question.question || question.text || question.title || question.description;
     }
 
-    if (mappingQuestionToVariable) {
+    if (mappingQuestionToVariable && varQuestionMapping[questionId]) {
       variableName = varQuestionMapping[questionId];
     } else {
       variableName = questionId;
     }
+
 
     const displayName = `${variableName}`;
     return { displayName, description };
@@ -86,7 +87,7 @@ export const UnidimensionalityResults: React.FC<UnidimensionalityResultsProps> =
         </p>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[320px] overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -116,6 +117,8 @@ export const UnidimensionalityResults: React.FC<UnidimensionalityResultsProps> =
           <tbody className="bg-white divide-y divide-gray-200">
             {constructs.map((construct) => {
               const { displayName } = getVariableDisplayInfo(construct);
+
+              console.log('displayName', displayName, construct)
               const data = unidimensionality[construct];
               const cronbachAlpha = data.cronbach_alpha || 0;
               const compositeReliability = data.dillon_goldstein_rho || 0;

@@ -43,10 +43,10 @@ export const EffectSizeResults: React.FC<EffectSizeResultsProps> = ({
 
     const question = questions.find(q => q.id == questionId);
     if (question) {
-      description = question.question || question.text || question.title || '';
+      description = question.question || question.text || question.title || question.description;
     }
 
-    if (mappingQuestionToVariable) {
+    if (mappingQuestionToVariable && varQuestionMapping[questionId]) {
       variableName = varQuestionMapping[questionId];
     } else {
       variableName = questionId;
@@ -80,7 +80,7 @@ export const EffectSizeResults: React.FC<EffectSizeResultsProps> = ({
         </p>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[320px] overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
