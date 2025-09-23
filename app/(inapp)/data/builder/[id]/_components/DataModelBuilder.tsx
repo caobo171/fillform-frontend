@@ -55,7 +55,7 @@ export default function DataModelBuilder() {
 
     useEffect(() => {
         if (numRequest > 0) {
-            setIsShowingResult(false);
+            setIsShowingResult(true);
         }
     }, [numRequest])
 
