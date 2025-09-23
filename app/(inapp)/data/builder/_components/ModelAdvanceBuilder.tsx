@@ -21,6 +21,7 @@ import { AdvanceModelType, EdgeDataType, NodeDataType } from '@/store/data.servi
 import { forwardRef, useImperativeHandle } from 'react';
 import { PencilIcon, TrashIcon, BoltIcon } from '@heroicons/react/24/outline';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, EdgeProps } from '@xyflow/react';
+import { Modal } from '@/components/common/Modal';
 
 interface ModelAdvanceBuilderProps {
   model?: AdvanceModelType | null,
@@ -174,15 +175,36 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
 
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-360 max-w-xl">
-        <h3 className="text-lg font-bold mb-4">Chỉnh sửa biến</h3>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal
+      open={true}
+      onCancel={onCancel}
+      title="Chỉnh sửa biến"
+      width="600px"
+      panelClassName="max-h-[90vh] overflow-y-auto"
+      footer={
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Hoàn tất
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Quay lại
+          </button>
+        </div>
+      }
+    >
+      <div className="space-y-4">
           {/* Variable Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tên biến (ví dụ biến là Độ hài lòng => thì tên là DHL)
+              Tên biến (ví dụ biến là Độ hài lòng thì tên là DHL)
             </label>
             <input
               type="text"
@@ -351,25 +373,8 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Hoàn tất
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Quay lại
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+    </Modal>
   );
 };
 
@@ -417,13 +422,33 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-320 max-w-xl">
-        <h3 className="text-lg font-bold mb-4">
-          {isEditing ? 'Chỉnh sửa hiệu ứng điều tiết' : 'Tạo hiệu ứng điều tiết'}
-        </h3>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal
+      open={true}
+      onCancel={onCancel}
+      title={isEditing ? 'Chỉnh sửa hiệu ứng điều tiết' : 'Tạo hiệu ứng điều tiết'}
+      width="600px"
+      panelClassName="max-h-[90vh] overflow-y-auto"
+      footer={
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={!label.trim() || !moderateVariable || !independentVariable}
+            className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            Hoàn thành
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Hủy
+          </button>
+        </div>
+      }
+    >
+      <div className="space-y-4">
           {/* Moderate Effect Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -534,26 +559,8 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={!label.trim() || !moderateVariable || !independentVariable}
-              className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-              Hoàn thành
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Hủy
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+    </Modal>
   );
 };
 
@@ -577,11 +584,32 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96 max-w-md">
-        <h3 className="text-lg font-bold mb-4">Chỉnh sửa mối quan hệ</h3>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal
+      open={true}
+      onCancel={onCancel}
+      title="Chỉnh sửa mối quan hệ"
+      width="500px"
+      panelClassName="max-h-[90vh] overflow-y-auto"
+      footer={
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Save Changes
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Cancel
+          </button>
+        </div>
+      }
+    >
+      <div className="space-y-4">
           {/* Connection Info */}
           <div className="bg-gray-50 p-3 rounded-md">
             <div className="text-sm text-gray-600 mb-1">Mối quan hệ:</div>
@@ -620,25 +648,8 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Save Changes
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+    </Modal>
   );
 };
 
