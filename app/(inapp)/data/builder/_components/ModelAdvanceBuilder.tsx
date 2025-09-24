@@ -261,6 +261,23 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
           {/* Average and Standard Deviation - Only for Variable type */}
           {nodeType === 'variable' && (
             <div className="grid  gap-3">
+              {/* Note about independent variables only */}
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-2">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      <strong>Lưu ý:</strong> Giá trị trung bình và độ lệch chuẩn chỉ áp dụng cho <strong>biến độc lập (independent variables)</strong>. 
+                      Biến phụ thuộc sẽ có giá trị được tính toán tự động dựa trên mối quan hệ hồi quy.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Giá trị trung bình (Average), nếu không có giá trị xác định thì để 0
