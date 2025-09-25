@@ -963,33 +963,6 @@ export default function BuildDataForm() {
                                                 )}
                                             </div>
 
-                                            {
-                                                (isShowingResult) && (
-                                                    <>
-                                                        {
-                                                            dataForm?.form?.temp_data?.smartPLS ? (
-                                                                <SmartPLSResult
-                                                                    data={dataForm?.form?.temp_data?.smartPLS}
-                                                                    title="Kết quả phân tích SmartPLS"
-                                                                    className="mb-8"
-                                                                />
-                                                            ) : null
-                                                        }
-
-                                                        {/* SPSS Analysis Results */}
-                                                        {
-                                                            (dataForm?.form?.temp_data?.basic_analysis || dataForm?.form?.temp_data?.linear_regression_analysis) ? (
-                                                                <SPSSResult
-                                                                    basicAnalysis={dataForm?.form?.temp_data?.basic_analysis}
-                                                                    linearRegressionAnalysis={dataForm?.form?.temp_data?.linear_regression_analysis}
-                                                                    title="Kết quả phân tích SPSS"
-                                                                    className="mb-8"
-                                                                />
-                                                            ) : null
-                                                        }
-                                                    </>
-                                                )
-                                            }
                                         </>
 
                                     )}
@@ -1003,7 +976,7 @@ export default function BuildDataForm() {
 
 
                     {
-                        (false) && (
+                        (isShowingResult) && (
                             <>
 
                                 {
