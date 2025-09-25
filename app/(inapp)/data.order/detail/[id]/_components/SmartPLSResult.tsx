@@ -86,17 +86,17 @@ const SmartPLSResult = ({
         model={model}
       />
     },
-    {
-      key: 'path_coefficients',
-      label: 'Path Coefficients',
-      hasData: data?.raw_path_coefficients && Object.keys(data.raw_path_coefficients).length > 0,
-      component: <PathCoefficientsResults 
-        pathCoefficients={data?.raw_path_coefficients || {}} 
-        questions={questions}
-        mappingQuestionToVariable={mappingQuestionToVariable}
-        model={model}
-      />
-    },
+    // {
+    //   key: 'path_coefficients',
+    //   label: 'Path Coefficients',
+    //   hasData: data?.raw_path_coefficients && Object.keys(data.raw_path_coefficients).length > 0,
+    //   component: <PathCoefficientsResults 
+    //     pathCoefficients={data?.raw_path_coefficients || {}} 
+    //     questions={questions}
+    //     mappingQuestionToVariable={mappingQuestionToVariable}
+    //     model={model}
+    //   />
+    // },
     {
       key: 'inner_model',
       label: 'Significance Testing',
@@ -144,7 +144,7 @@ const SmartPLSResult = ({
     {
       key: 'vif',
       label: 'VIF',
-      hasData: data?.raw_vif && Object.keys(data.raw_vif).length > 0,
+      hasData: data?.raw_vif?.inner_vif && data?.raw_vif?.outer_vif,
       component: <VIFResults 
         vifResults={data?.raw_vif || {}} 
         questions={questions}
@@ -152,17 +152,17 @@ const SmartPLSResult = ({
         model={model}
       />
     },
-    {
-      key: 'effect_size',
-      label: 'Effect Size (f²)',
-      hasData: data?.raw_f_squared && Object.keys(data.raw_f_squared).length > 0,
-      component: <EffectSizeResults 
-        effectSizeResults={data?.raw_f_squared || {}} 
-        questions={questions}
-        mappingQuestionToVariable={mappingQuestionToVariable}
-        model={model}
-      />
-    }
+    // {
+    //   key: 'effect_size',
+    //   label: 'Effect Size (f²)',
+    //   hasData: data?.raw_f_squared && Object.keys(data.raw_f_squared).length > 0,
+    //   component: <EffectSizeResults 
+    //     effectSizeResults={data?.raw_f_squared || {}} 
+    //     questions={questions}
+    //     mappingQuestionToVariable={mappingQuestionToVariable}
+    //     model={model}
+    //   />
+    // }
   ].filter(tab => tab.hasData)
 
   if (tabs.length === 0) {
