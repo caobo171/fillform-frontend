@@ -234,12 +234,12 @@ export type RawDataModel = {
 
 
 export type SmartPLSResult = {
-  raw_crossloading: {
+  raw_crossloadings: {
     [latent_variable: string]: {
       [latent_variable: string]: number
     }
   },
-  raw_path_coefficient: {
+  raw_path_coefficients: {
     [latent_variable: string]: {
       [latent_variable: string]: number
     }
@@ -282,15 +282,15 @@ export type SmartPLSResult = {
     }
   },
 
-  raw_path_coefficients: {
-    [hypothesis: string]: {
-      direct: number,
-      indirect: number,
-      total: number,
-      from: string,
-      to: string
-    },
-  },
+  // raw_path_coefficients: {
+  //   [hypothesis: string]: {
+  //     direct: number,
+  //     indirect: number,
+  //     total: number,
+  //     from: string,
+  //     to: string
+  //   },
+  // },
 
 
   raw_unidimensionality: {
@@ -320,7 +320,14 @@ export type SmartPLSResult = {
 
 
   raw_vif: {
-    [variable: string]: number
+    inner_vif: {
+      [variable: string]: {
+        [variable: string]: number
+      }
+    },
+    outer_vif: {
+      [variable: string]: number
+    }
   },
 
 

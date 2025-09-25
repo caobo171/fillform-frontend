@@ -56,9 +56,9 @@ const SmartPLSResult = ({
     {
       key: 'cross_loadings',
       label: 'Cross Loadings',
-      hasData: data?.raw_crossloading && Object.keys(data.raw_crossloading).length > 0,
+      hasData: data?.raw_crossloadings && Object.keys(data.raw_crossloadings).length > 0,
       component: <CrossLoadingsResults 
-        crossLoadings={data?.raw_crossloading || {}} 
+        crossLoadings={data?.raw_crossloadings || {}} 
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
@@ -89,9 +89,9 @@ const SmartPLSResult = ({
     {
       key: 'path_coefficients',
       label: 'Path Coefficients',
-      hasData: data?.raw_path_coefficient && Object.keys(data.raw_path_coefficient).length > 0,
+      hasData: data?.raw_path_coefficients && Object.keys(data.raw_path_coefficients).length > 0,
       component: <PathCoefficientsResults 
-        pathCoefficients={data?.raw_path_coefficient || {}} 
+        pathCoefficients={data?.raw_path_coefficients || {}} 
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
@@ -130,17 +130,17 @@ const SmartPLSResult = ({
         model={model}
       />
     },
-    {
-      key: 'fornell_larcker',
-      label: 'Fornell-Larcker',
-      hasData: data?.raw_fornell_larcker && Object.keys(data.raw_fornell_larcker).length > 0,
-      component: <FornellLarckerResults 
-        fornellLarckerMatrix={data?.raw_fornell_larcker || {}} 
-        questions={questions}
-        mappingQuestionToVariable={mappingQuestionToVariable}
-        model={model}
-      />
-    },
+    // {
+    //   key: 'fornell_larcker',
+    //   label: 'Fornell-Larcker',
+    //   hasData: data?.raw_fornell_larcker && Object.keys(data.raw_fornell_larcker).length > 0,
+    //   component: <FornellLarckerResults 
+    //     fornellLarckerMatrix={data?.raw_fornell_larcker || {}} 
+    //     questions={questions}
+    //     mappingQuestionToVariable={mappingQuestionToVariable}
+    //     model={model}
+    //   />
+    // },
     {
       key: 'vif',
       label: 'VIF',

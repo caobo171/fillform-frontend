@@ -65,7 +65,7 @@ export const DescriptiveStatistics: React.FC<DescriptiveStatisticsProps> = ({
   return (
     <div className={`bg-white rounded shadow-sm p-6 border border-gray-100 mb-4 ${className}`}>
       <h3 className="text-md font-bold mb-4">Thống kê mô tả (Descriptive Statistics)</h3>
-      <div className="overflow-x-auto max-h-[200px] overflow-y-auto">
+      <div className="overflow-x-auto max-h-[320px] overflow-y-auto">
         <table className="min-w-full table-auto">
           <thead>
             <tr className="bg-gray-50">

@@ -126,7 +126,7 @@ export const EFAResults: React.FC<EFAResultsProps> = ({
       {efaResult.factors && efaResult.factors.length > 0 && (
         <div>
           <h4 className="text-md font-semibold mb-3">Ma trận nhân tố</h4>
-          <div className="overflow-x-auto max-h-[200px] overflow-y-auto">
+          <div className="overflow-x-auto max-h-[560px] overflow-y-auto">
             <table className="min-w-full table-auto">
               <thead>
                 <tr className="bg-gray-50">

@@ -59,19 +59,18 @@ export const PathCoefficientsResults: React.FC<PathCoefficientsResultsProps> = (
     return null;
   }
 
-  const constructs = Object.keys(pathCoefficients);
-  const allTargets = new Set<string>();
+  // In plspm library: pathCoefficients[target][source] = coefficient from source -> target
+  const targets = Object.keys(pathCoefficients); // These are actually the target constructs (rows)
+  const allSources = new Set<string>();
   
-  // Get all target constructs
-  constructs.forEach(source => {
-    Object.keys(pathCoefficients[source]).forEach(target => {
-      if (pathCoefficients[source][target] !== 0) {
-        allTargets.add(target);
-      }
+  // Get all source constructs
+  targets.forEach(target => {
+    Object.keys(pathCoefficients[target]).forEach(source => {
+      allSources.add(source);
     });
   });
 
-  const targets = Array.from(allTargets);
+  const sources = Array.from(allSources);
 
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
@@ -88,7 +87,7 @@ export const PathCoefficientsResults: React.FC<PathCoefficientsResultsProps> = (
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                 From \ To
               </th>
               {targets.map((target) => {
@@ -102,12 +101,12 @@ export const PathCoefficientsResults: React.FC<PathCoefficientsResultsProps> = (
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {constructs.map((source) => {
+            {sources.map((source) => {
               const { displayName: sourceDisplayName } = getVariableDisplayInfo(source);
               
               // Check if this source has any non-zero coefficients
               const hasCoefficients = targets.some(target => 
-                pathCoefficients[source]?.[target] && pathCoefficients[source][target] !== 0
+                pathCoefficients[target]?.[source] && pathCoefficients[target][source] !== 0
               );
               
               if (!hasCoefficients) return null;
@@ -118,7 +117,7 @@ export const PathCoefficientsResults: React.FC<PathCoefficientsResultsProps> = (
                     {sourceDisplayName}
                   </td>
                   {targets.map((target) => {
-                    const coefficient = pathCoefficients[source]?.[target] || 0;
+                    const coefficient = pathCoefficients[target]?.[source] || 0;
                     
                     const getCoeffStatus = (coeff: number) => {
                       const absCoeff = Math.abs(coeff);

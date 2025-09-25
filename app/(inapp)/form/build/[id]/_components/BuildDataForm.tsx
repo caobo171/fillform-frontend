@@ -83,7 +83,7 @@ export default function BuildDataForm() {
 
     const [mappingQuestionToVariable, setMappingQuestionToVariable] = useState<{ [key: string]: string }>({});
 
-    const [isShowingResult, setIsShowingResult] = useState<boolean>(true);
+    const [isShowingResult, setIsShowingResult] = useState<boolean>(false);
 
 
     const realMappingQuestionToVariable = useMemo(() => {
