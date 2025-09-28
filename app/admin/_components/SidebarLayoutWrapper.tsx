@@ -23,6 +23,7 @@ export function SidebarLayoutWrapper({ children }: PropsWithChildren) {
         options: [
           { name: 'Users', icon: UserIcon, href: '/admin/users' },
           { name: 'Orders', icon: ListOrderedIcon, href: '/admin/orders' },
+          { name: 'Data Orders', icon: ListOrderedIcon, href: '/admin/data.orders' },
           { name: 'Forms', icon: FormInputIcon, href: '/admin/forms' },
           { name: 'Annoucements', icon: SpeakerWaveIcon, href: '/admin/system.announcements' },
           { name: 'Affiliate Withdrawals', icon: CreditCardIcon, href: '/admin/affiliate/withdrawals' },
