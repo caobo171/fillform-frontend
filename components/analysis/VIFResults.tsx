@@ -9,9 +9,7 @@ interface VIFResultsProps {
       }
     },
     outer_vif: {
-      [variable: string]: {
-        [variable: string]: number
-      }
+      [variable: string]: number
     }
   };
   questions?: any[];
@@ -28,7 +26,7 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
   className = ""
 }) => {
   const [activeTab, setActiveTab] = React.useState<'outer' | 'inner'>('outer');
-  
+
   const varCodeMapping: Record<string, any> = {};
   const varQuestionMapping: Record<string, any> = {};
 
@@ -89,8 +87,8 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
     return (
       <div className="space-y-6">
         {Object.entries(vifResults.outer_vif).map(([construct, indicators]) => {
-          const sortedIndicators = Object.entries(indicators).sort(([,a], [,b]) => b - a);
-          
+          const sortedIndicators = Object.entries(indicators).sort(([, a], [, b]) => b - a);
+
           return (
             <div key={construct} className="border border-gray-200 rounded-lg">
               <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
@@ -116,7 +114,7 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
                     {sortedIndicators.map(([indicator, vif]) => {
                       const { displayName } = getVariableDisplayInfo(indicator);
                       const interpretation = getVIFInterpretation(vif);
-                      
+
                       return (
                         <tr key={indicator} className="hover:bg-gray-50">
                           <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -154,8 +152,8 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
     return (
       <div className="space-y-6">
         {Object.entries(vifResults.inner_vif).map(([targetConstruct, predictors]) => {
-          const sortedPredictors = Object.entries(predictors).sort(([,a], [,b]) => b - a);
-          
+          const sortedPredictors = Object.entries(predictors).sort(([, a], [, b]) => b - a);
+
           return (
             <div key={targetConstruct} className="border border-gray-200 rounded-lg">
               <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
@@ -180,7 +178,7 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
                   <tbody className="bg-white divide-y divide-gray-200">
                     {sortedPredictors.map(([predictor, vif]) => {
                       const interpretation = getVIFInterpretation(vif);
-                      
+
                       return (
                         <tr key={predictor} className="hover:bg-gray-50">
                           <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -226,11 +224,10 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('outer')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'outer'
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'outer'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               Outer VIF
               <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
@@ -239,11 +236,10 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('inner')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'inner'
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'inner'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               Inner VIF
               <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">

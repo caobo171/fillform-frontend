@@ -146,7 +146,7 @@ const SmartPLSResult = ({
       label: 'VIF',
       hasData: data?.raw_vif?.inner_vif && data?.raw_vif?.outer_vif,
       component: <VIFResults 
-        vifResults={data?.raw_vif || {}} 
+        vifResults={data?.raw_vif} 
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}

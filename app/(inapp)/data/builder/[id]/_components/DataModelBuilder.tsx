@@ -42,6 +42,7 @@ export default function DataModelBuilder() {
     const [showDownloadForm, setShowDownloadForm] = useState<boolean>(false);
     const [numRequest, setNumRequest] = useState<number>(0);
     const [submitDisabled, setSubmitDisabled] = useState<boolean>(false);
+    const [isReadingAnalysisResult, setIsReadingAnalysisResult] = useState<boolean>(false);
     useEffect(() => {
         if (dataModel?.data_model?.data_model) {
             setModel(dataModel.data_model?.data_model as AdvanceModelType);
@@ -80,6 +81,7 @@ export default function DataModelBuilder() {
                 message: string,
             }>('/api/data.model/save.model', {
                 id: dataModel?.data_model?.id,
+                is_reading_analysis_result: isReadingAnalysisResult ? 1 : 0,
                 model: JSON.stringify(model),
                 name: name,
             });
@@ -118,6 +120,7 @@ export default function DataModelBuilder() {
             }>('/api/data.order/create.run', {
                 model_id: dataModel?.data_model?.id,
                 num_request: numRequest,
+                is_reading_analysis_result: isReadingAnalysisResult ? 1 : 0,
             });
 
             if (response.data.code !== Code.SUCCESS) {
@@ -306,6 +309,8 @@ export default function DataModelBuilder() {
                                             numMediatorVariables={currentMediatorVariables.length}
                                             numDependentVariables={currentDependentVariables.length}
                                             numIndependentVariables={currentIndependentVariables.length}
+                                            isReadingAnalysisResult={isReadingAnalysisResult}
+                                            onIsReadingAnalysisResultChange={(value) => setIsReadingAnalysisResult(value)}
                                         />
 
                                         {!isShowingResult ? (

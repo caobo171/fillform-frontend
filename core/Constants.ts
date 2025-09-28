@@ -197,6 +197,8 @@ export const MEDIATOR_VARIABLE_PRICE = 80000;
 export const DEPENDENT_VARIABLE_PRICE = 20000;
 export const INDEPENDENT_VARIABLE_PRICE = 30000;
 
+export const READ_RESULT_PRICE = 50000;
+
 export const PULSES_TOKEN = 'My5wdWxzZXN1cnZleXM';
 
 

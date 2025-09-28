@@ -409,6 +409,11 @@ export type RawDataOrderModel = {
     smartPLS?: SmartPLSResult,
     finalData: any[],
 
+    report_file?: {
+      name: string;
+      url: string;
+    },
+
     basic_analysis?: {
       cronbach_alphas: {
         construct_name: string,

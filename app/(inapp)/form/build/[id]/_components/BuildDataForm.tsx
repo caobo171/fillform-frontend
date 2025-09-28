@@ -64,6 +64,7 @@ export default function BuildDataForm() {
     const [specificEndDate, setSpecificEndDate] = useState('');
     const [specificDailySchedules, setSpecificDailySchedules] = useState<any[]>([]);
 
+    const [isReadingAnalysisResult, setIsReadingAnalysisResult] = useState<boolean>(false);
     const modelsData = useUserDataModels(1, 200, dataForm?.form?.owner_id || '', {});
 
     const [selectedAdvanceModel, setSelectedAdvanceModel] = useState<RawDataModel | null>(null);
@@ -198,7 +199,8 @@ export default function BuildDataForm() {
                 disabled_days: disabledDays.join(','),
                 specific_start_date: specificStartDate,
                 specific_end_date: specificEndDate,
-                specific_daily_schedules: specificDailySchedules.map(e => `${e.date}_${e.startTime}_${e.endTime}_${e.enabled}`).join(',')
+                specific_daily_schedules: specificDailySchedules.map(e => `${e.date}_${e.startTime}_${e.endTime}_${e.enabled}`).join(','),
+                is_reading_analysis_result: isReadingAnalysisResult ? 1 : 0,
             });
 
             if (response.data?.code == Code.SUCCESS) {
@@ -874,6 +876,8 @@ export default function BuildDataForm() {
                                                 numMediatorVariables={currentMediatorVariables.length}
                                                 numIndependentVariables={currentIndependentVariables.length}
                                                 numDependentVariables={currentDependentVariables.length}
+                                                isReadingAnalysisResult={isReadingAnalysisResult}
+                                                onIsReadingAnalysisResultChange={(value) => setIsReadingAnalysisResult(value)}
                                                 specificStartDate={specificStartDate}
                                                 specificEndDate={specificEndDate}
                                                 specificDailySchedules={specificDailySchedules}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { AI_PRICE, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE, MODEL_PRICE, MODERATE_VARIABLE_PRICE, MEDIATOR_VARIABLE_PRICE, DEPENDENT_VARIABLE_PRICE, INDEPENDENT_VARIABLE_PRICE } from '@/core/Constants';
+import { AI_PRICE, OPTIONS_DELAY, OPTIONS_DELAY_ENUM, ORDER_TYPE, MODEL_PRICE, MODERATE_VARIABLE_PRICE, MEDIATOR_VARIABLE_PRICE, DEPENDENT_VARIABLE_PRICE, INDEPENDENT_VARIABLE_PRICE, READ_RESULT_PRICE } from '@/core/Constants';
 import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
@@ -34,6 +34,10 @@ interface CreateOrderFormProps {
   onStartTimeChange?: (value: string) => void;
   onEndTimeChange?: (value: string) => void;
   onDisabledDaysChange?: (value: number[]) => void;
+
+  isReadingAnalysisResult?: boolean;
+  onIsReadingAnalysisResultChange?: (value: boolean) => void;
+
   // New props for SPECIFIC_DELAY
   specificStartDate?: string;
   specificEndDate?: string;
@@ -101,7 +105,9 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
   specificDailySchedules = [],
   onSpecificStartDateChange = () => { },
   onSpecificEndDateChange = () => { },
-  onSpecificDailySchedulesChange = () => { }
+  onSpecificDailySchedulesChange = () => { },
+  isReadingAnalysisResult = false,
+  onIsReadingAnalysisResultChange = () => { }
 }) => {
   const user = useMe();
   const [pricePerUnit, setPricePerUnit] = useState<number>(OPTIONS_DELAY[OPTIONS_DELAY_ENUM.NO_DELAY].price);
@@ -128,6 +134,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
   const daysDropdownRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(daysDropdownRef, () => setDaysDropdownOpen(false));
+
+  const isSPSSModel = numModerateVariables <= 0 && numMediatorVariables <= 0 && numIndependentVariables > 1 && numDependentVariables == 1;
 
   // Calculate price based on delay type
   useEffect(() => {
@@ -409,10 +417,15 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
       modelBuilderPrice += (numDependentVariables || 0) * DEPENDENT_VARIABLE_PRICE;
 
       calculatedTotal += modelBuilderPrice;
+
+      // Add-on fixed fee for Vietnamese SPSS result translation
+      if (isReadingAnalysisResult) {
+        calculatedTotal += READ_RESULT_PRICE;
+      }
     }
 
     setTotal(calculatedTotal);
-  }, [numRequest, pricePerUnit, schedulePriceAdjustment, orderType, numModerateVariables, numMediatorVariables, numIndependentVariables, numDependentVariables]);
+  }, [numRequest, pricePerUnit, schedulePriceAdjustment, orderType, numModerateVariables, numMediatorVariables, numIndependentVariables, numDependentVariables, isReadingAnalysisResult]);
 
 
 
@@ -470,6 +483,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             />
           </div>
         </div>
+        
         <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
           <label htmlFor="delay" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Điền rải random như người thật:</label>
           <div className="w-full sm:w-1/2">
@@ -747,6 +761,31 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             </div>
           </div>
         )}
+
+        {/* DATA_MODEL add-on options */}
+        {orderType === ORDER_TYPE.DATA_MODEL && isSPSSModel && (
+          <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+            <label htmlFor="vn-spss-result" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Nhận kết quả phân tích SPSS:</label>
+            <div className="w-full sm:w-1/2">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="vn-spss-result"
+                  checked={isReadingAnalysisResult}
+                  onChange={(e) => onIsReadingAnalysisResultChange(e.target.checked)}
+                  className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                />
+                <label
+                  htmlFor="vn-spss-result"
+                  className="ml-2 block text-sm text-gray-700 cursor-pointer"
+                >
+                  Tick để nhận bản PDF (+{READ_RESULT_PRICE.toLocaleString()} VND phí cố định)
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-6 my-6 shadow-sm">
@@ -775,6 +814,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             </ul>
           </div>
         )}
+
+
 
         {/* Pricing Breakdown */}
         <div className="bg-white rounded-lg p-4 mb-3 border border-blue-100">
@@ -860,6 +901,14 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                     </div>
                   )}
                 </div>
+
+                {/* Vietnamese SPSS result add-on breakdown */}
+                {isReadingAnalysisResult && (
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">Kết quả phân tích SPSS  (phí cố định):</span>
+                    <span className="font-medium text-purple-700">+{READ_RESULT_PRICE.toLocaleString()} VND</span>
+                  </div>
+                )}
               </>
             )}
 

@@ -3,7 +3,7 @@ import PaymentInformation from '../common/PaymentInformation';
 import Link from 'next/link';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { useMe } from '@/hooks/user';
-import { MODERATE_VARIABLE_PRICE, MEDIATOR_VARIABLE_PRICE, DEPENDENT_VARIABLE_PRICE, INDEPENDENT_VARIABLE_PRICE } from '@/core/Constants';
+import { MODERATE_VARIABLE_PRICE, MEDIATOR_VARIABLE_PRICE, DEPENDENT_VARIABLE_PRICE, INDEPENDENT_VARIABLE_PRICE, READ_RESULT_PRICE } from '@/core/Constants';
 
 interface CreateDownloadOrderFormProps {
     userCredit: number;
@@ -20,6 +20,8 @@ interface CreateDownloadOrderFormProps {
     numIndependentVariables?: number;
     numDependentVariables?: number;
     hidePayment?: boolean;
+    isReadingAnalysisResult?: boolean;
+    onIsReadingAnalysisResultChange?: (value: boolean) => void;
 }
 
 
@@ -34,6 +36,8 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
     numMediatorVariables,
     numIndependentVariables,
     numDependentVariables,
+    isReadingAnalysisResult,
+    onIsReadingAnalysisResultChange,
 
     className = '',
     showTitle = true,
@@ -42,6 +46,8 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
 }) => {
     const user = useMe();
     const [total, setTotal] = useState<number>(0);
+
+    const isSPSSModel = (numModerateVariables || 0) <= 0 && (numMediatorVariables || 0) <= 0 && (numIndependentVariables || 0) > 1 && (numDependentVariables || 0) == 1;
 
     // Calculate price based on variable types and counts
     useEffect(() => {
@@ -53,8 +59,13 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
         totalPrice += (numIndependentVariables || 0) * INDEPENDENT_VARIABLE_PRICE;
         totalPrice += (numDependentVariables || 0) * DEPENDENT_VARIABLE_PRICE;
 
+        // Add Vietnamese SPSS result fee if selected
+        if (isSPSSModel && isReadingAnalysisResult) {
+            totalPrice += READ_RESULT_PRICE;
+        }
+
         setTotal(totalPrice);
-    }, [numModerateVariables, numMediatorVariables, numIndependentVariables, numDependentVariables]);
+    }, [numModerateVariables, numMediatorVariables, numIndependentVariables, numDependentVariables, isReadingAnalysisResult, isSPSSModel]);
 
 
 
@@ -101,6 +112,31 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
                         />
                     </div>
                 </div>
+
+                {/* Vietnamese SPSS analysis result option */}
+                {isSPSSModel && (
+                    <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
+                        <label htmlFor="vn-spss-result-download" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Nhận kết quả phân tích SPSS:</label>
+                        <div className="w-full sm:w-1/2">
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="vn-spss-result-download"
+                                    checked={isReadingAnalysisResult || false}
+                                    onChange={(e) => {
+                                        if (onIsReadingAnalysisResultChange) {
+                                            onIsReadingAnalysisResultChange(e.target.checked);
+                                        }
+                                    }}
+                                    className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <label htmlFor="vn-spss-result-download" className="ml-2 text-sm text-gray-700">
+                                    <span className="block text-xs text-gray-500">Tick để nhận bản PDF (+{READ_RESULT_PRICE.toLocaleString()} VND phí cố định)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </div>
 
@@ -153,6 +189,14 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
                                     <span className="font-medium">
                                         {((numDependentVariables || 0) * DEPENDENT_VARIABLE_PRICE).toLocaleString()} VND
                                     </span>
+                                </div>
+                            )}
+
+                            {/* Vietnamese SPSS result add-on breakdown */}
+                            {isSPSSModel && isReadingAnalysisResult && (
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-sm text-gray-600">Kết quả phân tích SPSS  (phí cố định):</span>
+                                    <span className="font-medium text-purple-700">+{READ_RESULT_PRICE.toLocaleString()} VND</span>
                                 </div>
                             )}
                         </div>

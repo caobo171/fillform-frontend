@@ -211,6 +211,42 @@ const DataOrderPage = () => {
                             <span>Tải file dữ liệu CSV</span>
                         </div>
                     </div>
+
+                    {
+                        order.data?.order?.data?.report_file?.url ? (
+                            <div className="rounded-lg border border-gray-100 mt-4">
+                                <div
+                                    className="flex cursor-pointer items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg border border-red-200 transition-colors"
+                                    onClick={(e) => {
+                                        // Force download using Fetch API
+                                        e.preventDefault();
+                                        const url = Constants.IMAGE_URL + (order.data?.order?.data?.report_file?.url || '');
+                                        const filename = order.data?.order?.data?.report_file?.name || "report.pdf";
+
+                                        fetch(url)
+                                            .then(response => response.blob())
+                                            .then(blob => {
+                                                const blobUrl = window.URL.createObjectURL(blob);
+                                                const a = document.createElement('a');
+                                                a.style.display = 'none';
+                                                a.href = blobUrl;
+                                                a.download = filename;
+                                                document.body.appendChild(a);
+                                                a.click();
+                                                window.URL.revokeObjectURL(blobUrl);
+                                                document.body.removeChild(a);
+                                            })
+                                            .catch(() => window.open(url, '_blank'));
+                                    }}
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span>Tải file báo cáo</span>
+                                </div>
+                            </div>
+                        ) : null
+                    }
                 </div>
 
 
