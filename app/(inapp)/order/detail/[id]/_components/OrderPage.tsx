@@ -563,7 +563,11 @@ const OrderPage = () => {
 
                                     {
                                         order.data?.order?.ai_result?.output_model ? (
-                                            <ModelAdvanceBuilder model={order.data?.order?.ai_result?.output_model} setModel={() => { }} isReadOnly={true} />
+                                            <ModelAdvanceBuilder 
+                                                questions={order.data?.order?.data}
+                                                mappingQuestionToVariable={order.data?.order?.ai_result?.mapping_question_to_variable}
+                                                model={order.data?.order?.ai_result?.output_model} 
+                                                setModel={() => { }} isReadOnly={true} />
                                         ) : (
                                             <p>Không có mô hình</p>
                                         )

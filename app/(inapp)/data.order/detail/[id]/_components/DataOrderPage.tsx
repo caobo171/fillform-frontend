@@ -142,8 +142,8 @@ const DataOrderPage = () => {
                             </h3>
                             <div className="space-y-3">
                                 <div className="flex justify-between items-start">
-                                    <span className="text-gray-600">Tên Form:</span>
-                                    <Link href={'/data.model/detail/' + order.data?.order.data_model_id} className="font-semibold text-primary-600 hover:underline text-right max-w-[60%] truncate">
+                                    <span className="text-gray-600">Tên Model:</span>
+                                    <Link href={'/data/builder/' + order.data?.order.data_model_id} className="font-semibold text-primary-600 hover:underline text-right max-w-[60%] truncate">
                                         {order.data?.order.name}
                                     </Link>
                                 </div>
@@ -162,7 +162,7 @@ const DataOrderPage = () => {
                     <div className="bg-white p-6 rounded-lg border border-gray-100">
                         {
                             order.data?.order?.data_model ? (
-                                <ModelAdvanceBuilder model={order.data?.order?.data_model} setModel={(model) => { }} isReadOnly={true} />
+                                <ModelAdvanceBuilder model={order.data?.order?.data_model}  setModel={(model) => { }} isReadOnly={true} />
                             ) : (
                                 <p>Không có mô hình</p>
                             )
