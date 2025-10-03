@@ -308,11 +308,8 @@ const OrderPage = () => {
                                 </div>
 
 
-
-
-
                                 {
-                                    order.data?.order.type === ORDER_TYPE.AGENT && order.data?.order.ai_result?.status !== 'DONE_AI_THINKING' ? (
+                                    order.data?.order.ai_result?.status && order.data?.order.ai_result?.status !== 'DONE_AI_THINKING' ? (
                                         <div className="pt-2 border-t border-gray-100 mt-2">
                                             <div className="flex items-center justify-between">
                                                 <span className="text-gray-600">AI is thinking</span>

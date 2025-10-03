@@ -34,6 +34,55 @@ const DataOrderPage = () => {
             setIsAnalyzing(false);
         }
     }, [order.data?.order.status]);
+
+
+    useEffect(() => {
+
+        if (me) {
+            (async () => {
+                await Helper.waitUntil(() => {
+                    return SocketService.socket;
+                })
+
+
+                // Create throttled version of order.mutate that executes at most once every 5 seconds
+                let lastMutateTime = 0;
+                const throttledMutate = () => {
+                    const now = Date.now();
+                    if (now - lastMutateTime >= 5000) { // 5000ms = 5s
+                        lastMutateTime = now;
+                        order.mutate();
+                    } else {
+                        console.log('Throttled order.mutate call', now - lastMutateTime, 'ms since last call');
+                    }
+                };
+
+                SocketService.socket.on('order_running', (data: any) => {
+                    console.log('order_running', data);
+                    throttledMutate();
+                });
+
+                SocketService.socket.on('order_completed', (data: any) => {
+                    console.log('order_completed', data);
+                    throttledMutate();
+                });
+
+                SocketService.socket.on('ai_thinking', (data: any) => {
+                    console.log('ai_thinking', data);
+                    throttledMutate();
+                });
+
+                return () => {
+                    SocketService.socket.off('order_running');
+                    SocketService.socket.off('order_completed');
+                    SocketService.socket.off('ai_thinking');
+                }
+            })()
+
+        }
+
+    }, [me]);
+
     // Note: You'll need to fetch this data from your API
     const isAdmin = me.data?.is_super_admin;
 
@@ -152,6 +201,55 @@ const DataOrderPage = () => {
                                     <span className="font-semibold">{order.data?.order.num}</span>
                                 </div>
                             </div>
+                            {
+                                order.data?.order.data?.status && order.data?.order.data?.status !== 'DONE_AI_THINKING' ? (
+                                    <div className="pt-2 border-t border-gray-100 mt-2">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-600">AI is thinking</span>
+                                            <div className="flex items-center">
+                                                {order.data?.order.status !== ORDER_STATUS.ERROR ? (
+                                                    <>
+                                                        {order.data?.order.createdAt && new Date().getTime() - new Date(order.data.order.createdAt).getTime() > 30 * 60 * 1000 ? (
+                                                            <div className="flex items-center">
+                                                                <div className="mr-2 h-4 w-4 text-red-600">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                                    </svg>
+                                                                </div>
+                                                                <span className="text-red-600 italic text-sm">Request may be stuck (waiting &gt;30 min)</span>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <div className="animate-spin mr-2 h-4 w-4 text-primary-600">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                    </svg>
+                                                                </div>
+                                                                <span className="text-gray-500 italic text-sm">{order.data?.order.data?.status}</span>
+                                                            </>
+                                                        )}
+                                                    </>
+                                                ) : (
+
+                                                    <>
+                                                        <div className="flex items-center">
+                                                            <div className="mr-2 h-4 w-4 text-red-600">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                                </svg>
+                                                            </div>
+                                                            <span className="text-red-600 italic text-sm">{order.data?.order.data?.error && me.data?.is_super_admin ? order.data?.order.data?.error : "AI bị lỗi, không thể phân tích cho bạn, hãy liên hệ chúng tôi để support"}</span>
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : null
+                            }
+
                         </div>
                     </div>
                 </div>
@@ -162,7 +260,7 @@ const DataOrderPage = () => {
                     <div className="bg-white p-6 rounded-lg border border-gray-100">
                         {
                             order.data?.order?.data_model ? (
-                                <ModelAdvanceBuilder model={order.data?.order?.data_model}  setModel={(model) => { }} isReadOnly={true} />
+                                <ModelAdvanceBuilder model={order.data?.order?.data_model} setModel={(model) => { }} isReadOnly={true} />
                             ) : (
                                 <p>Không có mô hình</p>
                             )

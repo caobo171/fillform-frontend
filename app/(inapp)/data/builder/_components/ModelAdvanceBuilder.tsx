@@ -201,196 +201,196 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
       }
     >
       <div className="space-y-4">
-          {/* Variable Name */}
+        {/* Variable Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tên biến (ví dụ biến là Độ hài lòng thì tên là DHL)
+          </label>
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter variable name"
+            autoFocus
+          />
+        </div>
+
+        {/* Observable Questions Count - Only for Variable type */}
+        {nodeType === 'variable' && (questions || []).length <= 0 && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tên biến (ví dụ biến là Độ hài lòng thì tên là DHL)
+              Số lượng biến quan sát <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
+              type="number"
+              min="0"
+              max="50"
+              value={observableQuestions}
+              onChange={(e) => setObservableQuestions(parseInt(e.target.value) || 1)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter variable name"
-              autoFocus
             />
           </div>
-
-          {/* Observable Questions Count - Only for Variable type */}
-          {nodeType === 'variable' && (questions || []).length <= 0 && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Số lượng biến quan sát <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="50"
-                value={observableQuestions}
-                onChange={(e) => setObservableQuestions(parseInt(e.target.value) || 1)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          )}
+        )}
 
 
 
-          {/* Likert Scale Selection - Only for Variable type */}
-          {nodeType === 'variable' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Thang đo likert
-              </label>
-              <select
-                value={likertScale}
-                onChange={(e) => setLikertScale(parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value={3}>Thang đo likert 3</option>
-                <option value={4}>Thang đo likert 4</option>
-                <option value={5}>Thang đo likert 5</option>
-                <option value={6}>Thang đo likert 6</option>
-                <option value={7}>Thang đo likert 7</option>
-                <option value={8}>Thang đo likert 8</option>
-                <option value={9}>Thang đo likert 9</option>
-                <option value={10}>Thang đo likert 10</option>
-              </select>
-            </div>
-          )}
+        {/* Likert Scale Selection - Only for Variable type */}
+        {nodeType === 'variable' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Thang đo likert
+            </label>
+            <select
+              value={likertScale}
+              onChange={(e) => setLikertScale(parseInt(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value={3}>Thang đo likert 3</option>
+              <option value={4}>Thang đo likert 4</option>
+              <option value={5}>Thang đo likert 5</option>
+              <option value={6}>Thang đo likert 6</option>
+              <option value={7}>Thang đo likert 7</option>
+              <option value={8}>Thang đo likert 8</option>
+              <option value={9}>Thang đo likert 9</option>
+              <option value={10}>Thang đo likert 10</option>
+            </select>
+          </div>
+        )}
 
-          {/* Average and Standard Deviation - Only for Variable type */}
-          {nodeType === 'variable' && (
-            <div className="grid  gap-3">
-              {/* Note about independent variables only */}
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-2">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700">
-                      <strong>Lưu ý:</strong> Giá trị trung bình và độ lệch chuẩn chỉ áp dụng cho <strong>biến độc lập (independent variables)</strong>. 
-                      Biến phụ thuộc sẽ có giá trị được tính toán tự động dựa trên mối quan hệ hồi quy.
-                    </p>
-                  </div>
+        {/* Average and Standard Deviation - Only for Variable type */}
+        {nodeType === 'variable' && (
+          <div className="grid  gap-3">
+            {/* Note about independent variables only */}
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-2">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-blue-700">
+                    <strong>Lưu ý:</strong> Giá trị trung bình và độ lệch chuẩn chỉ áp dụng cho <strong>biến độc lập (independent variables)</strong>.
+                    Biến phụ thuộc sẽ có giá trị được tính toán tự động dựa trên mối quan hệ hồi quy.
+                  </p>
                 </div>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Giá trị trung bình (Average), nếu không có giá trị xác định thì để 0
-                </label>
-                <input
-                  type="text"
-                  value={average}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setAverage(value);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Độ lệch chuẩn (Standard Deviation), nếu không có giá trị xác định thì để 1
-                </label>
-                <input
-                  type="text"
-                  value={standardDeviation}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Allow empty string, positive numbers and decimal points
-                    setStandardDeviation(value);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="1.00"
-                />
-              </div>
             </div>
-          )}
 
-          {/* Question Mapping - Only for Variable type and when questions are available */}
-          {nodeType === 'variable' && questions && questions.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Các câu hỏi quan sát của biến <span className="text-red-500">*</span>
+                Giá trị trung bình (Average), nếu không có giá trị xác định thì để 0
               </label>
-              <Select
-                isMulti
-                value={selectedQuestions}
-                onChange={(selectedOptions) => handleQuestionChange(selectedOptions || [])}
-                options={questions.filter(q => !mappingQuestionToVariable?.[q.id]).map(q => ({
-                  value: q.id,
-                  label: q.question.substring(0, 30) + (q.question.length > 30 ? '...' : '') + (q.description ? ' (' + q.description + ')' : '')
-                }))}
-                placeholder="Select questions to map to this variable..."
-                className="text-sm"
-                styles={{
-                  control: (provided) => ({
-                    ...provided,
-                    minHeight: '38px',
-                    fontSize: '14px',
-                  }),
-                  multiValue: (provided) => ({
-                    ...provided,
-                    fontSize: '12px',
-                  }),
-                  option: (provided) => ({
-                    ...provided,
-                    fontSize: '14px',
-                  })
+              <input
+                type="text"
+                value={average}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setAverage(value);
                 }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="0.00"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Select which questions should be associated with this variable for data generation.
-              </p>
             </div>
-          )}
-
-          {/* Moderate Effect Fields (only for moderate_effect type) */}
-          {nodeType === 'moderate_effect' && (
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Moderate Variable
-                </label>
-                <select
-                  value={moderateVariable}
-                  onChange={(e) => setModerateVariable(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select moderate variable...</option>
-                  {availableNodes.filter(n => n.id !== node.id && n.data?.nodeType === 'variable').map(targetNode => (
-                    <option key={targetNode.id} value={targetNode.id}>
-                      {(targetNode.data?.label as string) || targetNode.id}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Independent Variable
-                </label>
-                <select
-                  value={independentVariable}
-                  onChange={(e) => setIndependentVariable(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select independent variable...</option>
-                  {availableNodes.filter(n => n.id !== node.id && n.data?.nodeType === 'variable').map(targetNode => (
-                    <option key={targetNode.id} value={targetNode.id}>
-                      {(targetNode.data?.label as string) || targetNode.id}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Độ lệch chuẩn (Standard Deviation), nếu không có giá trị xác định thì để 1
+              </label>
+              <input
+                type="text"
+                value={standardDeviation}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow empty string, positive numbers and decimal points
+                  setStandardDeviation(value);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="1.00"
+              />
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
+        {/* Question Mapping - Only for Variable type and when questions are available */}
+        {nodeType === 'variable' && questions && questions.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Các câu hỏi quan sát của biến <span className="text-red-500">*</span>
+            </label>
+            <Select
+              isMulti
+              value={selectedQuestions}
+              onChange={(selectedOptions) => handleQuestionChange(selectedOptions || [])}
+              options={questions.filter(q => !mappingQuestionToVariable?.[q.id]).map(q => ({
+                value: q.id,
+                label: q.question.substring(0, 30) + (q.question.length > 30 ? '...' : '') + (q.description ? ' (' + q.description + ')' : '')
+              }))}
+              placeholder="Select questions to map to this variable..."
+              className="text-sm"
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  minHeight: '38px',
+                  fontSize: '14px',
+                }),
+                multiValue: (provided) => ({
+                  ...provided,
+                  fontSize: '12px',
+                }),
+                option: (provided) => ({
+                  ...provided,
+                  fontSize: '14px',
+                })
+              }}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Select which questions should be associated with this variable for data generation.
+            </p>
+          </div>
+        )}
+
+        {/* Moderate Effect Fields (only for moderate_effect type) */}
+        {nodeType === 'moderate_effect' && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Moderate Variable
+              </label>
+              <select
+                value={moderateVariable}
+                onChange={(e) => setModerateVariable(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select moderate variable...</option>
+                {availableNodes.filter(n => n.id !== node.id && n.data?.nodeType === 'variable').map(targetNode => (
+                  <option key={targetNode.id} value={targetNode.id}>
+                    {(targetNode.data?.label as string) || targetNode.id}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Independent Variable
+              </label>
+              <select
+                value={independentVariable}
+                onChange={(e) => setIndependentVariable(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select independent variable...</option>
+                {availableNodes.filter(n => n.id !== node.id && n.data?.nodeType === 'variable').map(targetNode => (
+                  <option key={targetNode.id} value={targetNode.id}>
+                    {(targetNode.data?.label as string) || targetNode.id}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+      </div>
     </Modal>
   );
 };
@@ -466,117 +466,117 @@ const ModerateEffectForm = ({ selectedNodeId, editingNode, onSave, onCancel, ava
       }
     >
       <div className="space-y-4">
-          {/* Moderate Effect Name */}
+        {/* Moderate Effect Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tên hiệu ứng điều tiết
+          </label>
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Enter moderate effect name"
+            autoFocus
+          />
+        </div>
+
+        {/* Target Variable (Read-only) */}
+        {!isEditing && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tên hiệu ứng điều tiết
+              Biến phục thuộc (Là biến bạn đang chọn)
             </label>
             <input
               type="text"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Enter moderate effect name"
-              autoFocus
+              value={(selectedNode?.data?.label as string) || ''}
+              disabled
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
             />
           </div>
+        )}
 
-          {/* Target Variable (Read-only) */}
-          {!isEditing && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Biến phục thuộc (Là biến bạn đang chọn)
-              </label>
-              <input
-                type="text"
-                value={(selectedNode?.data?.label as string) || ''}
-                disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
-              />
-            </div>
-          )}
-
-          {/* Moderate Variable Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Biến điều tiết
-            </label>
-            <select
-              value={moderateVariable}
-              onChange={(e) => setModerateVariable(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            >
-              <option value="">Chọn biến điều tiết...</option>
-              {availableNodes.filter(n =>
-                n.data?.nodeType === 'variable' &&
-                n.id !== selectedNodeId &&
-                n.id !== editingNode?.id
-              ).map(node => (
-                <option key={node.id} value={node.id}>
-                  {(node.data?.label as string) || node.id}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Independent Variable Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Biến độc lập
-            </label>
-            <select
-              value={independentVariable}
-              onChange={(e) => setIndependentVariable(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            >
-              <option value="">Chọn biến độc lập...</option>
-              {availableNodes.filter(n =>
-                n.data?.nodeType === 'variable' &&
-                n.id !== selectedNodeId &&
-                n.id !== moderateVariable &&
-                n.id !== editingNode?.id
-              ).map(node => (
-                <option key={node.id} value={node.id}>
-                  {(node.data?.label as string) || node.id}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Effect Type Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Chiều hiệu ứng điều tiết
-            </label>
-            <div className="space-y-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="positive"
-                  checked={effectType === 'positive'}
-                  onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
-                  className="mr-2"
-                />
-                <span className="text-green-600 font-medium">Ảnh hưởng dương</span>
-                <span className="text-sm text-gray-500 ml-2">(tăng cường hiệu ứng)</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="negative"
-                  checked={effectType === 'negative'}
-                  onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
-                  className="mr-2"
-                />
-                <span className="text-red-600 font-medium">Ảnh hưởng âm</span>
-                <span className="text-sm text-gray-500 ml-2">(giảm nhẹ hiệu ứng)</span>
-              </label>
-            </div>
-          </div>
-
+        {/* Moderate Variable Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Biến điều tiết
+          </label>
+          <select
+            value={moderateVariable}
+            onChange={(e) => setModerateVariable(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          >
+            <option value="">Chọn biến điều tiết...</option>
+            {availableNodes.filter(n =>
+              n.data?.nodeType === 'variable' &&
+              n.id !== selectedNodeId &&
+              n.id !== editingNode?.id
+            ).map(node => (
+              <option key={node.id} value={node.id}>
+                {(node.data?.label as string) || node.id}
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Independent Variable Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Biến độc lập
+          </label>
+          <select
+            value={independentVariable}
+            onChange={(e) => setIndependentVariable(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          >
+            <option value="">Chọn biến độc lập...</option>
+            {availableNodes.filter(n =>
+              n.data?.nodeType === 'variable' &&
+              n.id !== selectedNodeId &&
+              n.id !== moderateVariable &&
+              n.id !== editingNode?.id
+            ).map(node => (
+              <option key={node.id} value={node.id}>
+                {(node.data?.label as string) || node.id}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Effect Type Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Chiều hiệu ứng điều tiết
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="positive"
+                checked={effectType === 'positive'}
+                onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
+                className="mr-2"
+              />
+              <span className="text-green-600 font-medium">Ảnh hưởng dương</span>
+              <span className="text-sm text-gray-500 ml-2">(tăng cường hiệu ứng)</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="negative"
+                checked={effectType === 'negative'}
+                onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
+                className="mr-2"
+              />
+              <span className="text-red-600 font-medium">Ảnh hưởng âm</span>
+              <span className="text-sm text-gray-500 ml-2">(giảm nhẹ hiệu ứng)</span>
+            </label>
+          </div>
+        </div>
+
+      </div>
     </Modal>
   );
 };
@@ -627,45 +627,45 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
       }
     >
       <div className="space-y-4">
-          {/* Connection Info */}
-          <div className="bg-gray-50 p-3 rounded-md">
-            <div className="text-sm text-gray-600 mb-1">Mối quan hệ:</div>
-            <div className="font-medium">
-              {(sourceNode?.data?.label as string) || edge.source} → {(targetNode?.data?.label as string) || edge.target}
-            </div>
+        {/* Connection Info */}
+        <div className="bg-gray-50 p-3 rounded-md">
+          <div className="text-sm text-gray-600 mb-1">Mối quan hệ:</div>
+          <div className="font-medium">
+            {(sourceNode?.data?.label as string) || edge.source} → {(targetNode?.data?.label as string) || edge.target}
           </div>
-
-          {/* Effect Type Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Chiều của mối quan hệ
-            </label>
-            <div className="space-y-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="positive"
-                  checked={effectType === 'positive'}
-                  onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
-                  className="mr-2"
-                />
-                <span className="text-green-600 font-medium">Ảnh hưởng dương</span>
-
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="negative"
-                  checked={effectType === 'negative'}
-                  onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
-                  className="mr-2"
-                />
-                <span className="text-red-600 font-medium">Ảnh hưởng âm</span>
-              </label>
-            </div>
-          </div>
-
         </div>
+
+        {/* Effect Type Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Chiều của mối quan hệ
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="positive"
+                checked={effectType === 'positive'}
+                onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
+                className="mr-2"
+              />
+              <span className="text-green-600 font-medium">Ảnh hưởng dương</span>
+
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="negative"
+                checked={effectType === 'negative'}
+                onChange={(e) => setEffectType(e.target.value as 'positive' | 'negative')}
+                className="mr-2"
+              />
+              <span className="text-red-600 font-medium">Ảnh hưởng âm</span>
+            </label>
+          </div>
+        </div>
+
+      </div>
     </Modal>
   );
 };
@@ -745,56 +745,63 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
       } ${styles.bg}`}>
 
       {/* Action Buttons - Show on hover */}
-      {!isReadOnly && (
-        <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1 z-10">
-          <div className="relative group/edit">
-            <button
-              onClick={handleEditClick}
-              className="w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-            >
-              <PencilIcon className="w-4 h-4" />
-            </button>
-            <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
-              <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                {nodeType === 'variable' ? "Chỉnh sửa biến" : "Chỉnh sửa hiệu ứng điều tiết"}
-                <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-              </div>
+
+      <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1 z-10">
+        <div className="relative group/edit">
+          <button
+            onClick={handleEditClick}
+            className="w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+          >
+            <PencilIcon className="w-4 h-4" />
+          </button>
+          <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+              {nodeType === 'variable' ? "Chỉnh sửa biến" : "Chỉnh sửa hiệu ứng điều tiết"}
+              <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
             </div>
           </div>
+        </div>
 
-          {nodeType === 'variable' && (
-            <div className="relative group/moderate">
+
+        {!isReadOnly && (
+          <>
+            {nodeType === 'variable' && (
+              <div className="relative group/moderate">
+                <button
+                  onClick={handleModerateEffectClick}
+                  className="w-7 h-7 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                >
+                  <BoltIcon className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/moderate:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    Thêm hiệu ứng điều tiết
+                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="relative group/delete">
               <button
-                onClick={handleModerateEffectClick}
-                className="w-7 h-7 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                onClick={handleDeleteClick}
+                className="w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
               >
-                <BoltIcon className="w-4 h-4" />
+                <TrashIcon className="w-4 h-4" />
               </button>
-              <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/moderate:opacity-100 transition-opacity duration-200 pointer-events-none">
+              <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/delete:opacity-100 transition-opacity duration-200 pointer-events-none">
                 <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                  Thêm hiệu ứng điều tiết
+                  {nodeType === 'variable' ? "Xoá biến" : "Xoá hiệu ứng điều tiết"}
                   <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
             </div>
-          )}
+          </>
+        )}
 
-          <div className="relative group/delete">
-            <button
-              onClick={handleDeleteClick}
-              className="w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-            >
-              <TrashIcon className="w-4 h-4" />
-            </button>
-            <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/delete:opacity-100 transition-opacity duration-200 pointer-events-none">
-              <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                {nodeType === 'variable' ? "Xoá biến" : "Xoá hiệu ứng điều tiết"}
-                <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
+      </div>
+
 
       <div className="flex flex-col items-center text-center">
         {/* Variable Name */}
@@ -901,34 +908,35 @@ const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, ta
   return (
     <>
       <BaseEdge path={edgePath} style={style} />
-      {!isReadOnly && (
-        <EdgeLabelRenderer>
-          <div
-            style={{
-              position: 'absolute',
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-              fontSize: 12,
-              pointerEvents: 'all',
-            }}
-            className={`nodrag nopan group ${selected ? 'opacity-100' : 'opacity-0 hover:opacity-100'} transition-opacity duration-200`}
-          >
-            <div className="flex gap-1 bg-white rounded-full shadow-lg border border-gray-200 p-1">
-              <div className="relative group/edit">
-                <button
-                  onClick={handleEditClick}
-                  className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
-                  title="Chỉnh sửa mối quan hệ"
-                >
-                  <PencilIcon className="w-3 h-3" />
-                </button>
-                <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                    Chỉnh sửa mối quan hệ
-                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                  </div>
+
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: 'absolute',
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            fontSize: 12,
+            pointerEvents: 'all',
+          }}
+          className={`nodrag nopan group ${selected ? 'opacity-100' : 'opacity-0 hover:opacity-100'} transition-opacity duration-200`}
+        >
+          <div className="flex gap-1 bg-white rounded-full shadow-lg border border-gray-200 p-1">
+            <div className="relative group/edit">
+              <button
+                onClick={handleEditClick}
+                className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                title="Chỉnh sửa mối quan hệ"
+              >
+                <PencilIcon className="w-3 h-3" />
+              </button>
+              <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+                <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                  Chỉnh sửa mối quan hệ
+                  <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
+            </div>
 
+            {!isReadOnly && (
               <div className="relative group/edit">
                 <button
                   onClick={handleDeleteClick}
@@ -947,11 +955,12 @@ const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, ta
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
           </div>
-        </EdgeLabelRenderer>
-      )}
+        </div>
+      </EdgeLabelRenderer>
+
     </>
   );
 };
@@ -1060,8 +1069,6 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
 
   // Handle edit node button click
   const handleEditNode = useCallback((nodeId?: string) => {
-    if (isReadOnly) return;
-
     const targetNodeId = nodeId || selectedNode;
     if (!targetNodeId) return;
 
@@ -1543,7 +1550,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       </div>
 
       {/* Node Edit Form Modal - Only for variable nodes */}
-      {!isReadOnly && editingNode && editingNode.data?.nodeType === 'variable' && (
+      {editingNode && editingNode.data?.nodeType === 'variable' && (
         <NodeEditForm
           node={editingNode}
           isNewNode={isNewNode}
@@ -1568,7 +1575,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       )}
 
       {/* Edge Edit Form Modal */}
-      {!isReadOnly && editingEdge && (
+      {editingEdge && (
         <EdgeEditForm
           edge={editingEdge}
           onSave={handleEdgeUpdate}

@@ -188,7 +188,7 @@ export const ORDER_TYPE = {
 
 export const REFER_PERCENT = 15;
 export const MIN_DRAW_CREDIT = 100000;
-export const AI_PRICE = 1150;
+export const AI_PRICE = 1650;
 
 export const MODEL_PRICE = 250;
 

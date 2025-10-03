@@ -405,7 +405,8 @@ export type RawDataOrderModel = {
   owner_id: string;
   num: number,
   data: {
-
+    error?: string,
+    status: string,
     smartPLS?: SmartPLSResult,
     finalData: any[],
 
