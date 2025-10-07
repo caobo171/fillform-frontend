@@ -1007,7 +1007,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
       nodes: sourceModel?.nodes?.map(node => ({
         id: node.id,
         type: 'customNode',
-        position: node.position,
+        position: node.position || { x: Math.random() * 1000, y: Math.random() * 1000 },
         data: node.data,
       })) || [],
       edges: sourceModel?.edges?.map(edge => {
@@ -1523,7 +1523,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={isReadOnly ? undefined : onNodesChange}
+          onNodesChange={onNodesChange}
           onEdgesChange={isReadOnly ? undefined : onEdgesChange}
           onConnect={isReadOnly ? undefined : onConnect}
           onNodeClick={onNodeClick}
@@ -1539,7 +1539,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
           zoomOnDoubleClick={true}
           minZoom={0.1}
           maxZoom={4}
-          nodesDraggable={!isReadOnly}
+          nodesDraggable={true}
           nodesConnectable={!isReadOnly}
           elementsSelectable={true}
         >

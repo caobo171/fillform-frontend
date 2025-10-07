@@ -552,7 +552,7 @@ const OrderPage = () => {
                     {/** Showing model */}
 
                     <>
-                        {order.data?.order.type === ORDER_TYPE.DATA_MODEL ? (
+                        {order.data?.order.type === ORDER_TYPE.DATA_MODEL || order.data?.order.type === ORDER_TYPE.AGENT ? (
                             <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
                                 <h2 className="text-2xl font-bold mb-4">Cấu hình mô hình</h2>
 
