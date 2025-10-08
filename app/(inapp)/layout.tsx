@@ -48,8 +48,8 @@ export default function InappLayout({ children }: PropsWithChildren) {
       if (today - created_date > 24 * 2 * 60 * 60 * 1000) {
         return;
       }
-      if (!localStorage.getItem('fillform_first_annoucement_' + me.data?.id)) {
-        localStorage.setItem('fillform_first_annoucement_' + me.data?.id, 'true');
+      if (!localStorage.getItem('survify_first_annoucement_' + me.data?.id)) {
+        localStorage.setItem('survify_first_annoucement_' + me.data?.id, 'true');
         setShowFirstAnnoucement(true);
       }
     }
@@ -58,7 +58,7 @@ export default function InappLayout({ children }: PropsWithChildren) {
   useEffect(() => {
     if (login_annoucement) {
 
-      const announcementKey = `fillform_login_annoucement_${me.data?.id}_${login_annoucement.id}`;
+      const announcementKey = `survify_login_annoucement_${me.data?.id}_${login_annoucement.id}`;
       const storedTimestampStr = localStorage.getItem(announcementKey);
       const startOfToday = new Date().setHours(0, 0, 0, 0);
 

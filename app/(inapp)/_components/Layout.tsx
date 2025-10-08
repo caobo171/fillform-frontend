@@ -22,7 +22,7 @@ export default function NormalLayout({ children }: PropsWithChildren) {
     { name: 'Mã hoá data', href: '/data/encode' },
     { name: 'Build dữ liệu đẹp', href: '/data/builder', id: 'build_data' },
     { name: 'Nạp tiền', href: '/credit' },
-    { name: 'Về fillform', href: 'https://fillform.info' },
+    { name: 'Về survify', href: 'https://survify.info' },
   ];
 
 

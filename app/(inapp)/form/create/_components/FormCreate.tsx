@@ -265,7 +265,7 @@ export default function FormCreate() {
                                         <p className="text-gray-700">
                                             Cần hỗ trợ? Liên hệ{' '}
                                             <a
-                                                href="https://www.facebook.com/fillformvn"
+                                                href="https://www.facebook.com/survifyvn"
                                                 className="text-primary-600 hover:underline font-medium"
                                             >
                                                 FillForm - Điền form tự động

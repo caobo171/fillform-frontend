@@ -153,7 +153,7 @@ const OrderPage = () => {
                                             </div>
 
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Link fillform form:</span>
+                                                <span className="text-gray-600">Link survify form:</span>
                                                 <span className="font-semibold text-primary-600 hover:underline max-w-[60%] truncate"><Link href={`/form/${order.data?.order.form_id}`}>{order.data?.order.name}</Link></span>
                                             </div>
                                         </>

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/user/', '/admin/'],
     },
-    sitemap: 'https://app.fillform.info/sitemap.xml',
+    sitemap: 'https://app.survify.info/sitemap.xml',
   };
 }

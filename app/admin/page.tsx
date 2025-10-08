@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Users - Admin - Fillform',
   description: 'Users - Admin - Fillform',
   alternates: {
-    canonical: 'https://app.fillform.info/admin/users',
+    canonical: 'https://app.survify.info/admin/users',
   },
 };
 
