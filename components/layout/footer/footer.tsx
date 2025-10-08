@@ -8,18 +8,18 @@ import { Container } from '../container/container';
 
 const navigation = {
   detail: [
-    { name: 'Về survify', href: 'https://survify.info' },
+    { name: 'Về fillform', href: 'https://fillform.info' },
    
   ],
   social: [
     {
       name: 'Gmail',
-      href: 'mailto:survify.info@gmail.com',
+      href: 'mailto:fillform.info@gmail.com',
       icon: '/static/svg/gmail.svg',
     },
     {
       name: 'Facebook',
-      href: 'https://www.facebook.com/survifyvn',
+      href: 'https://www.facebook.com/fillformvn',
       icon: '/static/svg/facebook.svg',
     },
     {
@@ -29,7 +29,7 @@ const navigation = {
     },
     {
       name: 'Tiktok',
-      href: 'https://www.tiktok.com/@survify.info',
+      href: 'https://www.tiktok.com/@fillform.info',
       icon: '/static/svg/tiktok.svg',
     }
     // {
@@ -38,7 +38,7 @@ const navigation = {
     //   icon: '/static/svg/discord.svg',
     // },
   ],
-  contacts: [{ name: 'Contact us', href: 'https://www.facebook.com/survifyvn' }],
+  contacts: [{ name: 'Contact us', href: 'https://www.facebook.com/fillformvn' }],
 };
 
 export function LayoutFooter() {
@@ -83,7 +83,7 @@ export function LayoutFooter() {
               ))}
 
               <a
-                href="https://www.facebook.com/survifyvn"
+                href="https://www.facebook.com/fillformvn"
                 target="_blank"
                 className="hover:text-gray-500"
               >

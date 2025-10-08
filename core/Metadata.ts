@@ -1,7 +1,7 @@
 class MetaData {
-  static landingPageDomain = 'https://survify.info/';
+  static landingPageDomain = 'https://fillform.info/';
 
-  static appDomain = 'https://app.survify.info';
+  static appDomain = 'https://app.fillform.info';
 
   static defaultKeywords =
     'Điền đơn tự động, ứng dụng điền đơn tự động, ứng dụng điền đơn, google form';

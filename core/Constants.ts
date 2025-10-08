@@ -2,13 +2,13 @@ const FAKE_DATA = {
   IMAGE_URL:
     'https://cungdecor.vn/wp-content/uploads/2019/04/kien-truc-noi-that-la-gi-xu-huong-thiet-ke-kien-truc-noi-that-hien-nay-02.jpg',
 };
-const IMAGE_URL = "https://survifyposts.s3.ap-southeast-1.amazonaws.com/";
+const IMAGE_URL = "https://fillformposts.s3.ap-southeast-1.amazonaws.com/";
 
-export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.survify.info';
+export const SOCKET_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.fillform.info';
 
-export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.survify.info';
+export const API_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4001' : 'https://app.fillform.info';
 
-export const AFFILIATE_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000' : 'https://app.survify.info';
+export const AFFILIATE_URL = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000' : 'https://app.fillform.info';
 
 export const POSTHOG_KEY = process.env.NODE_ENV !== 'production' ? 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD' : 'phc_2CSfwxsr7KuXj0jJ4YvMmsCzV2MWRaUaTEp14WfY9CD';
 export const POSTHOG_HOST = process.env.NODE_ENV !== 'production' ? 'https://us.i.posthog.com' : 'https://us.i.posthog.com';
