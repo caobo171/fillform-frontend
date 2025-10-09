@@ -68,7 +68,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
   const [label, setLabel] = useState((node.data?.label as string) || '');
   const nodeType = (node.data?.nodeType as 'variable' | 'moderate_effect') || 'variable';
   const [observableQuestions, setObservableQuestions] = useState(
-    (node.data?.observableQuestions as number) || 1
+    (node.data?.observableQuestions as number) || 0
   );
   const [likertScale, setLikertScale] = useState(
     (node.data?.likertScale as number) || 5
@@ -227,7 +227,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
               min="0"
               max="50"
               value={observableQuestions}
-              onChange={(e) => setObservableQuestions(parseInt(e.target.value) || 1)}
+              onChange={(e) => setObservableQuestions(parseInt(e.target.value) || 0)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -684,7 +684,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
   id: string;
 }) => {
   const nodeType = data?.nodeType || 'variable';
-  const observableQuestions = data?.observableQuestions || 1;
+  const observableQuestions = data?.observableQuestions || 0;
   const moderateVariable = data?.moderateVariable;
   const independentVariable = data?.independentVariable;
   const average = data?.average;
@@ -1215,7 +1215,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
         ...node,
         data: {
           ...node.data,
-          observableQuestions: node.data.observableQuestions || 1
+          observableQuestions: node.data.observableQuestions || 0
         },
       }))
     );
