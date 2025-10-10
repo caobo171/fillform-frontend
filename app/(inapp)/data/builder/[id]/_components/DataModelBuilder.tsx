@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { XCircle } from 'lucide-react'
+import { XCircle, Copy } from 'lucide-react'
 import { z } from 'zod'
 
 import { Button, Input } from '@/components/common'
@@ -202,12 +202,45 @@ export default function DataModelBuilder() {
         }
     }
 
+    const handleCloneModel = async () => {
+        if (!model || !dataModel?.data_model) {
+            Toast.error('No model to clone');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const clonedName = `${name} (Copy)`;
+            const res = await Fetch.postWithAccessToken<{
+                code: number,
+                model: RawDataModel,
+                message: string,
+            }>('/api/data.model/create', {
+                model: JSON.stringify(model),
+                name: clonedName,
+                is_reading_analysis_result: 0,
+            });
+
+            if (res.data.code == Code.SUCCESS) {
+                Toast.success('Model cloned successfully!');
+                router.push(`/data/builder/${res.data.model.id}`);
+            } else {
+                Toast.error(res.data.message || 'Failed to clone model');
+            }
+        } catch (error) {
+            console.error('Error cloning model:', error);
+            Toast.error('Failed to clone model');
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <>
             <section className="bg-gradient-to-b from-primary-50 to-white">
                 <div className="container mx-auto px-4 pt-8 pb-6" data-aos="fade-up">
                     {(loading) && <LoadingAbsolute />}
-                    <div className="container mx-auto mb-8">
+                    <div className="container mx-auto mb-8 flex flex-col gap-6">
                         <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-center text-gray-900">Build dữ liệu đẹp</h1>
 
                         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
@@ -237,6 +270,24 @@ export default function DataModelBuilder() {
                                     <p>Video hướng dẫn chi tiết: <a target="_blank" href="https://www.youtube.com/watch?v=SpqLCXKGFGU" className="text-primary-600 font-medium hover:underline">Xem tại đây</a></p>
                                 </div>
 
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Copy className="h-5 w-5 text-primary-600" />
+                                    <h3 className="text-lg font-semibold text-gray-900">Nhân bản mô hình</h3>
+                                </div>
+                                <Button
+                                    onClick={handleCloneModel}
+                                    disabled={!model || loading}
+                                    className="flex items-center gap-2"
+                                    type="outline"
+                                >
+                                    <Copy className="h-4 w-4" />
+                                    Nhân bản mô hình này
+                                </Button>
                             </div>
                         </div>
 
