@@ -15,6 +15,7 @@ import UnidimensionalityResults from '@/components/analysis/UnidimensionalityRes
 import PathCoefficientsResults from '@/components/analysis/PathCoefficientsResults'
 import EffectsResults from '@/components/analysis/EffectsResults'
 import InnerModelResults from '@/components/analysis/InnerModelResults'
+import { useMe } from '@/hooks/user'
 
 interface SmartPLSResultProps {
   data: SmartPLSResult
@@ -38,7 +39,8 @@ const SmartPLSResult = ({
   questions = [],
   mappingQuestionToVariable,
   model }: SmartPLSResultProps) => {
-  const [activeTab, setActiveTab] = useState(0)
+  const [activeTab, setActiveTab] = useState(0);
+  const me = useMe();
 
   // Define tabs with specialized components
   const tabs = [
@@ -75,7 +77,7 @@ const SmartPLSResult = ({
         model={model}
       />
     },
-    {
+    me.data?.is_super_admin && {
       key: 'inner_summary',
       label: 'Inner Summary',
       hasData: data?.raw_inner_summary && Object.keys(data.raw_inner_summary).length > 0,
@@ -97,7 +99,7 @@ const SmartPLSResult = ({
     //     model={model}
     //   />
     // },
-    {
+    me.data?.is_super_admin && {
       key: 'inner_model',
       label: 'Significance Testing',
       hasData: data?.raw_inner_model && Object.keys(data.raw_inner_model).length > 0,
@@ -108,7 +110,7 @@ const SmartPLSResult = ({
         model={model}
       />
     },
-    {
+    me.data?.is_super_admin && {
       key: 'effects',
       label: 'Effects Analysis',
       hasData: data?.raw_effects && Object.keys(data.raw_effects).length > 0,
@@ -163,7 +165,7 @@ const SmartPLSResult = ({
     //     model={model}
     //   />
     // }
-  ].filter(tab => tab.hasData)
+  ].filter(tab => tab && tab?.hasData)
 
   if (tabs.length === 0) {
     return (
