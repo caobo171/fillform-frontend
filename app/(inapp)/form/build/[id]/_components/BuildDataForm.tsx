@@ -47,6 +47,7 @@ export default function BuildDataForm() {
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const [chatOpen, setChatOpen] = useState<boolean>(true);
     const [chatErrors, setChatErrors] = useState<ChatError[]>([]);
+    
 
     const availableQuestions = dataForm?.form.loaddata || [];
 
@@ -159,11 +160,13 @@ export default function BuildDataForm() {
             });
 
             if (res.data.form) {
+                console.log('Form saved successfully');
                 setIsCreatingNewModel(false);
                 mutateForm();
                 modelsData.mutate();
+                console.log('Form saved successfully 2');
                 Toast.success('Lưu model thành công');
-            }
+            } 
 
 
 
@@ -174,6 +177,7 @@ export default function BuildDataForm() {
             Toast.error(error.message || 'Lỗi khi lưu model');
         }
 
+        console.log('Form saved successfully 3');
         setIsLoading(false);
         setIsSaved(true);
     };
@@ -817,7 +821,7 @@ export default function BuildDataForm() {
 
 
 
-                            {isSaved && !chatErrors.some(error => error.type === 'error') && (
+                            {isSaved && (
                                 <div className="animate-fade-in bg-green-50 border-l-4 border-green-600 p-6 mb-6 rounded-lg shadow-sm flex flex-col items-center text-center">
                                     <div className="flex items-center gap-2 mb-3">
                                         <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
