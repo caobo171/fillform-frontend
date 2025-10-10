@@ -16,6 +16,8 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import { ModelAdvanceBuilder } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder'
 import OrderEditForm from './OrderEditForm'
+import SmartPLSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SmartPLSResult'
+import SPSSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SPSSResult'
 
 
 
@@ -27,7 +29,7 @@ const OrderPage = () => {
     const [isFetching, setIsFetching] = useState(false)
     // Note: You'll need to fetch this data from your API
     const isAdmin = me.data?.is_super_admin;
-
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     const model = order.data?.order?.ai_result?.output_model;
     const mappingQuestionToVariable = order.data?.order?.ai_result?.mapping_question_to_variable;
@@ -560,10 +562,10 @@ const OrderPage = () => {
 
                                     {
                                         order.data?.order?.ai_result?.output_model ? (
-                                            <ModelAdvanceBuilder 
+                                            <ModelAdvanceBuilder
                                                 questions={order.data?.order?.data}
                                                 mappingQuestionToVariable={order.data?.order?.ai_result?.mapping_question_to_variable}
-                                                model={order.data?.order?.ai_result?.output_model} 
+                                                model={order.data?.order?.ai_result?.output_model}
                                                 setModel={() => { }} isReadOnly={true} />
                                         ) : (
                                             <p>Không có mô hình</p>
@@ -574,6 +576,7 @@ const OrderPage = () => {
                         ) : <></>}
 
                     </>
+
 
 
                     {/* Showing percentage */}
@@ -667,6 +670,94 @@ const OrderPage = () => {
 
 
                 </div>
+
+
+
+                {/* SmartPLS Analysis Section */}
+                <>
+                    {
+                        isAdmin ? (
+                            <>
+                                {
+                                    order.data?.order?.ai_result?.smartPLS ? (
+                                        <SmartPLSResult
+                                            data={order.data.order.ai_result.smartPLS}
+                                            title="Kết quả phân tích SmartPLS"
+                                            className="mb-8"
+                                        />
+                                    ) : null
+                                }
+
+                                {/* SPSS Analysis Results */}
+                                {
+                                    (order.data?.order?.ai_result?.basic_analysis || order?.data?.order?.ai_result?.linear_regression_analysis) ? (
+                                        <SPSSResult
+                                            basicAnalysis={order.data?.order?.ai_result?.basic_analysis}
+                                            linearRegressionAnalysis={order?.data?.order?.ai_result?.linear_regression_analysis}
+                                            title="Kết quả phân tích SPSS"
+                                            className="mb-8"
+                                        />
+                                    ) : null
+                                }
+                            </>
+                        ) : null
+                    }
+
+                </>
+                {
+                    isAdmin ? (
+                        <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
+                            <h2 className="text-2xl font-bold mb-4">Chạy phân tích dữ liệu</h2>
+                            <p className="text-gray-600 mb-6">Chưa có kết quả phân tích. Nhấn nút bên dưới để bắt đầu phân tích dữ liệu với thuật toán SmartPLS.</p>
+
+                            <button
+                                onClick={async () => {
+                                    setIsAnalyzing(true);
+                                    try {
+                                        const response = await Fetch.postWithAccessToken<{
+                                            order: any,
+                                            code: number,
+                                            message: string
+                                        }>("/api/order/analysize", {
+                                            id: params.id
+                                        });
+
+                                        if (response.data.code === Code.SUCCESS) {
+                                            Toast.success("Phân tích thành công!");
+                                            order.mutate();
+                                        } else {
+                                            Toast.error(response.data.message || "Có lỗi xảy ra khi phân tích");
+                                        }
+                                    } catch (error) {
+                                        console.error("Analysis error:", error);
+                                        Toast.error("Có lỗi xảy ra khi phân tích");
+                                    } finally {
+                                        setIsAnalyzing(false);
+                                    }
+                                }}
+                                disabled={isAnalyzing}
+                                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200 space-x-2"
+                            >
+                                {isAnalyzing ? (
+                                    <>
+                                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>Đang phân tích...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                        </svg>
+                                        <span>Bắt đầu phân tích SmartPLS</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    ) : null
+                }
             </div>
         </section>
     )

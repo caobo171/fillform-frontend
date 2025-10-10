@@ -388,7 +388,7 @@ const DataOrderPage = () => {
                 {
                     isAdmin ? (
                         <div className="text-left mb-8 bg-white rounded shadow-sm p-6 border border-gray-100">
-                            <h2 className="text-2xl font-bold mb-4">Chạy phân tích dữ liệu SmartPLS</h2>
+                            <h2 className="text-2xl font-bold mb-4">Chạy phân tích dữ liệu</h2>
                             <p className="text-gray-600 mb-6">Chưa có kết quả phân tích. Nhấn nút bên dưới để bắt đầu phân tích dữ liệu với thuật toán SmartPLS.</p>
 
                             <button
