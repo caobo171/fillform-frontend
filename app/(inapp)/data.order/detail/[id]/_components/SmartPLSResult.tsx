@@ -15,7 +15,6 @@ import UnidimensionalityResults from '@/components/analysis/UnidimensionalityRes
 import PathCoefficientsResults from '@/components/analysis/PathCoefficientsResults'
 import EffectsResults from '@/components/analysis/EffectsResults'
 import InnerModelResults from '@/components/analysis/InnerModelResults'
-import { useMe } from '@/hooks/user'
 
 interface SmartPLSResultProps {
   data: SmartPLSResult
@@ -32,35 +31,57 @@ interface TabData {
   data: Record<string, any>
 }
 
-const SmartPLSResult = ({ 
+const SmartPLSResult = ({
   data,
   title,
   className,
   questions = [],
   mappingQuestionToVariable,
   model }: SmartPLSResultProps) => {
-  const [activeTab, setActiveTab] = useState(0);
-  const me = useMe();
+  const [activeTab, setActiveTab] = useState(0)
 
   // Define tabs with specialized components
   const tabs = [
     {
-      key: 'outer_model',
-      label: 'Outer Model',
-      hasData: data?.raw_outer_model && Object.keys(data.raw_outer_model).length > 0,
-      component: <OuterModelResults 
-        outerModel={data?.raw_outer_model || {}} 
+      key: 'inner_model',
+      label: 'Significance Testing',
+      hasData: data?.raw_inner_model && Object.keys(data.raw_inner_model).length > 0,
+      component: <InnerModelResults
+        innerModel={data?.raw_inner_model || {}}
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
       />
     },
     {
+      key: 'outer_model',
+      label: 'Outer Model',
+      hasData: data?.raw_outer_model && Object.keys(data.raw_outer_model).length > 0,
+      component: <OuterModelResults
+        outerModel={data?.raw_outer_model || {}}
+        questions={questions}
+        mappingQuestionToVariable={mappingQuestionToVariable}
+        model={model}
+      />
+    },
+    // {
+    //   key: 'inner_summary',
+    //   label: 'Inner Summary',
+    //   hasData: data?.raw_inner_summary && Object.keys(data.raw_inner_summary).length > 0,
+    //   component: <InnerSummaryResults
+    //     innerSummary={data?.raw_inner_summary || {}}
+    //     questions={questions}
+    //     mappingQuestionToVariable={mappingQuestionToVariable}
+    //     model={model}
+    //   />
+    // },
+
+    {
       key: 'cross_loadings',
       label: 'Cross Loadings',
       hasData: data?.raw_crossloadings && Object.keys(data.raw_crossloadings).length > 0,
-      component: <CrossLoadingsResults 
-        crossLoadings={data?.raw_crossloadings || {}} 
+      component: <CrossLoadingsResults
+        crossLoadings={data?.raw_crossloadings || {}}
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
@@ -70,24 +91,14 @@ const SmartPLSResult = ({
       key: 'unidimensionality',
       label: 'Reliability',
       hasData: data?.raw_unidimensionality && Object.keys(data.raw_unidimensionality).length > 0,
-      component: <UnidimensionalityResults 
-        unidimensionality={data?.raw_unidimensionality || {}} 
+      component: <UnidimensionalityResults
+        unidimensionality={data?.raw_unidimensionality || {}}
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
       />
     },
-    me.data?.is_super_admin && {
-      key: 'inner_summary',
-      label: 'Inner Summary',
-      hasData: data?.raw_inner_summary && Object.keys(data.raw_inner_summary).length > 0,
-      component: <InnerSummaryResults 
-        innerSummary={data?.raw_inner_summary || {}} 
-        questions={questions}
-        mappingQuestionToVariable={mappingQuestionToVariable}
-        model={model}
-      />
-    },
+
     // {
     //   key: 'path_coefficients',
     //   label: 'Path Coefficients',
@@ -99,23 +110,13 @@ const SmartPLSResult = ({
     //     model={model}
     //   />
     // },
-    me.data?.is_super_admin && {
-      key: 'inner_model',
-      label: 'Significance Testing',
-      hasData: data?.raw_inner_model && Object.keys(data.raw_inner_model).length > 0,
-      component: <InnerModelResults 
-        innerModel={data?.raw_inner_model || {}} 
-        questions={questions}
-        mappingQuestionToVariable={mappingQuestionToVariable}
-        model={model}
-      />
-    },
-    me.data?.is_super_admin && {
+
+    {
       key: 'effects',
       label: 'Effects Analysis',
       hasData: data?.raw_effects && Object.keys(data.raw_effects).length > 0,
-      component: <EffectsResults 
-        effects={data?.raw_effects || {}} 
+      component: <EffectsResults
+        effects={data?.raw_effects || {}}
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
@@ -125,8 +126,8 @@ const SmartPLSResult = ({
       key: 'htmt',
       label: 'HTMT',
       hasData: data?.raw_htmt && Object.keys(data.raw_htmt).length > 0,
-      component: <HTMTResults 
-        htmtMatrix={data?.raw_htmt || {}} 
+      component: <HTMTResults
+        htmtMatrix={data?.raw_htmt || {}}
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
@@ -147,8 +148,8 @@ const SmartPLSResult = ({
       key: 'vif',
       label: 'VIF',
       hasData: data?.raw_vif?.inner_vif && data?.raw_vif?.outer_vif,
-      component: <VIFResults 
-        vifResults={data?.raw_vif} 
+      component: <VIFResults
+        vifResults={data?.raw_vif}
         questions={questions}
         mappingQuestionToVariable={mappingQuestionToVariable}
         model={model}
@@ -165,7 +166,7 @@ const SmartPLSResult = ({
     //     model={model}
     //   />
     // }
-  ].filter(tab => tab && tab?.hasData)
+  ].filter(tab => tab.hasData)
 
   if (tabs.length === 0) {
     return (
@@ -194,7 +195,7 @@ const SmartPLSResult = ({
         <nav className="flex flex-wrap gap-2 px-6 py-2" aria-label="Tabs">
           {tabs.map((tab, index) => (
             <button
-              key={tab?.key}
+              key={tab.key}
               onClick={() => setActiveTab(index)}
               className={clsx(
                 "py-2 px-3 border-b-2 font-medium text-sm whitespace-nowrap rounded-t-lg transition-colors",
@@ -203,7 +204,7 @@ const SmartPLSResult = ({
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50"
               )}
             >
-              {tab?.label}
+              {tab.label}
             </button>
           ))}
         </nav>
