@@ -32,7 +32,20 @@ const OrderPage = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     const model = order.data?.order?.ai_result?.output_model;
-    const mappingQuestionToVariable = order.data?.order?.ai_result?.mapping_question_to_variable;
+    const mappingQuestionToVariable = useMemo(() => {
+        if (!order.data?.order?.ai_result?.mapping_question_to_variable) {
+            let mapping: { [key: string]: string } = {};
+            for (const node of model?.nodes || []) {
+                for (const question of node.questions || []) {
+                    mapping[question] = node.id;
+                }
+            }
+
+            console.log(mapping);
+            return mapping;
+        }
+        return order.data?.order?.ai_result?.mapping_question_to_variable;
+    }, [order.data]);
 
     const realMappingQuestionToVariable = useMemo(() => {
 
@@ -564,7 +577,7 @@ const OrderPage = () => {
                                         order.data?.order?.ai_result?.output_model ? (
                                             <ModelAdvanceBuilder
                                                 questions={order.data?.order?.data}
-                                                mappingQuestionToVariable={order.data?.order?.ai_result?.mapping_question_to_variable}
+                                                mappingQuestionToVariable={mappingQuestionToVariable}
                                                 model={order.data?.order?.ai_result?.output_model}
                                                 setModel={() => { }} isReadOnly={true} />
                                         ) : (
