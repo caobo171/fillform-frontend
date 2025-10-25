@@ -188,14 +188,14 @@ export const ORDER_TYPE = {
 
 export const REFER_PERCENT = 15;
 export const MIN_DRAW_CREDIT = 100000;
-export const AI_PRICE = 1650;
+export const AI_PRICE = 2650;
 
 export const MODEL_PRICE = 250;
 
-export const MODERATE_VARIABLE_PRICE = 80000;
-export const MEDIATOR_VARIABLE_PRICE = 80000;
-export const DEPENDENT_VARIABLE_PRICE = 20000;
-export const INDEPENDENT_VARIABLE_PRICE = 30000;
+export const MODERATE_VARIABLE_PRICE = 150000;
+export const MEDIATOR_VARIABLE_PRICE = 180000;
+export const DEPENDENT_VARIABLE_PRICE = 50000;
+export const INDEPENDENT_VARIABLE_PRICE = 40000;
 
 export const READ_RESULT_PRICE = 50000;
 
