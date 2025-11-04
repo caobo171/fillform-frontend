@@ -324,7 +324,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
               onChange={(selectedOptions) => handleQuestionChange(selectedOptions || [])}
               options={questions.filter(q => !mappingQuestionToVariable?.[q.id]).map(q => ({
                 value: q.id,
-                label: q.question.substring(0, 30) + (q.question.length > 30 ? '...' : '') + (q.description ? ' (' + q.description + ')' : '')
+                label: (q.question || '').substring(0, 30) + ((q.question || '').length > 30 ? '...' : '') + ((q.description || '').length > 0 ? ' (' + q.description + ')' : '')
               }))}
               placeholder="Select questions to map to this variable..."
               className="text-sm"
