@@ -99,9 +99,16 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
       .filter(([questionId, variableId]) => variableId == node.id)
       .map(([questionId]) => {
         const question = questions?.find(q => q.id == questionId);
+
+        let name = (question?.question || '').substring(0, 30) + ((question?.question || '').length > 30 ? '...' : '');
+
+        if (!name) {
+          name = ((question?.description || '').length > 0 ? ' (' + question?.description + ')' : '');
+        }
+
         return question ? {
           value: question.id,
-          label: question.question || question.name || questionId
+          label: name
         } : null;
       })
       .filter(Boolean) as { value: string; label: string; }[];
