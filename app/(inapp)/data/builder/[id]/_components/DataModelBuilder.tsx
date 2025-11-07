@@ -302,6 +302,7 @@ export default function DataModelBuilder() {
                                 {
                                     model ? (
                                         <ModelAdvanceBuilder
+                                            onChange={() => setShowDownloadForm(false)}
                                             model={model}
                                             setModel={setModel}
                                             useLocalStorage={false}

@@ -31,6 +31,7 @@ interface ModelAdvanceBuilderProps {
   mappingQuestionToVariable?: { [key: string]: string },
   setMappingQuestionToVariable?: (mapping: { [key: string]: string }) => void,
   questions?: any[],
+  onChange?: () => void,
 }
 
 export interface ModelAdvanceBuilderRef {
@@ -979,7 +980,8 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
   isReadOnly = false,
   mappingQuestionToVariable,
   setMappingQuestionToVariable,
-  questions
+  questions,
+  onChange
 }, ref) => {
 
   // Local storage functions
@@ -1092,6 +1094,9 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
         setEditingNode(nodeToEdit);
         setIsNewNode(false);
       }
+
+      onChange?.();
+      
     }
   }, [selectedNode, nodes, isReadOnly]);
 
@@ -1113,6 +1118,8 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
     if (selectedNode === targetNodeId) {
       setSelectedNode(null);
     }
+
+    onChange?.();
   }, [selectedNode, setNodes, setEdges, isReadOnly]);
 
   // Create nodeTypes with access to current nodes and handlers

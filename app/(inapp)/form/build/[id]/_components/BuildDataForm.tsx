@@ -12,13 +12,11 @@ import { DataModel, RawDataModel, RawForm } from '@/store/types';
 import { Helper } from '@/services/Helper';
 import { useRouter } from 'next/navigation';
 import { QUESTION_TYPE, Code, OPTIONS_DELAY_ENUM, ORDER_TYPE, PULSES_TOKEN } from '@/core/Constants';
-import { FormInfoSection } from '../../../_components/FormInfoSection';
-import { BasicModelBuilder } from './BasicModelBuilder'
 import { Toast } from '@/services/Toast';
 import { CreateOrderForm } from "@/components/form";
 import { useMe, useMyBankInfo } from '@/hooks/user';
-import { useMyDataModels, useUserDataModels } from '@/hooks/data.model';
-import { ModelAdvanceBuilder, ModelAdvanceBuilderRef } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
+import { useUserDataModels } from '@/hooks/data.model';
+import { ModelAdvanceBuilderRef } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
 import ACL from '@/services/ACL';
 import Select from 'react-select';
 import { AdvanceModelType, ModerateEffectNodeDataType, VariableNodeDataType } from '@/store/data.service.types';
@@ -26,6 +24,7 @@ import { useModelVariables } from '@/hooks/useModelVariables';
 import { ModelSelectionComponent } from './ModelSelectionComponent';
 import SmartPLSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SmartPLSResult';
 import SPSSResult from '@/app/(inapp)/data.order/detail/[id]/_components/SPSSResult';
+import { FormInfoSection } from '../../../_components/FormInfoSection';
 
 interface ChatError {
     id: string;
