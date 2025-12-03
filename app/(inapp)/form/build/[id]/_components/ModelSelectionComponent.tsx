@@ -1,5 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
+import Link from 'next/link';
 import { RawDataModel } from '@/store/types';
 import { AdvanceModelType } from '@/store/data.service.types';
 import { ModelAdvanceBuilder, ModelAdvanceBuilderRef } from '@/app/(inapp)/data/builder/_components/ModelAdvanceBuilder';
@@ -173,11 +174,25 @@ export const ModelSelectionComponent: React.FC<ModelSelectionComponentProps> = (
                                     <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p className="text-blue-800 text-sm font-medium">
+                                    <p className="text-blue-800 text-sm font-medium flex items-center gap-2">
                                         {isCreatingNewModel ? (
                                             <>🆕 Đang tạo model mới: <strong>{advanceModelData.name}</strong></>
                                         ) : (
-                                            <>Đang chỉnh sửa model: <strong>{selectedAdvanceModel?.name}</strong></>
+                                            <>
+                                                Đang chỉnh sửa model: <strong>{selectedAdvanceModel?.name}</strong>
+                                                {selectedAdvanceModel?.id && (
+                                                    <Link 
+                                                        href={`/data/builder/${selectedAdvanceModel.id}`}
+                                                        target="_blank"
+                                                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                                                        title="Mở model trong tab mới"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                        </svg>
+                                                    </Link>
+                                                )}
+                                            </>
                                         )}
                                     </p>
                                 </div>
