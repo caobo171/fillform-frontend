@@ -42,7 +42,7 @@ export default function DataOrderLists({ admin }: { admin?: boolean }) {
 
     const inListAdmin = admin && !userId;
     if (admin) {
-        dataOrder = useUserDataOrders(page, ITEMS_PER_PAGE, userId, {
+        dataOrder = useUserDataOrders(currentPage, ITEMS_PER_PAGE, userId, {
             q: query
         })
     } else {
@@ -163,7 +163,7 @@ export default function DataOrderLists({ admin }: { admin?: boolean }) {
         <div className="px-4 sm:px-6 lg:px-8">
             <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
-                    <h1 className="text-2xl font-semibold text-gray-900">Orders</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900">Data Orders</h1>
                     <p className="mt-2 text-sm text-gray-700">
                         Danh sách tất cả các lượt download dữ liệu
                     </p>

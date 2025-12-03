@@ -41,7 +41,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
 
     const inListAdmin = admin && !userId;
     if (admin) {
-        dataOrder = useUserOrders(page, ITEMS_PER_PAGE, userId, {
+        dataOrder = useUserOrders(currentPage, ITEMS_PER_PAGE, userId, {
             q: query
         })
     } else {
