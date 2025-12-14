@@ -91,10 +91,10 @@ export default function UserDetailPage() {
                     <div className="px-4 sm:px-6 lg:px-8">
                         <h5 className="text-lg font-medium">Xin chào</h5>
                         <h1 className="text-4xl font-bold">{user?.data?.username}</h1>
-                        <div className="flex flex-row justify-between mt-4">
-                            <h4 className="text-2xl"><span className="font-bold">Email: </span>{user?.data?.email}</h4>
-                            <h4 className="text-2xl"><span className="font-bold">Số dư: </span>{user?.data?.credit.toLocaleString()} VND</h4>
-                            <h4 className="text-2xl"><span className="font-bold">Id Credit: </span>{user?.data?.idcredit}</h4>
+                        <div className="flex flex-row justify-between flex-wrap mt-4 gap-8">
+                            <h4 className="md:text-2xl text-xl break-all"><span className="font-bold">Email: </span>{user?.data?.email}</h4>
+                            <h4 className="md:text-2xl text-xl break-all"><span className="font-bold">Số dư: </span>{user?.data?.credit.toLocaleString()} VND</h4>
+                            <h4 className="md:text-2xl text-xl break-all"><span className="font-bold">Id Credit: </span>{user?.data?.idcredit}</h4>
                         </div>
                         <button
                             onClick={() => setOpenModal(true)}

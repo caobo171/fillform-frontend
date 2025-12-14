@@ -137,7 +137,7 @@ const DataOrderPage = () => {
 
 
     if (order.isLoading) {
-        return <Loading />
+        return <LoadingAbsolute />
     }
 
 
