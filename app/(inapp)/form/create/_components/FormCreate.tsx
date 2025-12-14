@@ -13,6 +13,7 @@ import LoadingAbsolute from '@/components/loading'
 import { Button, Input } from '@/components/common'
 import { FormItem, InlineFormItem } from '@/components/form/FormItem'
 import Meta from '@/components/ui/Meta'
+import { useSearchParam } from 'react-use'
 
 const formCreateSchema = z.object({
     form_link: z.string().min(1, 'Vui lòng nhập đường dẫn edit form!'),
@@ -25,6 +26,7 @@ export default function FormCreate() {
     const [loading, setLoading] = useState<boolean>(false);
     const [msg, setMsg] = useState<string>('');
     const [isViewFormLink, setIsViewFormLink] = useState<boolean>(false);
+    const type_param = useSearchParam('type');
 
     const {
         control,
@@ -64,7 +66,15 @@ export default function FormCreate() {
 
             if (res.data?.form){
                 Toast.success('Tạo form thành công!');
-                router.push(`/form/${res.data?.form?.id}`);
+                if (type_param == 'ai' || type_param == 'agent' || type_param == 'ai_agent') {
+                    router.push(`/form/ai/${res.data?.form?.id}`);
+                } else if (type_param == 'model' || type_param == 'build') {
+                    router.push(`/form/build/${res.data?.form?.id}`);
+                } else if (type_param == 'data' || type_param == 'prefill') {
+                    router.push(`/form/prefill/${res.data?.form?.id}`);
+                } else {
+                    router.push(`/form/${res.data?.form?.id}`);
+                } 
             }
         } catch (e) {
             setMsg(`Đã xảy ra lỗi, bạn hãy kiểm tra xem form đã được mở quyền truy cập cho tất có mọi người có link và tắt thu thập email, tắt cho phép chỉnh sửa câu trả lời và phải tắt mỗi mail chỉ điền 1 lần hay chưa nha ! 

@@ -193,6 +193,25 @@ const OrderEditForm: FC<OrderEditFormProps> = ({ order, mutateOrder }) => {
         }
     }
 
+
+    const orderFixErrors = async () => {
+        setIsFetching(true)
+        try {
+            const res = await Fetch.postWithAccessToken<{ code: number }>('/api/order/fix.errors', {
+                id: params.id as string
+            })
+
+            if (res.data.code === Code.SUCCESS) {
+                mutateOrder();
+                Toast.success('Order đã được chạy lại');
+            }
+        } catch (error) {
+            Toast.error('Lỗi khi chạy lại order');
+        } finally {
+            setIsFetching(false)
+        }
+    }
+
     return (
         <div>
             {isFetching ? <LoadingAbsolute /> : <></>}
@@ -213,7 +232,10 @@ const OrderEditForm: FC<OrderEditFormProps> = ({ order, mutateOrder }) => {
                             {/* Admin Controls */}
                             <div className="flex flex-wrap gap-2 mb-6">
                                 {order.status === ORDER_STATUS.SUCCESS ? (
-                                    <button disabled className="px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed opacity-50">Tiếp tục</button>
+                                    <>
+                                        <button disabled className="px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed opacity-50">Tiếp tục</button>
+                                        <button onClick={() => orderFixErrors()} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors">Chạy lại câu hỏi lỗi</button>
+                                    </>
                                 ) : order.status === ORDER_STATUS.RUNNING ? (
                                     <button
                                         onClick={() => orderPause()}
