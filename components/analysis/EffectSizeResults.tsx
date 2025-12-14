@@ -62,7 +62,7 @@ export const EffectSizeResults: React.FC<EffectSizeResultsProps> = ({
 
   const getEffectSizeInterpretation = (f2: number) => {
     if (f2 < 0.02) return { level: 'Không có', color: 'text-gray-600', bgColor: 'bg-gray-50' };
-    if (f2 < 0.15) return { level: 'Nhỏ', color: 'text-blue-600', bgColor: 'bg-blue-50' };
+    if (f2 < 0.15) return { level: 'Nhỏ', color: 'text-primary-600', bgColor: 'bg-primary-50' };
     if (f2 < 0.35) return { level: 'Trung bình', color: 'text-green-600', bgColor: 'bg-green-50' };
     return { level: 'Lớn', color: 'text-purple-600', bgColor: 'bg-purple-50' };
   };
@@ -136,7 +136,7 @@ export const EffectSizeResults: React.FC<EffectSizeResultsProps> = ({
           <span className="text-gray-600">f² &lt; 0.02: Không có</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-primary-500 rounded-full mr-2"></div>
           <span className="text-gray-600">f² ≥ 0.02: Nhỏ</span>
         </div>
         <div className="flex items-center">

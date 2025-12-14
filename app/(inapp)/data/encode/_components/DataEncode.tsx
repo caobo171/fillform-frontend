@@ -194,9 +194,9 @@ export default function DataEncode() {
                                         <li>File CSV kết quả sẽ được tải về máy của bạn</li>
                                     </ol>
 
-                                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-blue-800 mt-4">
+                                    <div className="bg-primary-50 border border-blue-100 rounded-lg p-4 text-primary-800 mt-4">
                                         <p>
-                                            <strong className="text-blue-600">Lưu ý: </strong>
+                                            <strong className="text-primary-600">Lưu ý: </strong>
                                             File CSV được tạo ra sẽ chứa dữ liệu đã được mã hóa, giúp bạn điền form nhanh chóng hơn với FillForm.
                                         </p>
                                     </div>

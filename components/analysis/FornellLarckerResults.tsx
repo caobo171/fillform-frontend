@@ -108,7 +108,7 @@ export const FornellLarckerResults: React.FC<FornellLarckerResultsProps> = ({
                       <td key={colVar} className="px-4 py-3 whitespace-nowrap text-sm text-center">
                         <span className={`${
                           isDiagonal 
-                            ? 'text-blue-600 font-bold' 
+                            ? 'text-primary-600 font-bold' 
                             : isProblematic 
                               ? 'text-red-600 font-bold' 
                               : 'text-gray-600'
@@ -126,7 +126,7 @@ export const FornellLarckerResults: React.FC<FornellLarckerResultsProps> = ({
       </div>
 
       <div className="mt-4 text-sm text-gray-600">
-        <p><span className="font-semibold text-blue-600">Đường chéo (√AVE):</span> Căn bậc hai của phương sai trích trung bình</p>
+        <p><span className="font-semibold text-primary-600">Đường chéo (√AVE):</span> Căn bậc hai của phương sai trích trung bình</p>
         <p><span className="font-semibold text-gray-600">Ngoài đường chéo:</span> Tương quan giữa các khái niệm</p>
         <p><span className="font-semibold text-red-600">Cảnh báo:</span> Tương quan ≥ √AVE có thể có vấn đề tính phân biệt</p>
       </div>

@@ -141,15 +141,15 @@ const CreateDownloadOrderForm: React.FC<CreateDownloadOrderFormProps> = ({
             </div>
 
             {!hidePayment && (
-                <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-6 my-6 shadow-sm">
+                <div className="bg-primary-50 border border-blue-200 text-primary-800 rounded-lg p-6 my-6 shadow-sm">
                     <div className="flex flex-col sm:flex-row items-center justify-between border-b border-blue-200 pb-4 mb-4">
                         <h3 className="text-lg sm:text-xl font-bold">TỔNG CỘNG:</h3>
-                        <div className="text-2xl font-bold text-blue-700">{total.toLocaleString()} VND</div>
+                        <div className="text-2xl font-bold text-primary-700">{total.toLocaleString()} VND</div>
                     </div>
 
                     {/* Pricing Breakdown */}
                     <div className="bg-white rounded-lg p-4 mb-3 border border-blue-100">
-                        <h4 className="font-medium text-blue-800 mb-3">Chi tiết giá:</h4>
+                        <h4 className="font-medium text-primary-800 mb-3">Chi tiết giá:</h4>
                         <div className="bg-gray-50 p-3 rounded-lg mb-4">
                             {(numModerateVariables || 0) > 0 && (
                                 <div className="flex justify-between items-center mb-2">

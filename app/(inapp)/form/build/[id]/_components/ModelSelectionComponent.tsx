@@ -169,12 +169,12 @@ export const ModelSelectionComponent: React.FC<ModelSelectionComponentProps> = (
                     {/* Model Editor */}
                     {advanceModelData && (
                         <div className="mt-6">
-                            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="mb-4 p-4 bg-primary-50 border border-blue-200 rounded-lg">
                                 <div className="flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p className="text-blue-800 text-sm font-medium flex items-center gap-2">
+                                    <p className="text-primary-800 text-sm font-medium flex items-center gap-2">
                                         {isCreatingNewModel ? (
                                             <>🆕 Đang tạo model mới: <strong>{advanceModelData.name}</strong></>
                                         ) : (
@@ -184,7 +184,7 @@ export const ModelSelectionComponent: React.FC<ModelSelectionComponentProps> = (
                                                     <Link 
                                                         href={`/data/builder/${selectedAdvanceModel.id}`}
                                                         target="_blank"
-                                                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                                                        className="inline-flex items-center text-primary-600 hover:text-primary-800 transition-colors"
                                                         title="Mở model trong tab mới"
                                                     >
                                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

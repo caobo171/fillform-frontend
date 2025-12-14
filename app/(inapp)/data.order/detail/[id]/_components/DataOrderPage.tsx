@@ -169,7 +169,7 @@ const DataOrderPage = () => {
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-600">Tình trạng:</span>
                                     <span className={clsx("font-semibold px-2 py-1 rounded-full text-xs",
-                                        order.data?.order.status === ORDER_STATUS.RUNNING ? "bg-blue-100 text-blue-800" : "",
+                                        order.data?.order.status === ORDER_STATUS.RUNNING ? "bg-primary-100 text-primary-800" : "",
                                         order.data?.order.status === ORDER_STATUS.PAUSE ? "bg-yellow-100 text-yellow-800" : "",
                                         order.data?.order.status === ORDER_STATUS.CANCELED ? "bg-red-100 text-red-800" : "",
                                         order.data?.order.status === ORDER_STATUS.SUCCESS ? "bg-green-100 text-green-800" : "",
@@ -274,7 +274,7 @@ const DataOrderPage = () => {
 
                     <div className="rounded-lg border border-gray-100">
                         <div
-                            className="flex cursor-pointer items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+                            className="flex cursor-pointer items-center justify-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg border border-blue-200 transition-colors"
                             onClick={(e) => {
                                 // Force download using Fetch API
 
@@ -417,7 +417,7 @@ const DataOrderPage = () => {
                                     }
                                 }}
                                 disabled={isAnalyzing}
-                                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200 space-x-2"
+                                className="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200 space-x-2"
                             >
                                 {isAnalyzing ? (
                                     <>

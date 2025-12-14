@@ -125,7 +125,7 @@ const OrderPage = () => {
 
 
     if (order.isLoading) {
-        return <Loading />
+        return <LoadingAbsolute />
     }
 
 
@@ -239,7 +239,7 @@ const OrderPage = () => {
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-600">Tình trạng:</span>
                                     <span className={clsx("font-semibold px-2 py-1 rounded-full text-xs",
-                                        order.data?.order.status === ORDER_STATUS.RUNNING ? "bg-blue-100 text-blue-800" : "",
+                                        order.data?.order.status === ORDER_STATUS.RUNNING ? "bg-primary-100 text-primary-800" : "",
                                         order.data?.order.status === ORDER_STATUS.PAUSE ? "bg-yellow-100 text-yellow-800" : "",
                                         order.data?.order.status === ORDER_STATUS.CANCELED ? "bg-red-100 text-red-800" : "",
                                         order.data?.order.status === ORDER_STATUS.SUCCESS ? "bg-green-100 text-green-800" : "",
@@ -417,13 +417,13 @@ const OrderPage = () => {
                                                         detail.result === "completed" ? "bg-green-100 text-green-800" : "",
                                                         detail.result === "failed" ? "bg-red-100 text-red-800" : "",
                                                         detail.result === "pending" ? "bg-yellow-100 text-yellow-800" : "",
-                                                        detail.result === "waiting" ? "bg-blue-100 text-blue-800" : "",
+                                                        detail.result === "waiting" ? "bg-primary-100 text-primary-800" : "",
                                                         detail.result === "paused" ? "bg-purple-100 text-purple-800" : "",
                                                         detail.result === "stopped" ? "bg-gray-100 text-gray-800" : "",
                                                     )}>
                                                         {detail.result?.toUpperCase()}
                                                     </div>
-                                                    <a href={detail.data} target='_blank' className="w-1/4 text-center hover:bg-blue-50 flex items-center justify-center text-blue-600">
+                                                    <a href={detail.data} target='_blank' className="w-1/4 text-center hover:bg-primary-50 flex items-center justify-center text-primary-600">
                                                         Xem
                                                     </a>
                                                 </div>
@@ -495,7 +495,7 @@ const OrderPage = () => {
                                         <a
                                             href={Constants.IMAGE_URL + order.data.order.ai_result.data_file.url}
                                             download={order.data.order.ai_result.data_file.name || "data.csv"}
-                                            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+                                            className="flex items-center justify-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg border border-blue-200 transition-colors"
                                             onClick={(e) => {
                                                 // Force download using Fetch API
                                                 e.preventDefault();
@@ -749,7 +749,7 @@ const OrderPage = () => {
                                     }
                                 }}
                                 disabled={isAnalyzing}
-                                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200 space-x-2"
+                                className="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors duration-200 space-x-2"
                             >
                                 {isAnalyzing ? (
                                     <>

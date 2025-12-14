@@ -73,7 +73,7 @@ export const InnerSummaryResults: React.FC<InnerSummaryResultsProps> = ({
 
   const getRSquaredStatus = (r2: number) => {
     if (r2 >= 0.67) return { status: 'Mạnh', color: 'text-green-600', bgColor: 'bg-green-50' };
-    if (r2 >= 0.33) return { status: 'Trung bình', color: 'text-blue-600', bgColor: 'bg-blue-50' };
+    if (r2 >= 0.33) return { status: 'Trung bình', color: 'text-primary-600', bgColor: 'bg-primary-50' };
     if (r2 >= 0.19) return { status: 'Yếu', color: 'text-yellow-600', bgColor: 'bg-yellow-50' };
     return { status: 'Rất yếu', color: 'text-red-600', bgColor: 'bg-red-50' };
   };
@@ -140,7 +140,7 @@ export const InnerSummaryResults: React.FC<InnerSummaryResultsProps> = ({
                   <td className="px-4 py-3 whitespace-nowrap text-center">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                       type === 'Exogenous' 
-                        ? 'bg-blue-50 text-blue-600' 
+                        ? 'bg-primary-50 text-primary-600' 
                         : 'bg-purple-50 text-purple-600'
                     }`}>
                       {type === 'Exogenous' ? 'Ngoại sinh' : 'Nội sinh'}
@@ -196,7 +196,7 @@ export const InnerSummaryResults: React.FC<InnerSummaryResultsProps> = ({
           <span className="text-gray-600">R² ≥ 0.67: Mạnh</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-primary-500 rounded-full mr-2"></div>
           <span className="text-gray-600">R² ≥ 0.33: Trung bình</span>
         </div>
         <div className="flex items-center">

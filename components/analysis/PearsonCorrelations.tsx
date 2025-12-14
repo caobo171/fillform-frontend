@@ -100,7 +100,7 @@ export const PearsonCorrelations: React.FC<PearsonCorrelationsProps> = ({
                     <td className="px-4 py-1 text-left text-sm">
                       <span className={`font-semibold ${
                         corr.significance === '***' ? 'text-green-600' :
-                        corr.significance === '**' ? 'text-blue-600' :
+                        corr.significance === '**' ? 'text-primary-600' :
                         corr.significance === '*' ? 'text-yellow-600' :
                         'text-gray-400'
                       }`}>
@@ -125,7 +125,7 @@ export const PearsonCorrelations: React.FC<PearsonCorrelationsProps> = ({
               <p className="font-medium mb-2">Mức ý nghĩa thống kê:</p>
               <p>
                 <span className="text-green-600 font-semibold">***:</span> p &lt; 0.001 | 
-                <span className="text-blue-600 font-semibold ml-2">**:</span> p &lt; 0.01 | 
+                <span className="text-primary-600 font-semibold ml-2">**:</span> p &lt; 0.01 | 
                 <span className="text-yellow-600 font-semibold ml-2">*:</span> p &lt; 0.05 | 
                 <span className="text-gray-400 font-semibold ml-2">ns:</span> không có ý nghĩa thống kê
               </p>

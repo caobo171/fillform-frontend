@@ -110,7 +110,7 @@ const UserInfo = (props: { user: RawUser }) => {
                     </a>
 
 
-                    <a href={props.user.facebook} target={`_blank`} className="mr-3 w-10 h-10 rounded-full flex justify-center items-center bg-blue-400 text-white">
+                    <a href={props.user.facebook} target={`_blank`} className="mr-3 w-10 h-10 rounded-full flex justify-center items-center bg-primary-400 text-white">
                         <ImFacebook />
                     </a>
 

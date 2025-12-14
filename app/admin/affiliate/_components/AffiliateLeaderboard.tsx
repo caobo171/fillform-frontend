@@ -33,7 +33,7 @@ export default function AffiliateLeaderboard() {
     if (rank === 1) return 'bg-yellow-500'; // Gold for 1st
     if (rank === 2) return 'bg-gray-400'; // Silver for 2nd
     if (rank === 3) return 'bg-amber-600'; // Bronze for 3rd
-    return 'bg-blue-500'; // Default blue for others
+    return 'bg-primary-500'; // Default blue for others
   };
   
   // Function to determine podium color based on rank
@@ -41,7 +41,7 @@ export default function AffiliateLeaderboard() {
     if (rank === 1) return 'bg-yellow-200'; // Gold for 1st
     if (rank === 2) return 'bg-gray-200'; // Silver for 2nd
     if (rank === 3) return 'bg-amber-200'; // Bronze for 3rd
-    return 'bg-blue-100'; // Default blue for others
+    return 'bg-primary-100'; // Default blue for others
   };
 
   // Function to determine avatar size based on rank
@@ -68,7 +68,7 @@ export default function AffiliateLeaderboard() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
       </div>
     );
   }

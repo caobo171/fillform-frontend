@@ -44,7 +44,7 @@ export function Badge(props: BadgeProps) {
             'bg-green-100 text-green-700': type === 'green',
           },
           {
-            'bg-blue-100 text-blue-700': type === 'blue',
+            'bg-primary-100 text-primary-700': type === 'blue',
           },
           {
             'bg-purple-100 text-purple-700': type === 'purple',

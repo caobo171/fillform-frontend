@@ -370,7 +370,7 @@ export default function DataModelBuilder() {
                                                 type="button"
                                                 onClick={() => handleDownloadOrderAnalysis()}
                                                 disabled={loading}
-                                                className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all flex items-center justify-center
+                                                className={`w-full mt-6 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all flex items-center justify-center
                                                     ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

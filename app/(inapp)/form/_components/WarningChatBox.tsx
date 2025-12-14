@@ -77,7 +77,7 @@ const WarningChatBox = ({ chatOpen, chatErrors, toggleChat, removeChatError }: W
                                 <div className={`p-3 rounded-lg rounded-tl-none text-xs relative
                                     ${error.type === "error" ? "bg-red-50 text-red-800" :
                                         error.type === "warning" ? "bg-yellow-50 text-yellow-800" :
-                                            "bg-primary-50 text-blue-800"
+                                            "bg-primary-50 text-primary-800"
                                     }`}>
                                     <button
                                         className="absolute top-1 right-1 text-xs opacity-70 hover:opacity-100 transition-opacity"

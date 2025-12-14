@@ -138,7 +138,7 @@ export const UnidimensionalityResults: React.FC<UnidimensionalityResultsProps> =
                   <td className="px-4 py-3 whitespace-nowrap text-center">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                       mode === 'A' 
-                        ? 'bg-blue-50 text-blue-600' 
+                        ? 'bg-primary-50 text-primary-600' 
                         : 'bg-purple-50 text-purple-600'
                     }`}>
                       {mode}

@@ -35,7 +35,7 @@ export const FormTypeNavigation = ({ formId, type }: FormTypeNavigationProps) =>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21h18M9 8h1m-1 4h1m-1 4h1m4-8h1m-1 4h1m-1 4h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16" />
         </svg>
         <span className="flex items-center">Điền theo mô hình NCKH
-          {/* <span className="ml-1.5 text-xs px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded-md font-medium">Beta</span> */}
+          <span className="ml-1.5 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full font-semibold bg-amber-50 text-amber-800 border border-amber-300 shadow-sm animate-pulse">Hot</span>
         </span>
       </Link>
       <Link href={`/form/ai/${formId}`} className={buttonStyles(type === 'ai')}>

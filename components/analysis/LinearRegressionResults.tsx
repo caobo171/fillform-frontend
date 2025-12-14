@@ -83,7 +83,7 @@ export const LinearRegressionResults: React.FC<LinearRegressionResultsProps> = (
                   <td className="px-4 py-2 text-center">
                     <span className={`font-semibold ${
                       coeff.significance === '***' ? 'text-green-600' :
-                      coeff.significance === '**' ? 'text-blue-600' :
+                      coeff.significance === '**' ? 'text-primary-600' :
                       coeff.significance === '*' ? 'text-yellow-600' :
                       'text-gray-400'
                     }`}>
@@ -98,7 +98,7 @@ export const LinearRegressionResults: React.FC<LinearRegressionResultsProps> = (
         <div className="mt-4 text-sm text-gray-600">
           <p>
             <span className="text-green-600 font-semibold">***:</span> p &lt; 0.001 | 
-            <span className="text-blue-600 font-semibold ml-2">**:</span> p &lt; 0.01 | 
+            <span className="text-primary-600 font-semibold ml-2">**:</span> p &lt; 0.01 | 
             <span className="text-yellow-600 font-semibold ml-2">*:</span> p &lt; 0.05 | 
             <span className="text-gray-400 font-semibold ml-2">ns:</span> không có ý nghĩa thống kê
           </p>

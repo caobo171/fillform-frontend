@@ -7,7 +7,7 @@ export const ShowMoreButton = React.memo(
     <button
       onClick={onClick}
       name="show-more"
-      className={`${className} outline-none focus:outline-none px-3 py-1 border-2 border-blue-400 rounded text-blue-400 font-medium hover:border-blue-700 hover:text-blue-700 transition-all`}
+      className={`${className} outline-none focus:outline-none px-3 py-1 border-2 border-blue-400 rounded text-primary-400 font-medium hover:border-blue-700 hover:text-primary-700 transition-all`}
     >
       {title || 'Show all'}
     </button>
@@ -27,11 +27,11 @@ const variantStyles = {
   solid: {
     slate:
       'bg-slate-900 text-white hover:bg-slate-700 hover:text-slate-100 active:bg-slate-800 active:text-slate-300 focus-visible:outline-slate-900',
-    blue: 'bg-blue-600 text-white hover:text-slate-100 hover:bg-blue-500 active:bg-blue-800 active:text-blue-100 focus-visible:outline-blue-600',
+    blue: 'bg-primary-600 text-white hover:text-slate-100 hover:bg-primary-500 active:bg-primary-800 active:text-primary-100 focus-visible:outline-blue-600',
     green:
       'bg-green-600 text-white hover:text-slate-100 hover:bg-green-500 active:bg-green-800 active:text-green-100 focus-visible:outline-green-600',
     white:
-      'bg-white text-slate-900 hover:bg-blue-50 active:bg-blue-200 active:text-slate-600 focus-visible:outline-white',
+      'bg-white text-slate-900 hover:bg-primary-50 active:bg-primary-200 active:text-slate-600 focus-visible:outline-white',
     primary:
       'bg-primary text-white hover:text-slate-100 hover:bg-primary-900 active:bg-primary-800 active:text-primary-100 focus-visible:outline-primary-600',
   },

@@ -459,7 +459,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
         <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
           <label htmlFor="price" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Đơn giá mỗi câu trả lời:</label>
           <div className="w-full sm:w-1/2 p-2 rounded">
-            <p id="pricePerAnswer" className="sm:text-right font-bold text-blue-600">
+            <p id="pricePerAnswer" className="sm:text-right font-bold text-primary-600">
               {(pricePerUnit + schedulePriceAdjustment).toLocaleString()} VND
             </p>
             <p className="sm:text-right text-xs text-gray-500 mt-1">
@@ -510,7 +510,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                     return (
                       <div
                         key={key}
-                        className={`p-3 hover:bg-gray-100 cursor-pointer ${parseInt(key) === delayType ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
+                        className={`p-3 hover:bg-gray-100 cursor-pointer ${parseInt(key) === delayType ? 'bg-primary-50 border-l-4 border-blue-500' : ''}`}
                         onClick={() => {
                           onDelayTypeChange(parseInt(key));
                           setIsDropdownOpen(false);
@@ -625,7 +625,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
                         return (
                           <div
                             key={day}
-                            className={`p-3 hover:bg-gray-100 cursor-pointer flex items-center ${isSelected ? 'bg-blue-50' : ''}`}
+                            className={`p-3 hover:bg-gray-100 cursor-pointer flex items-center ${isSelected ? 'bg-primary-50' : ''}`}
                             onClick={() => {
                               const newDisabledDays = isSelected
                                 ? localDisabledDays.filter(d => d !== day)
@@ -653,8 +653,8 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
         {/* SPECIFIC_DELAY Schedule Options */}
         {delayType === OPTIONS_DELAY_ENUM.SPECIFIC_DELAY && (
-          <div className="border border-blue-200 rounded-lg p-4 mb-4 bg-blue-50">
-            <h4 className="font-bold text-blue-800 mb-3">Chọn thời gian chạy chính xác (+0 VND/yêu cầu)</h4>
+          <div className="border border-blue-200 rounded-lg p-4 mb-4 bg-primary-50">
+            <h4 className="font-bold text-primary-800 mb-3">Chọn thời gian chạy chính xác (+0 VND/yêu cầu)</h4>
 
             {/* Date Range Selection */}
             <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -788,10 +788,10 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-6 my-6 shadow-sm">
+      <div className="bg-primary-50 border border-blue-200 text-primary-800 rounded-lg p-6 my-6 shadow-sm">
         <div className="flex flex-col sm:flex-row items-center justify-between border-b border-blue-200 pb-4 mb-4">
           <h3 className="text-lg sm:text-xl font-bold">TỔNG CỘNG:</h3>
-          <div className="text-2xl font-bold text-blue-700">{total.toLocaleString()} VND</div>
+          <div className="text-2xl font-bold text-primary-700">{total.toLocaleString()} VND</div>
         </div>
         <div className="bg-white rounded-lg p-3 mb-3">
           <p className="text-sm text-gray-700 w-full" dangerouslySetInnerHTML={{ __html: delayInfo }}></p>
@@ -819,7 +819,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
         {/* Pricing Breakdown */}
         <div className="bg-white rounded-lg p-4 mb-3 border border-blue-100">
-          <h4 className="font-medium text-blue-800 mb-3">Chi tiết giá:</h4>
+          <h4 className="font-medium text-primary-800 mb-3">Chi tiết giá:</h4>
           <div className="space-y-2 text-sm">
             {/* Base price */}
             <div className="flex justify-between items-center">
@@ -831,7 +831,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             {orderType === ORDER_TYPE.AGENT && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-700">Phụ phí Agent AI:</span>
-                <span className="font-medium text-blue-600">+{AI_PRICE.toLocaleString()} VND</span>
+                <span className="font-medium text-primary-600">+{AI_PRICE.toLocaleString()} VND</span>
               </div>
             )}
 
@@ -850,7 +850,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
             <div className="border-t border-gray-200 pt-2 mt-2">
               <div className="flex justify-between items-center">
                 <span className="font-medium text-gray-900">Tổng đơn giá/yêu cầu:</span>
-                <span className="font-bold text-lg text-blue-600">{(pricePerUnit + schedulePriceAdjustment).toLocaleString()} VND</span>
+                <span className="font-bold text-lg text-primary-600">{(pricePerUnit + schedulePriceAdjustment).toLocaleString()} VND</span>
               </div>
             </div>
 

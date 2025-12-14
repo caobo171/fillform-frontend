@@ -194,7 +194,7 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
           <button
             type="submit"
             onClick={handleSubmit}
-            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Hoàn tất
           </button>
@@ -270,15 +270,15 @@ const NodeEditForm = ({ node, onSave, onCancel, availableNodes, questions, isNew
         {nodeType === 'variable' && (
           <div className="grid  gap-3">
             {/* Note about independent variables only */}
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-2">
+            <div className="bg-primary-50 border border-blue-200 rounded-md p-3 mb-2">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className="h-5 w-5 text-primary-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm text-primary-700">
                     <strong>Lưu ý:</strong> Giá trị trung bình và độ lệch chuẩn chỉ áp dụng cho <strong>biến độc lập (independent variables)</strong>.
                     Biến phụ thuộc sẽ có giá trị được tính toán tự động dựa trên mối quan hệ hồi quy.
                   </p>
@@ -620,7 +620,7 @@ const EdgeEditForm = ({ edge, onSave, onCancel, nodes }: {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Save Changes
           </button>
@@ -719,10 +719,10 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
       default: // variable
         return {
           border: 'border-blue-500',
-          bg: 'bg-blue-50',
-          text: 'text-blue-900',
-          badge: 'bg-blue-600',
-          count: 'bg-blue-100 text-blue-800',
+          bg: 'bg-primary-50',
+          text: 'text-primary-900',
+          badge: 'bg-primary-600',
+          count: 'bg-primary-100 text-primary-800',
           label: 'Biến'
         };
     }
@@ -758,7 +758,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
         <div className="relative group/edit">
           <button
             onClick={handleEditClick}
-            className="w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+            className="w-7 h-7 bg-primary-500 hover:bg-primary-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
           >
             <PencilIcon className="w-4 h-4" />
           </button>
@@ -874,7 +874,7 @@ const CustomNode = ({ data, selected, nodes, mappingQuestionToVariable, question
         <Handle
           type="target"
           position={Position.Left}
-          className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white hover:!bg-blue-600 !left-[-8px]"
+          className="!w-4 !h-4 !bg-primary-500 !border-2 !border-white hover:!bg-primary-600 !left-[-8px]"
         />
       )}
 
@@ -931,7 +931,7 @@ const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, ta
             <div className="relative group/edit">
               <button
                 onClick={handleEditClick}
-                className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                className="w-6 h-6 bg-primary-500 hover:bg-primary-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
                 title="Chỉnh sửa mối quan hệ"
               >
                 <PencilIcon className="w-3 h-3" />
@@ -1497,7 +1497,7 @@ export const ModelAdvanceBuilder = forwardRef<ModelAdvanceBuilderRef, ModelAdvan
                   });
 
                 }}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600"
               >
                 Thêm biến
               </button>

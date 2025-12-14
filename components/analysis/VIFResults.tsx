@@ -225,7 +225,7 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
             <button
               onClick={() => setActiveTab('outer')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'outer'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-blue-500 text-primary-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
@@ -237,7 +237,7 @@ export const VIFResults: React.FC<VIFResultsProps> = ({
             <button
               onClick={() => setActiveTab('inner')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'inner'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-blue-500 text-primary-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >

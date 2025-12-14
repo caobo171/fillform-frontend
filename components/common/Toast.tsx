@@ -33,7 +33,7 @@ export function ToastContextHolder() {
     }
 
     if (iconProps.type === 'info') {
-      return <InformationCircleIcon className="w-5 h-5 text-blue-500" />;
+      return <InformationCircleIcon className="w-5 h-5 text-primary-500" />;
     }
 
     if (iconProps.type === 'error') {

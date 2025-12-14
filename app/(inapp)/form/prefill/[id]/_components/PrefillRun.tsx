@@ -647,10 +647,10 @@ export default function PrefillRun() {
                                             <span><strong>Tự luận:</strong> Nhập trực tiếp đáp án, cố hạn chế dấu , ; và xuống dòng</span>
                                         </p>
 
-                                        <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 text-blue-800">
+                                        <div className="mt-4 p-3 bg-primary-50 rounded-md border border-blue-100 text-primary-800">
                                             <p className="font-semibold mb-1">Data mẫu (thông tin cá nhân đều là thông tin ảo):</p>
                                             <a href="https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit"
-                                                className="text-blue-600 hover:underline"
+                                                className="text-primary-600 hover:underline"
                                                 target="_blank"
                                                 rel="noopener noreferrer">
                                                 https://docs.google.com/spreadsheets/d/1dqZwuXIQJ1VnnRGsVU5eS40zN1wB2Q9U/edit

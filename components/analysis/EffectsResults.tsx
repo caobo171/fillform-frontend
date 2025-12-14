@@ -73,7 +73,7 @@ export const EffectsResults: React.FC<EffectsResultsProps> = ({
       level: 'Mạnh'
     };
     if (absEffect >= 0.3) return { 
-      color: effect > 0 ? 'text-blue-600' : 'text-orange-600', 
+      color: effect > 0 ? 'text-primary-600' : 'text-orange-600', 
       strength: 'font-medium',
       level: 'Trung bình'
     };
@@ -150,7 +150,7 @@ export const EffectsResults: React.FC<EffectsResultsProps> = ({
                 const hasIndirectEffect = Math.abs(indirect) > 0.1;
                 
                 if (hasDirectEffect && hasIndirectEffect) {
-                  return { type: 'Partial', color: 'text-blue-600', bgColor: 'bg-blue-50' };
+                  return { type: 'Partial', color: 'text-primary-600', bgColor: 'bg-primary-50' };
                 } else if (!hasDirectEffect && hasIndirectEffect) {
                   return { type: 'Full', color: 'text-green-600', bgColor: 'bg-green-50' };
                 } else if (hasDirectEffect && !hasIndirectEffect) {
@@ -209,7 +209,7 @@ export const EffectsResults: React.FC<EffectsResultsProps> = ({
           <span className="text-gray-600">Full Mediation: Chỉ có hiệu ứng gián tiếp</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-primary-500 rounded-full mr-2"></div>
           <span className="text-gray-600">Partial Mediation: Có cả 2 hiệu ứng</span>
         </div>
         <div className="flex items-center">

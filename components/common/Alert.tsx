@@ -21,7 +21,7 @@ export function Alert(props: AlertProps) {
 
   const wrapperClass = useMemo(() => {
     if (type === 'info') {
-      return 'bg-blue-50';
+      return 'bg-primary-50';
     }
 
     if (type === 'error') {
@@ -41,7 +41,7 @@ export function Alert(props: AlertProps) {
 
   const iconClass = useMemo(() => {
     if (type === 'info') {
-      return 'text-blue-400';
+      return 'text-primary-400';
     }
 
     if (type === 'error') {
@@ -61,7 +61,7 @@ export function Alert(props: AlertProps) {
 
   const textClass = useMemo(() => {
     if (type === 'info') {
-      return 'text-blue-700';
+      return 'text-primary-700';
     }
 
     if (type === 'error') {

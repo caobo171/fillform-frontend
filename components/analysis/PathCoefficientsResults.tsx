@@ -128,9 +128,9 @@ export const PathCoefficientsResults: React.FC<PathCoefficientsResultsProps> = (
                         bg: coeff > 0 ? 'bg-green-50' : 'bg-red-50'
                       };
                       if (absCoeff >= 0.3) return { 
-                        color: coeff > 0 ? 'text-blue-600' : 'text-orange-600', 
+                        color: coeff > 0 ? 'text-primary-600' : 'text-orange-600', 
                         strength: 'font-medium',
-                        bg: coeff > 0 ? 'bg-blue-50' : 'bg-orange-50'
+                        bg: coeff > 0 ? 'bg-primary-50' : 'bg-orange-50'
                       };
                       return { 
                         color: 'text-gray-600', 
@@ -170,7 +170,7 @@ export const PathCoefficientsResults: React.FC<PathCoefficientsResultsProps> = (
           <span className="text-gray-600">|β| ≥ 0.5: Ảnh hưởng mạnh (-)</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-primary-500 rounded-full mr-2"></div>
           <span className="text-gray-600">|β| ≥ 0.3: Ảnh hưởng trung bình (+)</span>
         </div>
         <div className="flex items-center">

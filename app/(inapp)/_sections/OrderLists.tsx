@@ -270,7 +270,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                         'inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium ring-1 ring-inset ring-green-600/20',
                                                         order.status === ORDER_STATUS.SUCCESS ? 'bg-green-50 text-green-700' : '',
                                                         order.status === ORDER_STATUS.PAUSE ? 'bg-yellow-50 text-yellow-700' : '',
-                                                        order.status === ORDER_STATUS.RUNNING ? 'bg-blue-50 text-blue-700' : '',
+                                                        order.status === ORDER_STATUS.RUNNING ? 'bg-primary-50 text-primary-700' : '',
                                                     )}>
                                                         {order.status}
                                                     </span>
@@ -313,7 +313,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                     </>}
                                                     <Link
                                                         href={`/order/detail/${order.id}`}
-                                                        className="inline-flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded"
+                                                        className="inline-flex items-center p-2 text-primary-600 hover:bg-primary-50 rounded"
                                                         title="Xem chi tiết Order"
                                                     >
                                                         <span className="sr-only">Chi tiết</span>
@@ -324,7 +324,7 @@ export default function OrderLists({ admin }: { admin?: boolean }) {
                                                     </Link>
                                                     <button
                                                         onClick={() => window.open(order.url, '_blank', 'noopener,noreferrer')}
-                                                        className="inline-flex items-center p-2 text-blue-600 hover:bg-blue-50 rounded"
+                                                        className="inline-flex items-center p-2 text-primary-600 hover:bg-primary-50 rounded"
                                                         title="Xem Google Form"
                                                     >
                                                         <span className="sr-only">Form</span>

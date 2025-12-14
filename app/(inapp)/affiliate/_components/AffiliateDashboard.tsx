@@ -101,7 +101,7 @@ export default function AffiliateDashboard() {
   if (!user) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
       </div>
     )
   }
@@ -188,16 +188,16 @@ export default function AffiliateDashboard() {
 
           {/* Affiliate Benefits */}
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-medium text-blue-800 mb-2">Quyền lợi của bạn:</h3>
-            <ul className="space-y-2 text-sm text-blue-700">
+            <h3 className="text-lg font-medium text-primary-800 mb-2">Quyền lợi của bạn:</h3>
+            <ul className="space-y-2 text-sm text-primary-700">
               <li>- Chỉ được tính affiliate với tài khoản giới thiệu đăng kí mới.</li>
               <li>- FillForm sẽ tặng bạn {REFER_PERCENT}% trên mỗi giao dịch nạp tiền thành công của người được giới thiệu.</li>
               <li>- Hoa hồng phải đạt 100.000 VND mới được yêu cầu rút tiền.</li>
               <li>- Tài khoản đang bị lỗi hoặc lạm dụng, spam sẽ bị từ chối tính affiliate.</li>
             </ul>
             
-            <h3 className="text-lg font-medium text-blue-800 mt-4 mb-2">Quyền lợi của bạn bè được giới thiệu:</h3>
-            <p className="text-sm text-blue-700">- Được tặng ngay 5000 credit vào tài khoản đăng kí mới.</p>
+            <h3 className="text-lg font-medium text-primary-800 mt-4 mb-2">Quyền lợi của bạn bè được giới thiệu:</h3>
+            <p className="text-sm text-primary-700">- Được tặng ngay 5000 credit vào tài khoản đăng kí mới.</p>
           </div>
         </div>
 
@@ -235,7 +235,7 @@ export default function AffiliateDashboard() {
             <h2 className="text-xl font-bold mb-4">Danh sách giới thiệu</h2>
             {referrals.loading ? (
               <div className="flex justify-center items-center h-32">
-                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
               </div>
             ) : referrals.value?.length > 0 ? (
               <div className="overflow-x-auto">
@@ -270,7 +270,7 @@ export default function AffiliateDashboard() {
             <h2 className="text-xl font-bold mb-4">Danh sách yêu cầu rút tiền</h2>
             {!withdrawRequests.data ? (
               <div className="flex justify-center items-center h-32">
-                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
               </div>
             ) : withdrawRequests.data?.length > 0 ? (
               <div className="overflow-x-auto">

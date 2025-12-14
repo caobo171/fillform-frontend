@@ -20,7 +20,7 @@ const OrderEditForm: FC<OrderEditFormProps> = ({ order, mutateOrder }) => {
 
     const [owner, setOwner] = useState(order?.owner)
     const [delay, setDelay] = useState(order?.delay);
-    const [scheduleEnabled, setScheduleEnabled] = useState(Boolean(order?.schedule_setup?.enabled));
+    const [scheduleEnabled, setScheduleEnabled] = useState(Boolean(Number(order?.schedule_setup?.enabled)));
     const [startTime, setStartTime] = useState('08:00');
     const [endTime, setEndTime] = useState('20:00');
     const [disabledDays, setDisabledDays] = useState<number[]>([]);
@@ -35,10 +35,11 @@ const OrderEditForm: FC<OrderEditFormProps> = ({ order, mutateOrder }) => {
     const [endDateWarning, setEndDateWarning] = useState('');
     const [isGeneratingSchedules, setIsGeneratingSchedules] = useState(false);
 
+
     useEffect(() => {
         setOwner(order?.owner)
         setDelay(order?.delay)
-        setScheduleEnabled(Boolean(order?.schedule_setup?.enabled))
+        setScheduleEnabled(Boolean(Number(order?.schedule_setup?.enabled)))
 
         if (order.delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY) { // SPECIFIC_DELAY
             // Load specific delay info from backend if available
@@ -236,7 +237,7 @@ const OrderEditForm: FC<OrderEditFormProps> = ({ order, mutateOrder }) => {
                                 </button>
                                 <button
                                     onClick={() => orderClone()}
-                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                                    className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded transition-colors"
                                 >
                                     Clone
                                 </button>
@@ -303,7 +304,7 @@ const OrderEditForm: FC<OrderEditFormProps> = ({ order, mutateOrder }) => {
 
                                     {/* SPECIFIC_DELAY schedule controls */}
                                     {delay == OPTIONS_DELAY_ENUM.SPECIFIC_DELAY ? (
-                                        <div className="border border-blue-200 rounded-lg p-4 mb-4 bg-blue-50">
+                                        <div className="border border-blue-200 rounded-lg p-4 mb-4 bg-primary-50">
                                             <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div>
                                                     <label htmlFor="specific-start-date" className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu:</label>
@@ -495,7 +496,7 @@ const OrderEditForm: FC<OrderEditFormProps> = ({ order, mutateOrder }) => {
                                                                         return (
                                                                             <div
                                                                                 key={day}
-                                                                                className={`p-3 hover:bg-gray-100 cursor-pointer flex items-center ${isSelected ? 'bg-blue-50' : ''}`}
+                                                                                className={`p-3 hover:bg-gray-100 cursor-pointer flex items-center ${isSelected ? 'bg-primary-50' : ''}`}
                                                                                 onClick={() => {
                                                                                     const newDisabledDays = isSelected
                                                                                         ? disabledDays.filter(d => d !== day)

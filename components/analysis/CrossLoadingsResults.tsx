@@ -92,7 +92,14 @@ export const CrossLoadingsResults: React.FC<CrossLoadingsResultsProps> = ({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {indicators.map((indicator) => {
+            {indicators
+              .slice()
+              .sort((a, b) => {
+                const { displayName: aName } = getVariableDisplayInfo(a);
+                const { displayName: bName } = getVariableDisplayInfo(b);
+                return aName.localeCompare(bName);
+              })
+              .map((indicator) => {
               const { displayName: indicatorDisplayName } = getVariableDisplayInfo(indicator);
               const loadings = crossLoadings[indicator];
               
