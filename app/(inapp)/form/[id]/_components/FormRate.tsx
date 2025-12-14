@@ -233,6 +233,12 @@ export default function FormRate() {
                 continue;
             }
 
+            if (question?.required != latest_question?.required) {
+                console.log(question, latest_question);
+                addChatError(chatErrors, `Có sự khác nhau về bắt buộc trong câu hỏi ${question.question} - ${question.description || ''} với config mới nhất, hãy kiểm tra lại dữ liệu form mới nhất nhé!`, `00000`, "error");
+                continue;
+            }
+
             if (question.type == QUESTION_TYPE.FILE) {
                 addChatError(chatErrors, `Chưa hỗ trợ câu hỏi loại file ${question.question} - ${question.description || ''}`, `00000`, "error");
                 continue;
