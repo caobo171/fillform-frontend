@@ -66,11 +66,11 @@ export default function FormRateOrder() {
                 //@ts-ignore
                 if (win.PulseSurvey.surveyIgnored?.(PULSES_TOKEN)) {
                     console.log('User has ignored the survey');
-                } else if (win.PulseSurvey.surveyResponded(PULSES_TOKEN)) {
+                } else if (win.PulseSurvey.surveyResponded?.(PULSES_TOKEN)) {
                     console.log('User has answered the survey');
                 } else {
                     // You can call to show survey directly
-                    win.PulseSurvey.showSurvey(PULSES_TOKEN);
+                    win.PulseSurvey.showSurvey?.(PULSES_TOKEN);
                 }
             } else {
                 Toast.error(response.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!');

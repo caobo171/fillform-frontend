@@ -160,15 +160,51 @@ export default function FormRate() {
             }
         });
 
-        // "Other" option validation
+        // "Other" / "Custom" option validation
         document.querySelectorAll(".js-answer-select").forEach((select: Element) => {
-            if (select instanceof HTMLSelectElement) {
-                const questionDom = select.closest(".js-question");
-                const questionId = questionDom?.id?.replace("question-", "");
+            if (!(select instanceof HTMLSelectElement)) return;
 
-                let question = dataForm?.latest_form_questions?.find(q => q.id == questionId);
-                if (select.value.toLowerCase().includes("other")) {
-                    addChatError(chatErrors, `Bạn chọn "other - bỏ qua không điền". Hãy kiểm tra lại đã tắt bắt buộc điền câu hỏi <b>${question?.question} - ${question?.description || ''}</b> trên Google Form chưa?`, `select-error-${select.id}`, question?.required ? "error" : "warning");
+            const questionDom = select.closest(".js-question");
+            const questionId = questionDom?.id?.replace("question-", "");
+            const question = dataForm?.latest_form_questions?.find(q => q.id == questionId);
+
+            const value = select.value.toLowerCase();
+
+            if (value.includes("other")) {
+                addChatError(
+                    chatErrors,
+                    `Bạn chọn "other - bỏ qua không điền". Hãy kiểm tra lại đã tắt bắt buộc điền câu hỏi <b>${question?.question} - ${question?.description || ''}</b> trên Google Form chưa?`,
+                    `select-error-${select.id}`,
+                    question?.required ? "error" : "warning"
+                );
+                return;
+            }
+
+            if (value.includes("custom")) {
+                const textarea = questionDom?.querySelector("textarea") as HTMLTextAreaElement | null;
+                const rawValue = textarea?.value || "";
+                const lines = rawValue.split("\n").map((e) => e.trim());
+                const nonEmptyLines = lines.filter((l) => l.length > 0);
+
+                // No non-empty line at all
+                if (nonEmptyLines.length === 0) {
+                    addChatError(
+                        chatErrors,
+                        `Bạn chọn kiểu "custom" nhưng chưa nhập nội dung nào cho câu hỏi <b>${question?.question} - ${question?.description || ''}</b>. Hãy nhập ít nhất 1 dòng nội dung.`,
+                        `custom-empty-${select.id}`,
+                        question?.required ? "error" : "warning"
+                    );
+                    return;
+                }
+
+                // At least one empty line exists
+                if (lines.some((l) => l.length === 0)) {
+                    addChatError(
+                        chatErrors,
+                        `Trong phần nội dung "custom" của câu hỏi <b>${question?.question} - ${question?.description || ''}</b> đang có dòng trống. Hãy xóa các dòng trống để tool trộn dữ liệu tốt hơn.`,
+                        `custom-empty-line-${select.id}`,
+                        question?.required ? "error" : "warning"
+                    );
                 }
             }
         });
@@ -314,6 +350,7 @@ export default function FormRate() {
             // Add event listeners for form validation
             const numberInputs = document.querySelectorAll("input[type='number']");
             const selects = document.querySelectorAll(".js-answer-select");
+            const textareas = document.querySelectorAll("textarea");
 
             const handleInputChange = () => {
                 validateAll();
@@ -340,6 +377,11 @@ export default function FormRate() {
                 });
             });
 
+            textareas.forEach((textarea: Element) => {
+                const textareaElement = textarea as HTMLTextAreaElement;
+                textareaElement.addEventListener('input', handleInputChange);
+            });
+
             validateAll();
 
             // Cleanup event listeners
@@ -351,6 +393,11 @@ export default function FormRate() {
                 selects.forEach((select: Element) => {
                     const selectElement = select as HTMLSelectElement;
                     selectElement.removeEventListener('change', () => handleSelectChange(selectElement.id));
+                });
+
+                textareas.forEach((textarea: Element) => {
+                    const textareaElement = textarea as HTMLTextAreaElement;
+                    textareaElement.removeEventListener('input', handleInputChange);
                 });
             };
         }
