@@ -37,7 +37,7 @@ export function Button({
       case 'solid': {
         cls = twMerge(
           cls,
-          'text-white bg-primary hover:bg-primary-900 focus-visible:outline-primary-900'
+          'text-white bg-primary-600 hover:bg-primary-900 focus-visible:outline-primary-900'
         );
         break;
       }

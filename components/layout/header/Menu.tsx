@@ -13,6 +13,7 @@ export type MenuItemProps = {
   name: string;
   href: string;
   isPremium?: boolean;
+  tag?: string;
 };
 
 export type MenuProps = {
@@ -52,13 +53,17 @@ export function Menu({ main, subs }: MenuProps) {
         )}
         onClick={() => logClick(item)}
       >
-        {item.isPremium ? (
-          <span className="inline-flex gap-2 items-center">
-            {item.name} <PremiumIcon />
+        <span className="inline-flex gap-1.5 items-center">
+          <span className="inline-flex gap-1.5 items-center">
+            {item.name}
+            {item.isPremium && <PremiumIcon />}
           </span>
-        ) : (
-          item.name
-        )}
+          {item.tag && (
+            <span className="ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold uppercase tracking-wide">
+              {item.tag}
+            </span>
+          )}
+        </span>
       </Link>
     ));
   }, [logClick, main, pathName]);
@@ -69,12 +74,18 @@ export function Menu({ main, subs }: MenuProps) {
     }
 
     const list = subs.map((item) => ({
-      label: item.isPremium ? (
-        <span className="inline-flex gap-2 items-center">
-          {item.name} <PremiumIcon />
+      label: (
+        <span className="inline-flex gap-1.5 items-center">
+          <span className="inline-flex gap-1.5 items-center">
+            {item.name}
+            {item.isPremium && <PremiumIcon />}
+          </span>
+          {item.tag && (
+            <span className="ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold uppercase tracking-wide">
+              {item.tag}
+            </span>
+          )}
         </span>
-      ) : (
-        item.name
       ),
       href: item.href,
       value: item.href,

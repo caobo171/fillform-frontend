@@ -130,7 +130,7 @@ export function Button({
 
     switch (type) {
       case 'solid': {
-        cls += ' text-white bg-primary hover:bg-primary-900';
+        cls += ' text-white bg-primary-600 hover:bg-primary-900';
         break;
       }
       case 'outline': {

@@ -764,24 +764,29 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({
 
         {/* DATA_MODEL add-on options */}
         {orderType === ORDER_TYPE.DATA_MODEL && isSPSSModel && (
-          <div className="mb-3 flex flex-col sm:flex-row items-start sm:items-center">
-            <label htmlFor="vn-spss-result" className="w-full sm:w-1/2 font-sm mb-2 sm:mb-0 text-gray-700">Nhận kết quả phân tích SPSS:</label>
-            <div className="w-full sm:w-1/2">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="vn-spss-result"
-                  checked={isReadingAnalysisResult}
-                  onChange={(e) => onIsReadingAnalysisResultChange(e.target.checked)}
-                  className="h-4 w-4 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
-                />
-                <label
-                  htmlFor="vn-spss-result"
-                  className="ml-2 block text-sm text-gray-700 cursor-pointer"
-                >
-                  Tick để nhận bản PDF (+{READ_RESULT_PRICE.toLocaleString()} VND phí cố định)
-                </label>
-              </div>
+          <div className="mb-4 rounded-xl border border-primary-100 bg-primary-50/60 px-4 py-3">
+            <div className="mb-1 flex items-center justify-between">
+              <label htmlFor="vn-spss-result" className="font-sm text-gray-800 flex items-center">
+                Nhận kết quả phân tích SPSS
+              </label>
+              <span className="ml-3 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+                Mới
+              </span>
+            </div>
+            <div className="mt-1 flex items-center">
+              <input
+                type="checkbox"
+                id="vn-spss-result"
+                checked={isReadingAnalysisResult}
+                onChange={(e) => onIsReadingAnalysisResultChange(e.target.checked)}
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
+              />
+              <label
+                htmlFor="vn-spss-result"
+                className="ml-2 block text-sm text-gray-700 cursor-pointer"
+              >
+                Tick để nhận bản PDF (+{READ_RESULT_PRICE.toLocaleString()} VND phí cố định)
+              </label>
             </div>
           </div>
         )}
